@@ -9,7 +9,7 @@
 
 <svelte:head>
   <title>Bienal {anio}</title>
-  <link rel="icon" type="image/x-icon" href={logo} style="max-height: 16px; max-width: 16px" />
+  <link rel="icon" type="image/x-icon" href={logo} style="max-height: 16px; max-width: 16px" class="bg-" />
 </svelte:head>
 
 <main>
