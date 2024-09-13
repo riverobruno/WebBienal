@@ -1,11 +1,16 @@
 
 <!-- src/routes/+layout.svelte -->
 <script>
-  // Aquí puedes agregar lógica si es necesario
-
+  let logo = "https://raw.githubusercontent.com/FRRe-DS/2024-06-TPI/main/client/src/public/bienal_logo_corto.png";
+  let anio= 2024;
   import Navbar from '../components/layout/Navbar.svelte';
   import Footer from '../components/layout/Footer.svelte';
 </script>
+
+<svelte:head>
+  <title>Bienal {anio}</title>
+  <link rel="icon" type="image/x-icon" href={logo} style="max-height: 16px; max-width: 16px" />
+</svelte:head>
 
 <main>
 

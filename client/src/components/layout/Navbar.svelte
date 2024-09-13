@@ -1,33 +1,25 @@
 
 <script>
   let isNavOpen = false;
-  let logo='../../public/bienal_logo.png'
+  let logo = "https://raw.githubusercontent.com/FRRe-DS/2024-06-TPI/main/client/src/public/bienal_logo.png";
+
 </script>
 
 <!-- Main navigation container -->
-<nav 
-  class="flex-no-wrap relative flex w-full items-center justify-between bg-white py-2 shadow-dark-mild dark:bg-neutral-700 lg:flex-wrap lg:justify-start lg:py-4 shadow-lg"
+<nav
+        class="flex-no-wrap relative flex w-full items-center justify-between bg-white py-2 shadow-dark-mild dark:bg-neutral-700 lg:flex-wrap lg:justify-start lg:py-4 shadow-lg"
 >
   <div class="flex w-full flex-wrap items-center justify-between px-3">
-    <div>
-      <img
-              class="me-2"
-              src={logo}
-              style="height: 10px"
-              alt="TE Logo"
-              loading="lazy" />
-      <!-- completarrrrr -->
-    </div>
 
     <!-- Hamburger button for mobile view -->
 
     <button
-      class="block border-0 bg-transparent px-2 text-black/50 hover:no-underline hover:shadow-none focus:no-underline focus:shadow-none focus:outline-none focus:ring-0 dark:text-neutral-200 lg:hidden"
-      type="button"
-      on:click={() => isNavOpen = !isNavOpen}
-      aria-controls="navbarSupportedContent1"
-      aria-expanded={isNavOpen}
-      aria-label="Toggle navigation"
+            class="block border-0 bg-transparent px-2 text-black/50 hover:no-underline hover:shadow-none focus:no-underline focus:shadow-none focus:outline-none focus:ring-0 dark:text-neutral-200 lg:hidden"
+            type="button"
+            on:click={() => isNavOpen = !isNavOpen}
+            aria-controls="navbarSupportedContent1"
+            aria-expanded={isNavOpen}
+            aria-label="Toggle navigation"
     >
       <!-- Hamburger icon -->
       <span class="[&>svg]:w-7 [&>svg]:stroke-black/50 dark:[&>svg]:stroke-neutral-200">
@@ -36,16 +28,20 @@
         </svg>
       </span>
     </button>
-    <img src={logo}  alt="TE Logo" />
 
     <!-- Collapsible navigation container -->
     <div
-      class={`!visible ${isNavOpen ? 'flex' : 'hidden'} flex-grow basis-[100%] items-center lg:!flex lg:basis-auto`}
-      id="navbarSupportedContent1"
+            class={`!visible ${isNavOpen ? 'flex' : 'hidden'} flex-grow basis-[100%] items-center lg:!flex lg:basis-auto`}
+            id="navbarSupportedContent1"
     >
       <!-- Logo -->
       <a class="mb-4 me-5 ms-2 mt-3 flex items-center text-neutral-900 hover:text-neutral-900 focus:text-neutral-900 dark:text-neutral-200 dark:hover:text-neutral-400 dark:focus:text-neutral-400 lg:mb-0 lg:mt-0" href="https://github.com/FRRe-DS/2024-06-TPI">
-
+          <img
+                  class="me-2"
+                  src={logo}
+                  style="max-height: 35px"
+                  alt="logo bienal"
+                  loading="lazy" />
       </a>
       <!-- Left navigation links -->
       <ul class="list-style-none me-auto flex flex-col ps-0 lg:flex-row">
@@ -87,12 +83,13 @@
         </a>
       </div>
 
-      <!-- profile-->
-     <div class="relative">
-     <a class="flex items-center" href="/">
-     <img src="https://tecdn.b-cdn.net/img/new/avatars/2.jpg" class="rounded-full" style="height: 25px; width: 25px" alt="" loading="lazy" />
-     </a>
-    </div>
+      <!-- profile
+      <div class="relative">
+        <a class="flex items-center" href="/">
+          <img src="https://tecdn.b-cdn.net/img/new/avatars/2.jpg" class="rounded-full" style="height: 25px; width: 25px" alt="" loading="lazy" />
+        </a>
+      </div>
+      -->
 
 
 
