@@ -3,7 +3,9 @@
     import { onMount} from 'svelte';
     import axios from 'axios';
 
-
+    /**
+     * @type {any[]}
+     */
     let cards = [];
 
 

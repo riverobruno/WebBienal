@@ -106,7 +106,7 @@ export async function EsculturasConsulta(filtro, orden, cantidad) {
 
           // Verificar si la escultura ya está en el map
           if (!esculturasMap.has(esculturaNombre)) {
-            // Si no existe, crear una nueva instancia y agregarla al map
+            // Si no existe, crear una nueva instancia de Esculturas
             const nuevaEscultura = new Esculturas(row.nombre, row.f_creacion, row.antecedentes, row.tecnica);
             nuevaEscultura.setPromedio(row.promedio);  // Setear el promedio
             esculturasMap.set(esculturaNombre, nuevaEscultura);
@@ -115,13 +115,25 @@ export async function EsculturasConsulta(filtro, orden, cantidad) {
           // Obtener la escultura actual del map
           const escultura = esculturasMap.get(esculturaNombre);
 
-          // Agregar artistas e imágenes si no existen ya
-          if (!escultura.getArtistas().some(artista => artista.nombre === row.NyA)) {
-            escultura.addArtista({ nombre: row.NyA, foto: row.URL_foto });
+          // Verificar y agregar artista
+          if (!escultura.getArtistas().some(artista => artista.DNI === row.DNI)) {
+            const nuevoArtista = {
+              DNI: row.DNI,
+              nombre: row.NyA,
+              biografia: row.res_biografia,
+              contacto: row.contacto,
+              foto: row.URL_foto
+            };
+            escultura.addArtista(nuevoArtista);
           }
 
-          if (!escultura.getImagenes().includes(row.URL)) {
-            escultura.addImagen(row.URL);
+          // Verificar y agregar imagen
+          if (!escultura.getImagenes().some(imagen => imagen.URL === row.URL)) {
+            const nuevaImagen = {
+              URL: row.URL,
+              etapa: row.etapa
+            };
+            escultura.addImagen(nuevaImagen);
           }
         });
 
@@ -280,9 +292,10 @@ for (const [index, artista] of artistas.entries()) {
   const contacto = artista.getContacto();
   console.log(contacto);
 */
-
+/*
 const esculturas = await EsculturasConsulta('promedio', 'ASC', 10);
-console.log(esculturas);
+console.log(esculturas[0]);
+*/
 
 /*
 //Promedio de estrellas ▲

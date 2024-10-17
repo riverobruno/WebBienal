@@ -1,3 +1,25 @@
+<!-- <script>
+//    require('dotenv').config();
+    import { onMount} from 'svelte';
+    import axios from 'axios';
+
+    /**
+     * @type {any[]}
+     */
+    let cards = [];
+
+    onMount(async () => {
+        try{
+            const res= await axios.get('http://localhost:3002/api/obras')
+            console.log(res.data)
+            cards=res.data
+        } catch (error){
+            console.log(error)
+        }
+
+    });
+    // Ejemplo de datos para las cards
+</script> -->
 
 <script>
     // Ejemplo de datos para las cards
