@@ -4,17 +4,25 @@ import { Eventos } from './clases.js';
 import { Artistas } from './clases.js';
 import { Imagenes } from './clases.js';
 import mysql from 'mysql2';
+// Esto de abajo es para usar el .env para guardar la contraseña de la database
+import dotenv from 'dotenv';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+dotenv.config({ path: join(__dirname, '../.env') });
+
 
 export function crearConeccion(){
   return mysql.createConnection({
-    host: "mysql-78aa191-desarrollosw.b.aivencloud.com",
-    port: 27673,
-    user: "avnadmin",
-    password: "???",
-    database: "desarrollo", // Asegúrate de especificar el nombre de tu base de datos
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME
   });
 }
-export async function ArtistasConsultas(filtro, orden, cantidad) {
+export async function ArtistasConsulta(filtro, orden, cantidad) {
   const con = crearConeccion();
 
   return new Promise((resolve, reject) => {
@@ -53,7 +61,6 @@ export async function ArtistasConsultas(filtro, orden, cantidad) {
   });
 }
 
-
 export async function EsculturasConsulta(filtro, orden, cantidad) {
   return new Promise((resolve, reject) => { // Aquí creamos una nueva promesa
     let con = crearConeccion();
@@ -87,9 +94,9 @@ export async function EsculturasConsulta(filtro, orden, cantidad) {
                 SELECT e.nombre, AVG(v.cant_estrellas) as promedio
                 FROM esculturas e inner join votan v on e.nombre = v.nombre_escultura
                 group by e.nombre
+                LIMIT ${cantidad}
               ) as tablaPromedios
-          ORDER BY ${filtro} ${orden}
-          LIMIT ${cantidad}`;
+          ORDER BY ${filtro} ${orden}`;
         }
 
       con.query(selectQuery, function (err, results) {
@@ -117,22 +124,22 @@ export async function EsculturasConsulta(filtro, orden, cantidad) {
 
           // Verificar y agregar artista
           if (!escultura.getArtistas().some(artista => artista.DNI === row.DNI)) {
-            const nuevoArtista = {
-              DNI: row.DNI,
-              nombre: row.NyA,
-              biografia: row.res_biografia,
-              contacto: row.contacto,
-              foto: row.URL_foto
-            };
+            const nuevoArtista = new Artistas(
+              row.DNI,
+              row.NyA,
+              row.res_biografia,
+              row.contacto,
+              row.URL_foto
+            );
             escultura.addArtista(nuevoArtista);
           }
 
           // Verificar y agregar imagen
           if (!escultura.getImagenes().some(imagen => imagen.URL === row.URL)) {
-            const nuevaImagen = {
-              URL: row.URL,
-              etapa: row.etapa
-            };
+            const nuevaImagen = new Imagenes(
+              row.URL,
+              row.etapa
+          );
             escultura.addImagen(nuevaImagen);
           }
         });
@@ -145,173 +152,75 @@ export async function EsculturasConsulta(filtro, orden, cantidad) {
       });
     });
   });
-  };
+};
 
-export function PromedioEscultura(nombre){
+export async function login(correo, password) {
   let con = crearConeccion();
-  con.connect(function (err) {
-    if (err) {
-      console.error('Error connecting: ' + err.stack);
-      return;
-    }
-    console.log("Connected!");
-    let selectQuery = `SELECT AVG(v.cant_estrellas) as promedio 
-    FROM esculturas e inner join votan v on e.nombre = v.nombre_escultura
-    WHERE nombre_escultura = '${nombre}'
-    GROUP BY e.nombre`;
-    
-    con.query(selectQuery, function (err, results) {
-      if (err) {
-        console.error('Error selecting data: ' + err.message);
-        return;
-      }
-      con.end();
-      return (results[0].promedio);
-    });
-});
-}
 
-export async function ArtistasdeEscultura(nombre) {
   return new Promise((resolve, reject) => {
-    let con = crearConeccion();
-
-    con.connect(function (err) {
+    con.connect((err) => {
       if (err) {
         console.error('Error connecting: ' + err.stack);
-        return reject(err); // Rechaza la promesa en caso de error de conexión
+        reject(err); // Rechazar la promesa en caso de error de conexión
+        return;
       }
       console.log("Connected!");
 
       let selectQuery = `
         SELECT *
-        FROM esculturas e 
-        INNER JOIN hechas_por h ON e.nombre = h.nombre_escultura
-        NATURAL JOIN artistas a
-        WHERE e.nombre = '${nombre}'`;
+        FROM visitantes v
+        WHERE v.email = ? AND v.contraseña = ?
+      `;
 
-      con.query(selectQuery, [nombre], function (err, results) {
+      // Realizamos la consulta a la base de datos
+      con.query(selectQuery, [correo, password], (err, results) => {
         if (err) {
-          console.error('Error selecting data: ' + err.message);
-          return reject(err); // Rechaza la promesa en caso de error en la consulta
+          console.error('Error querying the database:', err);
+          reject(err); // Rechazar la promesa en caso de error en la consulta
+        } else {
+          resolve(results); // Resolver la promesa con los resultados
         }
-
-        const listArtistas = results.map((row) => {
-          return new Artistas(row.DNI, row.NyA, row.res_biografia, row.contacto, row.URL_foto);
-        });
-
-        con.end(); // Cierra la conexión
-        resolve(listArtistas); // Resuelve la promesa con los resultados
+        con.end(); // Cerramos la conexión
       });
     });
   });
 }
 
+export async function EventosConsulta(filtro, orden, cantidad) {
+  const con = crearConeccion();
 
-export function login(correo, password) {
-  let con = crearConeccion();
-  con.connect(function (err) {
-    if (err) {
-      console.error('Error connecting: ' + err.stack);
-      return;
-    }
-    console.log("Connected!");
-
-    let selectQuery = `SELECT *
-                      FROM visitantes v
-                      where v.email = '${correo}' and v.contraseña = '${password}'`;
-
-    con.query(selectQuery, function (err, results) {
-      if (err) {
-        console.error('Error selecting data: ' + err.message);
-        return;
-      }
-      con.end();
-      return results;
-    });
-});
-}
-
-export async function ImagenesEscultura(escultura) {
   return new Promise((resolve, reject) => {
-    let con = crearConeccion();
-
     con.connect(function (err) {
       if (err) {
         console.error('Error connecting: ' + err.stack);
-        return reject(err); // Rechaza la promesa en caso de error de conexión
+        reject(err);
+        return;
       }
+
       console.log("Connected!");
+      // Seleccionar datos de la tabla "eventos"
+      let selectQuery;
+      if (cantidad == null) {
+        selectQuery = `SELECT * FROM eventos ORDER BY ${filtro} ${orden}`;
+      } else {
+        selectQuery = `SELECT * FROM eventos ORDER BY ${filtro} ${orden} LIMIT ${cantidad}`;
+      }
 
-      let selectQuery = `
-        SELECT *
-        FROM imagenes i 
-        INNER JOIN esculturas e ON i.nombre_escultura = e.nombre
-        WHERE e.nombre = '${escultura}'`;
-
-      con.query(selectQuery, [escultura], function (err, results) {
+      con.query(selectQuery, function (err, results) {
         if (err) {
           console.error('Error selecting data: ' + err.message);
-          return reject(err); // Rechaza la promesa en caso de error en la consulta
+          reject(err);
+          return;
         }
 
-        const listImagenes = results.map((row) => {
-          return new Imagenes(row.URL, row.etapa);
+        const listEventos = results.map((row) => {
+          return new Eventos(row.nombre, row.lugar, row.fecha_inicio, row.fecha_fin, row.tematica, row.hora_inicio, row.hora_fin);
         });
 
-        con.end(); // Cierra la conexión
-        resolve(listImagenes); // Resuelve la promesa con los resultados
+        // Cerrar la conexión
+        con.end();
+        resolve(listEventos);
       });
     });
   });
 }
-
-
-//login('acrawford@example.org', '}CH47H3R')
-
-//Ordenar artistas por:
-/*
-ArtistasConsultas('NyA','DESC',10); //Nombre del artista ▼
-ArtistasConsultas('NyA','ASC',10); //Nombre del artista ▲
-*/
-//Ordenar esculturas por:
-
-//console.log(EsculturasConsulta('promedio','DESC',10)); //Promedio de estrellas ▼
-
-/*
-const artistas = await ArtistasConsultas('NyA', 'DESC', 10);
-console.log(artistas);
-
-for (const [index, artista] of artistas.entries()) {
-  // Accede a los métodos de la clase Esculturas
-  const nombre = artista.getNyA();
-  console.log(nombre);
-  const imagen = artista.getURL_foto();
-  console.log(imagen);
-  const biografia = artista.getRes_biografia();
-  console.log(biografia);
-  const contacto = artista.getContacto();
-  console.log(contacto);
-*/
-/*
-const esculturas = await EsculturasConsulta('promedio', 'ASC', 10);
-console.log(esculturas[0]);
-*/
-
-/*
-//Promedio de estrellas ▲
-EsculturasConsulta('promedio', 'ASC', 10);
-EsculturasConsulta('nombre','DESC', 10); //Nombre de escultura ▼
-EsculturasConsulta('nombre','ASC', 10); //Nombre de escultura ▲
-EsculturasConsulta('f_creacion','DESC', 10); //Fecha de creación ▼
-EsculturasConsulta('f_creacion', 'ASC', 10); //Fecha de creación ▲
-*/
-//PromedioEscultura('Vanguardista Legado');
-//ArtistasdeEscultura('Vanguardista Legado');
-//ImagenesEscultura('Vanguardista Legado')
-
-//Ejemplo de tratamiento:
-/*
-results.forEach((row) => {
-  console.log(row.NyA);
-});
-*/

@@ -10,7 +10,7 @@
 
     onMount(async () => {
         try{
-            const res= await axios.get('http://localhost:3002/api/escultores')
+            const res= await axios.get('http://localhost:3001/api/escultores')
             console.log(res.data)
             cards=res.data
         } catch (error){
@@ -32,7 +32,7 @@
                         class="w-32 rounded-full"
                         alt="Avatar" />
                     <div class="absolute bottom-0 left-0 right-0 top-0 h-full w-full overflow-hidden bg-[hsla(0,0%,98%,0.15)] bg-fixed opacity-0 transition duration-300 ease-in-out hover:opacity-100"></div>
-                </a>
+                </a>    
             </div>
             <div class="p-6 text-surface dark:text-white">
                 <h5 class="mb-2 text-xl font-medium leading-tight text-black">
