@@ -1,13 +1,14 @@
-import dotenv from 'dotenv';
-import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
+// Verificar si la cookie se creó correctamente
+function checkCookie() {
+    const cookies = document.cookie.split(';');
+    const cookieExists = cookies.some(cookie => cookie.trim().startsWith('correo='));
 
-// Obtener el equivalente a __dirname
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+    if (cookieExists) {
+        console.log('La cookie "correo" se ha creado correctamente.');
+    } else {
+        console.log('La cookie "correo" no se ha creado.');
+    }
+}
 
-// Configurar dotenv con la ruta correcta
-dotenv.config({ path: join(__dirname, '../.env') });
-
-// Verificar si las variables se cargan correctamente
-console.log(process.env.DB_USER);
+// Llamar a esta función después de iniciar sesión
+checkCookie();

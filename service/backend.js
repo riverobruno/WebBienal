@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
+import cookieParser from 'cookie-parser';
 import { ArtistasConsulta, EsculturasConsulta, EventosConsulta, login} from './conecciondb.js';
 
 const app = express();
@@ -9,6 +10,7 @@ const port = 3001;
 app.use(cors()); // Permitir CORS
 // Middleware para analizar el cuerpo de la solicitud (JSON)
 app.use(bodyParser.json());
+app.use(cookieParser());
 
 // Crear una función asincrónica para manejar las consultas a la base de datos
 const obtenerArtistas = async () => {
@@ -157,6 +159,7 @@ app.get('/api/eventos', async (req, res) => {
 app.post('/api/login', (req, res) => {
   const { correo, contraseña } = req.body;
 
+  // Verificar si se ingresaron correo y contraseña
   if (!correo || !contraseña) {
     return res.status(400).json({ message: 'Por favor ingrese correo y contraseña' });
   }
@@ -165,16 +168,26 @@ app.post('/api/login', (req, res) => {
     .then(coneccion => {
       // Aquí es donde manejamos los resultados
       if (coneccion && coneccion.length > 0) {
-        res.status(200).json({ success: true, message: 'Inicio de sesión exitoso' });
+        // Establecer la cookie antes de enviar la respuesta
+        res.cookie('correo', correo, { httpOnly: true, maxAge: 3600000 }); // Cookie válida por 1 hora
+        return res.status(200).json({ success: true, message: 'Inicio de sesión exitoso' });
       } else {
-        res.status(401).json({ success: false, message: 'Credenciales incorrectas' });
+        return res.status(401).json({ success: false, message: 'Credenciales incorrectas' });
       }
     })
     .catch(error => {
       // En caso de error, enviamos una respuesta con estado 500
       console.error('Error en la conexión:', error);
-      res.status(500).json({ success: false, message: 'Error en el servidor' });
+      return res.status(500).json({ success: false, message: 'Error en el servidor' });
     });
+});
+
+// Ruta para verificar el login
+app.get('/check-login', (req, res) => {
+  if (req.cookies.correo) {
+    return res.status(200).send(`Usuario logueado: ${req.cookies.correo}`);
+  }
+  return res.status(401).send('No estás logueado');
 });
 
 app.listen(port, () => {
