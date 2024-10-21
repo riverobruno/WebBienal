@@ -13,9 +13,9 @@ app.use(bodyParser.json());
 app.use(cookieParser());
 
 // Crear una función asincrónica para manejar las consultas a la base de datos
-const obtenerArtistas = async () => {
+const obtenerArtistas = async (busqueda) => {
   try {
-    const artistas = await ArtistasConsulta('NyA', 'ASC', 20);
+    const artistas = await ArtistasConsulta('NyA', 'ASC', busqueda, 20);
 
     // Asegúrate de que esculturas es un array
     if (!Array.isArray(artistas)) {
@@ -49,9 +49,9 @@ const obtenerArtistas = async () => {
   }
 };
 
-const obtenerEsculturas = async () => {
+const obtenerEsculturas = async (busqueda) => {
   try {
-    const esculturas = await EsculturasConsulta('nombre', 'ASC', 20);
+    const esculturas = await EsculturasConsulta('nombre', 'ASC', busqueda, 20);
     // Asegúrate de que esculturas es un array
     if (!Array.isArray(esculturas)) {
       throw new Error('La consulta no devolvió un array');
@@ -89,9 +89,9 @@ const obtenerEsculturas = async () => {
   }
 };
 
-const obtenerEventos = async () => {
+const obtenerEventos = async (busqueda) => {
   try {
-    const eventos = await EventosConsulta('nombre', 'DESC', 20);
+    const eventos = await EventosConsulta('nombre', 'DESC', busqueda, 20);
 
     // Asegúrate de que esculturas es un array
     if (!Array.isArray(eventos)) {
@@ -141,18 +141,21 @@ const obtenerEventos = async () => {
 
 // Endpoint para obtener escultores
 app.get('/api/escultores', async (req, res) => {
-  const cards = await obtenerArtistas();  // Esperamos a que se procesen todas las consultas
+  const searchQuery = req.query.search;
+  const cards = await obtenerArtistas(searchQuery);  // Esperamos a que se procesen todas las consultas
   res.json(cards);
 });
 
 // Endpoint para obtener esculturas
 app.get('/api/esculturas', async (req, res) => {
-  const cards = await obtenerEsculturas();  // Esperamos a que se procesen todas las consultas
+  const searchQuery = req.query.search;
+  const cards = await obtenerEsculturas(searchQuery);  // Esperamos a que se procesen todas las consultas
   res.json(cards);
 });
 
 app.get('/api/eventos', async (req, res) => {
-  const cards = await obtenerEventos();  // Esperamos a que se procesen todas las consultas
+  const searchQuery = req.query.search;
+  const cards = await obtenerEventos(searchQuery);  // Esperamos a que se procesen todas las consultas
   res.json(cards);
 });
 
@@ -180,14 +183,6 @@ app.post('/api/login', (req, res) => {
       console.error('Error en la conexión:', error);
       return res.status(500).json({ success: false, message: 'Error en el servidor' });
     });
-});
-
-// Ruta para verificar el login
-app.get('/check-login', (req, res) => {
-  if (req.cookies.correo) {
-    return res.status(200).send(`Usuario logueado: ${req.cookies.correo}`);
-  }
-  return res.status(401).send('No estás logueado');
 });
 
 app.listen(port, () => {

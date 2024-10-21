@@ -22,7 +22,7 @@ export function crearConeccion(){
     database: process.env.DB_NAME
   });
 }
-export async function ArtistasConsulta(filtro, orden, cantidad) {
+export async function ArtistasConsulta(filtro, orden, busqueda, cantidad) {
   const con = crearConeccion();
 
   return new Promise((resolve, reject) => {
@@ -37,9 +37,14 @@ export async function ArtistasConsulta(filtro, orden, cantidad) {
       // Seleccionar datos de la tabla "artistas"
       let selectQuery;
       if (cantidad == null) {
-        selectQuery = `SELECT * FROM artistas ORDER BY ${filtro} ${orden}`;
+        selectQuery = `SELECT * FROM artistas 
+                      where NyA like '%${busqueda}%' or res_biografia like '%${busqueda}%' or contacto like '%${busqueda}%'
+                      ORDER BY ${filtro} ${orden}`;
       } else {
-        selectQuery = `SELECT * FROM artistas ORDER BY ${filtro} ${orden} LIMIT ${cantidad}`;
+        selectQuery = `SELECT * FROM artistas 
+                      where NyA like '%${busqueda}%' or res_biografia like '%${busqueda}%' or contacto like '%${busqueda}%'
+                      ORDER BY ${filtro} ${orden} 
+                      LIMIT ${cantidad}`;
       }
 
       con.query(selectQuery, function (err, results) {
@@ -61,7 +66,7 @@ export async function ArtistasConsulta(filtro, orden, cantidad) {
   });
 }
 
-export async function EsculturasConsulta(filtro, orden, cantidad) {
+export async function EsculturasConsulta(filtro, orden, busqueda, cantidad) {
   return new Promise((resolve, reject) => { // Aquí creamos una nueva promesa
     let con = crearConeccion();
 
@@ -82,6 +87,7 @@ export async function EsculturasConsulta(filtro, orden, cantidad) {
               natural join (
                 SELECT e.nombre, AVG(v.cant_estrellas) as promedio
                 FROM esculturas e inner join votan v on e.nombre = v.nombre_escultura
+                WHERE e.nombre like '%${busqueda}%' or e.tecnica like '%${busqueda}%'
                 group by e.nombre
               ) as tablaPromedios
           ORDER BY ${filtro} ${orden};`;
@@ -93,7 +99,8 @@ export async function EsculturasConsulta(filtro, orden, cantidad) {
               natural join (
                 SELECT e.nombre, AVG(v.cant_estrellas) as promedio
                 FROM esculturas e inner join votan v on e.nombre = v.nombre_escultura
-                group by e.nombre
+                WHERE e.nombre like '%${busqueda}%' or e.tecnica like '%${busqueda}%'
+                GROUP BY e.nombre
                 LIMIT ${cantidad}
               ) as tablaPromedios
           ORDER BY ${filtro} ${orden}`;
@@ -186,7 +193,7 @@ export async function login(correo, password) {
   });
 }
 
-export async function EventosConsulta(filtro, orden, cantidad) {
+export async function EventosConsulta(filtro, orden, busqueda, cantidad) {
   const con = crearConeccion();
 
   return new Promise((resolve, reject) => {
@@ -201,9 +208,16 @@ export async function EventosConsulta(filtro, orden, cantidad) {
       // Seleccionar datos de la tabla "eventos"
       let selectQuery;
       if (cantidad == null) {
-        selectQuery = `SELECT * FROM eventos ORDER BY ${filtro} ${orden}`;
+        selectQuery = `SELECT * 
+                        FROM eventos 
+                        where nombre like '%${busqueda}%' or lugar like '%${busqueda}%' or tematica like '%${busqueda}%'
+                        ORDER BY ${filtro} ${orden}`;
       } else {
-        selectQuery = `SELECT * FROM eventos ORDER BY ${filtro} ${orden} LIMIT ${cantidad}`;
+        selectQuery = `SELECT * 
+                        FROM eventos 
+                        where nombre like '%${busqueda}%' or lugar like '%${busqueda}%' or tematica like '%${busqueda}%'
+                        ORDER BY ${filtro} ${orden} 
+                        LIMIT ${cantidad}`;
       }
 
       con.query(selectQuery, function (err, results) {
