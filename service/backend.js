@@ -51,7 +51,7 @@ const obtenerArtistas = async (busqueda) => {
 
 const obtenerEsculturas = async (busqueda) => {
   try {
-    const esculturas = await EsculturasConsulta('nombre', 'ASC', busqueda, 20);
+    const esculturas = await EsculturasConsulta('promedio', 'DESC', busqueda, 20);
     // Asegúrate de que esculturas es un array
     if (!Array.isArray(esculturas)) {
       throw new Error('La consulta no devolvió un array');

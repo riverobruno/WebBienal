@@ -89,8 +89,9 @@ export async function EsculturasConsulta(filtro, orden, busqueda, cantidad) {
                 FROM esculturas e inner join votan v on e.nombre = v.nombre_escultura
                 WHERE e.nombre like '%${busqueda}%' or e.tecnica like '%${busqueda}%'
                 group by e.nombre
+                ORDER BY ${filtro} ${orden}
               ) as tablaPromedios
-          ORDER BY ${filtro} ${orden};`;
+          `;
       } else {
         selectQuery = `
           SELECT *
@@ -101,9 +102,10 @@ export async function EsculturasConsulta(filtro, orden, busqueda, cantidad) {
                 FROM esculturas e inner join votan v on e.nombre = v.nombre_escultura
                 WHERE e.nombre like '%${busqueda}%' or e.tecnica like '%${busqueda}%'
                 GROUP BY e.nombre
+                ORDER BY ${filtro} ${orden}
                 LIMIT ${cantidad}
               ) as tablaPromedios
-          ORDER BY ${filtro} ${orden}`;
+          `;
         }
 
       con.query(selectQuery, function (err, results) {

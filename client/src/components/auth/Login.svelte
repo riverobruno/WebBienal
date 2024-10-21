@@ -100,10 +100,6 @@
 
   }
 
-
-
-
-
 </style>
 <script>
   // Importar la función 'login' desde el archivo conecciondb.js en la raíz del proyecto
