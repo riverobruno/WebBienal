@@ -6,8 +6,9 @@ export class Esculturas {
     listaImagenes;
     listaArtistas;
     promedio;
+    slug;
 
-    constructor(nombre, f_creacion, antecedente, tecnica) {
+    constructor(nombre, f_creacion, antecedente, tecnica, slug) {
         this.nombre = nombre;
         this.f_creacion = f_creacion;
         this.antecedente = antecedente;
@@ -15,6 +16,7 @@ export class Esculturas {
         this.listaArtistas = [];
         this.listaImagenes = [];
         this.promedio = 0;
+        this.slug = slug;
     
     }
     getNombre() { return this.nombre; }
@@ -27,6 +29,7 @@ export class Esculturas {
     addImagen(imagen) { this.listaImagenes.push(imagen); }
     setPromedio(promed) { this.promedio = promed };
     getPromedio() { return this.promedio; }
+    getSlug(){ return this.slug;}
 }
 
 
@@ -52,8 +55,9 @@ export class Eventos {
     tematica;
     hora_inicio;
     hora_fin;
+    slug;
 
-    constructor(nombre, lugar, fecha_inicio, fecha_fin, tematica, hora_inicio, hora_fin) {
+    constructor(nombre, lugar, fecha_inicio, fecha_fin, tematica, hora_inicio, hora_fin, slug) {
         this.nombre = nombre;
         this.lugar = lugar;
         this.fecha_inicio = fecha_inicio;
@@ -61,6 +65,7 @@ export class Eventos {
         this.tematica = tematica;
         this.hora_inicio = hora_inicio;
         this.hora_fin = hora_fin;
+        this.slug = slug;
     }
     getNombre() { return this.nombre; }
     getLugar() { return this.lugar; }
@@ -69,6 +74,7 @@ export class Eventos {
     getTematica() { return this.tematica; }
     getHoraInicio() { return this.hora_inicio; }
     getHoraFin() { return this.hora_fin; }
+    getSlug() { return this.slug; }
 }
 
 export class Artistas {

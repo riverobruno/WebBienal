@@ -64,11 +64,12 @@ const obtenerEsculturas = async (busqueda) => {
       const obraArtista = obraArtistas[0].getNyA();
       const obraEscultorFoto = obraArtistas[0].getURL_foto();
       const average = escultura.getPromedio();
+      const slug = escultura.getSlug();
 
       cards.push({
         id: index + 1,
         title: 'Carta' + (index + 1),
-        obraPantalla: '/obras/' + obraNombre.replace(/ /g, ''),
+        href: slug, //'/obras/' + obraNombre.replace(/ /g, ''),
         obraImage: obraImagen,
         content: tecnica,
         obraName: obraNombre,
@@ -106,6 +107,7 @@ const obtenerEventos = async (busqueda) => {
       const lugar = evento.getLugar();
       const horaInicio = evento.getHoraInicio();
       const horaFin = evento.getHoraFin();
+      const slug = evento.getSlug();
 
       const options = {month: 'long', day: 'numeric' };
       const formattedFechaInicio = fechaInicio.toLocaleDateString('es-ES', options);
@@ -117,7 +119,7 @@ const obtenerEventos = async (busqueda) => {
 
       cards.push({
         title: 'evento' + (index + 1),
-        href: titulo.replace(/ /g, ''),
+        href: slug,
         eventName: titulo,
         eventStartDate: formattedFechaInicio,
         eventFinishDate: formattedFechaFin,
