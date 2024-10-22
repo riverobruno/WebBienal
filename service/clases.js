@@ -77,20 +77,21 @@ export class Artistas {
     res_biografia;
     contacto;
     URL_foto;
-    constructor(DNI, NyA, res_biografia, contacto, URL_foto) {
+    slug; // Agrega esta línea
+    constructor(DNI, NyA, res_biografia, contacto, URL_foto, slug) { // Agrega slug aquí
         this.DNI = DNI;
         this.NyA = NyA;
         this.res_biografia = res_biografia;
         this.contacto = contacto;
         this.URL_foto = URL_foto;
+        this.slug = slug; // Asigna slug
     }
     getDNI() { return this.DNI; }
     getNyA() { return this.NyA; }
     getRes_biografia() { return this.res_biografia; }
     getContacto() { return this.contacto; }
     getURL_foto() { return this.URL_foto; }
-
-
+    getSlug() { return this.slug; } // Agrega un método para obtener el slug
 }
 
 export class Imagenes {

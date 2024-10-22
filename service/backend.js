@@ -16,24 +16,21 @@ app.use(cookieParser());
 const obtenerArtistas = async (busqueda) => {
   try {
     const artistas = await ArtistasConsulta('NyA', 'ASC', busqueda, 20);
-
-    // Asegúrate de que esculturas es un array
     if (!Array.isArray(artistas)) {
       throw new Error('La consulta no devolvió un array');
     }
 
     const cards = [];
-
     for (const [index, artista] of artistas.entries()) {
-      // Accede a los métodos de la clase Esculturas
       const nombre = artista.getNyA();
       const imagen = artista.getURL_foto();
       const biografia = artista.getRes_biografia();
       const contacto = artista.getContacto();
+      const slug = artista.getSlug(); // Obtén el slug
 
       cards.push({
         id: index + 1,
-        escultorPantalla: 'Escultor ' + (index + 1),
+        escultorPantalla: slug, // Usa el slug en lugar de un texto genérico
         content: biografia,
         escultorName: nombre,
         escultorFoto: imagen,
@@ -45,7 +42,7 @@ const obtenerArtistas = async (busqueda) => {
 
   } catch (error) {
     console.error('Error al obtener artistas:', error);
-    return [];  // Retornar un array vacío en caso de error
+    return [];
   }
 };
 
