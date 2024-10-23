@@ -26,11 +26,10 @@ const obtenerArtistas = async (busqueda) => {
       const imagen = artista.getURL_foto();
       const biografia = artista.getRes_biografia();
       const contacto = artista.getContacto();
-      const slug = artista.getSlug(); // Obtén el slug
 
       cards.push({
         id: index + 1,
-        escultorPantalla: slug, // Usa el slug en lugar de un texto genérico
+        escultorPantalla: nombre.replace(/ /g, ''), 
         content: biografia,
         escultorName: nombre,
         escultorFoto: imagen,
@@ -64,12 +63,11 @@ const obtenerEsculturas = async (busqueda) => {
       const obraArtista = obraArtistas[0].getNyA();
       const obraEscultorFoto = obraArtistas[0].getURL_foto();
       const average = escultura.getPromedio();
-      const slug = escultura.getSlug();
 
       cards.push({
         id: index + 1,
         title: 'Carta' + (index + 1),
-        href: slug, //'/obras/' + obraNombre.replace(/ /g, ''),
+        obraPantalla: obraNombre.replace(/ /g, ''),
         obraImage: obraImagen,
         content: tecnica,
         obraName: obraNombre,
@@ -107,8 +105,6 @@ const obtenerEventos = async (busqueda) => {
       const lugar = evento.getLugar();
       const horaInicio = evento.getHoraInicio();
       const horaFin = evento.getHoraFin();
-      const slug = evento.getSlug();
-
       const options = {month: 'long', day: 'numeric' };
       const formattedFechaInicio = fechaInicio.toLocaleDateString('es-ES', options);
       const formattedFechaFin = fechaFin.toLocaleDateString('es-ES', options);
@@ -119,8 +115,8 @@ const obtenerEventos = async (busqueda) => {
 
       cards.push({
         title: 'evento' + (index + 1),
-        href: slug,
         eventName: titulo,
+        eventoPantalla: titulo.replace(/ /g, ''),
         eventStartDate: formattedFechaInicio,
         eventFinishDate: formattedFechaFin,
         startTime: formattedHoraInicio,
@@ -133,7 +129,7 @@ const obtenerEventos = async (busqueda) => {
     return cards;
 
   } catch (error) {
-    console.error('Error al obtener artistas:', error);
+    console.error('Error al obtener eventos:', error);
     return [];  // Retornar un array vacío en caso de error
   }
 };

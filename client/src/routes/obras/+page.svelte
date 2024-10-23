@@ -59,7 +59,7 @@
     <div
       class="block bg-white shadow-secondary-1 m-2.5 border-2 border-gray-300 rounded-md"
     >
-      <a href={`/obras/${card.href}`}>
+      <a href={`/obras/${card.obraPantalla}`}>
         <div class="relative overflow-hidden bg-cover bg-no-repeat">
           <img class="rounded-t-lg" src={card.obraImage} alt={card.title} />
           <div
