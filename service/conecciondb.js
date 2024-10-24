@@ -1,8 +1,4 @@
-import { Esculturas } from './clases.js';
-import { Visitantes } from './clases.js';
-import { Eventos } from './clases.js';
-import { Artistas } from './clases.js';
-import { Imagenes } from './clases.js';
+import { Esculturas, Visitantes, Eventos, Artistas, Imagenes } from './clases.js';
 import mysql from 'mysql2';
 // Esto de abajo es para usar el .env para guardar la contraseña de la database
 import dotenv from 'dotenv';
@@ -35,19 +31,8 @@ export async function ArtistasConsulta(filtro, orden, busqueda, cantidad) {
 
       console.log("Connected!");
       // Seleccionar datos de la tabla "artistas"
-      let selectQuery;
-      if (cantidad == null) {
-        selectQuery = `SELECT * FROM artistas 
-                      where NyA like '%${busqueda}%' or res_biografia like '%${busqueda}%' or contacto like '%${busqueda}%'
-                      ORDER BY ${filtro} ${orden}`;
-      } else {
-        selectQuery = `SELECT * FROM artistas 
-                      where NyA like '%${busqueda}%' or res_biografia like '%${busqueda}%' or contacto like '%${busqueda}%'
-                      ORDER BY ${filtro} ${orden} 
-                      LIMIT ${cantidad}`;
-      }
 
-      con.query(selectQuery, function (err, results) {
+      con.query('SELECT * FROM artistas', function (err, results) {
         if (err) {
           console.error('Error selecting data: ' + err.message);
           reject(err);
@@ -66,7 +51,7 @@ export async function ArtistasConsulta(filtro, orden, busqueda, cantidad) {
   });
 }
 
-export async function EsculturasConsulta(filtro, orden, busqueda, cantidad) {
+export async function EsculturasConsulta() {
   return new Promise((resolve, reject) => { // Aquí creamos una nueva promesa
     let con = crearConeccion();
 
@@ -78,37 +63,7 @@ export async function EsculturasConsulta(filtro, orden, busqueda, cantidad) {
       }
       console.log("Connected!");
 
-      let selectQuery;
-      if (cantidad == null) {
-        selectQuery = `
-          SELECT *
-          FROM esculturas e inner join hechas_por h on e.nombre = h.nombre_escultura
-              natural join artistas a inner join imagenes i on e.nombre = i.nombre_escultura
-              natural join (
-                SELECT e.nombre, AVG(v.cant_estrellas) as promedio
-                FROM esculturas e inner join votan v on e.nombre = v.nombre_escultura
-                WHERE e.nombre like '%${busqueda}%' or e.tecnica like '%${busqueda}%'
-                group by e.nombre
-                ORDER BY ${filtro} ${orden}
-              ) as tablaPromedios
-          `;
-      } else {
-        selectQuery = `
-          SELECT *
-          FROM esculturas e inner join hechas_por h on e.nombre = h.nombre_escultura
-              natural join artistas a inner join imagenes i on e.nombre = i.nombre_escultura
-              natural join (
-                SELECT e.nombre, AVG(v.cant_estrellas) as promedio
-                FROM esculturas e inner join votan v on e.nombre = v.nombre_escultura
-                WHERE e.nombre like '%${busqueda}%' or e.tecnica like '%${busqueda}%'
-                GROUP BY e.nombre
-                ORDER BY ${filtro} ${orden}
-                LIMIT ${cantidad}
-              ) as tablaPromedios
-          `;
-        }
-
-      con.query(selectQuery, function (err, results) {
+      con.query('CALL cons_esculturas()', function (err, results) {
         if (err) {
           console.error('Error selecting data: ' + err.message);
           reject(err); // Rechazamos la promesa en caso de error
@@ -117,7 +72,7 @@ export async function EsculturasConsulta(filtro, orden, busqueda, cantidad) {
 
         const esculturasMap = new Map();
 
-        results.forEach((row) => {
+        results[0].forEach((row) => {
           const esculturaNombre = row.nombre;
 
           // Verificar si la escultura ya está en el map
@@ -151,6 +106,7 @@ export async function EsculturasConsulta(filtro, orden, busqueda, cantidad) {
           );
             escultura.addImagen(nuevaImagen);
           }
+
         });
 
         // Convertir el Map a un array de esculturas
@@ -176,8 +132,7 @@ export async function login(correo, password) {
       console.log("Connected!");
 
       let selectQuery = `
-        SELECT *
-        FROM visitantes v
+        SELECT * FROM visitantes v
         WHERE v.email = ? AND v.contraseña = ?
       `;
 
@@ -207,22 +162,9 @@ export async function EventosConsulta(filtro, orden, busqueda, cantidad) {
       }
 
       console.log("Connected!");
+      
       // Seleccionar datos de la tabla "eventos"
-      let selectQuery;
-      if (cantidad == null) {
-        selectQuery = `SELECT * 
-                        FROM eventos 
-                        where nombre like '%${busqueda}%' or lugar like '%${busqueda}%' or tematica like '%${busqueda}%'
-                        ORDER BY ${filtro} ${orden}`;
-      } else {
-        selectQuery = `SELECT * 
-                        FROM eventos 
-                        where nombre like '%${busqueda}%' or lugar like '%${busqueda}%' or tematica like '%${busqueda}%'
-                        ORDER BY ${filtro} ${orden} 
-                        LIMIT ${cantidad}`;
-      }
-
-      con.query(selectQuery, function (err, results) {
+      con.query('SELECT * FROM eventos', function (err, results) {
         if (err) {
           console.error('Error selecting data: ' + err.message);
           reject(err);

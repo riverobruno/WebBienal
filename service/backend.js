@@ -3,14 +3,17 @@ import cors from 'cors';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import { ArtistasConsulta, EsculturasConsulta, EventosConsulta, login} from './conecciondb.js';
+import { ordenarEsculturas, buscarEsculturas } from './filtrosObjetos.js';
 
 const app = express();
 const port = 3001;
+let esculturas = [];
 
 app.use(cors()); // Permitir CORS
 // Middleware para analizar el cuerpo de la solicitud (JSON)
 app.use(bodyParser.json());
 app.use(cookieParser());
+
 
 // Crear una función asincrónica para manejar las consultas a la base de datos
 const obtenerArtistas = async (busqueda) => {
@@ -49,15 +52,21 @@ const obtenerArtistas = async (busqueda) => {
   }
 };
 
-const obtenerEsculturas = async (busqueda) => {
+const obtenerEsculturas = async (busqueda, criterio, orden) => {
   try {
-    const esculturas = await EsculturasConsulta('promedio', 'DESC', busqueda, 20);
+    if (esculturas.length == 0) {
+      esculturas = await EsculturasConsulta();
+    }
     // Asegúrate de que esculturas es un array
     if (!Array.isArray(esculturas)) {
       throw new Error('La consulta no devolvió un array');
     }
+
+    const esculturasFiltradas = buscarEsculturas(esculturas, busqueda);
+    const esculturasOrdenadas = ordenarEsculturas(esculturasFiltradas, criterio, orden);
+
     const cards = [];
-    for (const [index, escultura] of esculturas.entries()) {
+    for (const [index, escultura] of esculturasOrdenadas.entries()) {
       // Accede a los métodos de la clase Esculturas
       const listaObraImagenes = escultura.getImagenes();
       const obraImagen = listaObraImagenes[0].getURL();
@@ -67,6 +76,11 @@ const obtenerEsculturas = async (busqueda) => {
       const obraArtista = obraArtistas[0].getNyA();
       const obraEscultorFoto = obraArtistas[0].getURL_foto();
       const average = escultura.getPromedio();
+      const fecha_creacion = escultura.getFechaCreacion();
+      const promedioEstrellas = escultura.getPromedio();
+
+      const options = { year: 'numeric', month: 'long', day: 'numeric' };
+      const formattedFecha_creacion = fecha_creacion.toLocaleDateString('es-ES', options);
 
       cards.push({
         id: index + 1,
@@ -77,7 +91,9 @@ const obtenerEsculturas = async (busqueda) => {
         obraName: obraNombre,
         obraEscultor: obraArtista,
         obraEscultorFoto: obraEscultorFoto,
-        promedio: average
+        promedio: average,
+        f_creacion: formattedFecha_creacion,
+        promedio: promedioEstrellas
       });
     }
 
@@ -149,7 +165,9 @@ app.get('/api/escultores', async (req, res) => {
 // Endpoint para obtener esculturas
 app.get('/api/esculturas', async (req, res) => {
   const searchQuery = req.query.search;
-  const cards = await obtenerEsculturas(searchQuery);  // Esperamos a que se procesen todas las consultas
+  const criterio = req.query.sortBy;
+  const orden = req.query.order;
+  const cards = await obtenerEsculturas(searchQuery, criterio, orden);  // Esperamos a que se procesen todas las consultas
   res.json(cards);
 });
 
