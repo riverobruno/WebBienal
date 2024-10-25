@@ -2,12 +2,14 @@ import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
-import { ArtistasConsulta, EsculturasConsulta, EventosConsulta, login} from './conecciondb.js';
-import { ordenarEsculturas, buscarEsculturas } from './filtrosObjetos.js';
+import { ArtistasConsulta, EsculturasConsulta, EventosConsulta, login} from './conexiondb.js';
+import { ordenarEsculturas, buscarEsculturas, ordenarEventos, buscarEventos, ordenarArtistas, buscarArtistas } from './filtrosObjetos.js';
 
 const app = express();
 const port = 3001;
 let esculturas = [];
+let eventos = [];
+let artistas = [];
 
 app.use(cors()); // Permitir CORS
 // Middleware para analizar el cuerpo de la solicitud (JSON)
@@ -16,18 +18,21 @@ app.use(cookieParser());
 
 
 // Crear una función asincrónica para manejar las consultas a la base de datos
-const obtenerArtistas = async (busqueda) => {
+const obtenerArtistas = async (busqueda, criterio, orden) => {
   try {
-    const artistas = await ArtistasConsulta('NyA', 'ASC', busqueda, 20);
-
+    if (artistas.length == 0) {
+      artistas = await ArtistasConsulta();
+    }
     // Asegúrate de que esculturas es un array
     if (!Array.isArray(artistas)) {
       throw new Error('La consulta no devolvió un array');
     }
 
-    const cards = [];
+    const artistasFiltrados = buscarArtistas(artistas, busqueda);
+    const ArtistasOrdenados = ordenarArtistas(artistasFiltrados, criterio, orden);
 
-    for (const [index, artista] of artistas.entries()) {
+    const cards = [];
+    for (const [index, artista] of ArtistasOrdenados.entries()) {
       // Accede a los métodos de la clase Esculturas
       const nombre = artista.getNyA();
       const imagen = artista.getURL_foto();
@@ -105,18 +110,21 @@ const obtenerEsculturas = async (busqueda, criterio, orden) => {
   }
 };
 
-const obtenerEventos = async (busqueda) => {
+const obtenerEventos = async (busqueda, criterio, orden) => {
   try {
-    const eventos = await EventosConsulta('nombre', 'DESC', busqueda, 20);
-
+    if (esculturas.length == 0) {
+      eventos = await EventosConsulta();
+    }
     // Asegúrate de que esculturas es un array
     if (!Array.isArray(eventos)) {
       throw new Error('La consulta no devolvió un array');
     }
 
-    const cards = [];
+    const eventosFiltrados = buscarEventos(eventos, busqueda);
+    const eventosOrdenados = ordenarEventos(eventosFiltrados, criterio, orden);
 
-    for (const [index, evento] of eventos.entries()) {
+    const cards = [];
+    for (const [index, evento] of eventosOrdenados.entries()) {
       // Accede a los métodos de la clase Eventos
       const titulo = evento.getNombre();
       const fechaInicio = new Date(evento.getFechaInicio());
@@ -158,7 +166,9 @@ const obtenerEventos = async (busqueda) => {
 // Endpoint para obtener escultores
 app.get('/api/escultores', async (req, res) => {
   const searchQuery = req.query.search;
-  const cards = await obtenerArtistas(searchQuery);  // Esperamos a que se procesen todas las consultas
+  const criterio = req.query.sortBy;
+  const orden = req.query.order;
+  const cards = await obtenerArtistas(searchQuery, criterio, orden);  // Esperamos a que se procesen todas las consultas
   res.json(cards);
 });
 
@@ -173,7 +183,9 @@ app.get('/api/esculturas', async (req, res) => {
 
 app.get('/api/eventos', async (req, res) => {
   const searchQuery = req.query.search;
-  const cards = await obtenerEventos(searchQuery);  // Esperamos a que se procesen todas las consultas
+  const criterio = req.query.sortBy;
+  const orden = req.query.order;
+  const cards = await obtenerEventos(searchQuery, criterio, orden);  // Esperamos a que se procesen todas las consultas
   res.json(cards);
 });
 

@@ -30,6 +30,94 @@ export function ordenarEsculturas(listaEsculturas, criterio, orden) {
     });
 }
 
+export function ordenarEventos(listaEventos, criterio, orden) {
+    return listaEventos.sort((a, b) => {
+        let comparison = 0;
+
+        // Comparación según el criterio seleccionado
+        switch (criterio) {
+            case 'nombre':
+                comparison = a.getNombre().localeCompare(b.getNombre());
+                break;
+
+            case 'fecha_inicio':
+                // Primero comparamos por la fecha de inicio
+                const fechaInicioComparacion = new Date(a.getFechaInicio()) - new Date(b.getFechaInicio());
+
+                if (fechaInicioComparacion !== 0) {
+                    comparison = fechaInicioComparacion; // Si las fechas son diferentes, usamos esta comparación
+                } else {
+                    // Si las fechas son iguales, comparamos por hora de inicio
+                    const [horaA, minutoA] = a.getHoraInicio().split(':').map(Number);
+                    const [horaB, minutoB] = b.getHoraInicio().split(':').map(Number);
+
+                    const totalMinutosA = horaA * 60 + minutoA;
+                    const totalMinutosB = horaB * 60 + minutoB;
+
+                    const horaComparacion = totalMinutosA - totalMinutosB;
+                    if (horaComparacion !== 0) {
+                        comparison = horaComparacion; // Si las horas son diferentes, usamos esta comparación
+                    } else {
+                        // Si las horas de inicio son iguales, comparamos por hora de fin
+                        const [horaA, minutoA] = a.getHoraFin().split(':').map(Number);
+                        const [horaB, minutoB] = b.getHoraFin().split(':').map(Number);
+
+                        const totalMinutosA = horaA * 60 + minutoA;
+                        const totalMinutosB = horaB * 60 + minutoB;
+
+                        const horaComparacion = totalMinutosA - totalMinutosB;
+                        comparison = horaComparacion; // Ajustamos la comparación por hora
+                    }
+                }
+                break;
+
+            
+            case 'promedio':
+                comparison = parseFloat(a.getPromedio()) - parseFloat(b.getPromedio());
+                break;
+
+            default:
+                console.error('Criterio no reconocido: ' + criterio);
+                return 0;
+        }
+
+        // Ajuste según el orden (ascendente o descendente)
+        if (orden === 'DESC') {
+            comparison = comparison * -1; // Invierte el orden para descendente
+        }
+
+        return comparison;
+    });
+}
+
+export function ordenarArtistas(listaArtistas, criterio, orden) {
+    return listaArtistas.sort((a, b) => {
+        let comparison = 0;
+
+        // Comparación según el criterio seleccionado
+        switch (criterio) {
+            case 'nombre':
+                comparison = a.getNyA().localeCompare(b.getNyA());
+                break;
+            
+            case 'promedio':
+                comparison = parseFloat(a.getPromedio()) - parseFloat(b.getPromedio());
+                break;
+
+            default:
+                console.error('Criterio no reconocido: ' + criterio);
+                return 0;
+        }
+
+        // Ajuste según el orden (ascendente o descendente)
+        if (orden === 'DESC') {
+            comparison = comparison * -1; // Invierte el orden para descendente
+        }
+
+        return comparison;
+    });
+}
+
 export function buscarEsculturas(listaEsculturas, busqueda) {
     busqueda = busqueda.toLowerCase(); // Convertir la búsqueda a minúsculas
     const resultados = [];
@@ -61,6 +149,56 @@ export function buscarEsculturas(listaEsculturas, busqueda) {
                         }
                     }
                 }
+            }
+        }
+    });
+
+    return resultados;
+}
+
+export function buscarEventos(listaEventos, busqueda) {
+    busqueda = busqueda.toLowerCase(); // Convertir la búsqueda a minúsculas
+    const resultados = [];
+
+    listaEventos.forEach(evento => {
+        // Validar que la escultura no sea undefined y que tenga los métodos necesarios
+        if (evento && typeof evento.getNombre === 'function' && typeof evento.getLugar === 'function' 
+            && typeof evento.getTematica === 'function') {
+            // Verificar coincidencias en el nombre y técnica
+            const nombreEvento = evento.getNombre() || ""; // Default a vacío si no está definido
+            const lugarEvento = evento.getLugar() || ""; // Default a vacío si no está definido
+            const tematicaEvento = evento.getTematica() || ""; // Default a vacío si no está definido
+
+            if (nombreEvento.toLowerCase().includes(busqueda) ||
+                lugarEvento.toLowerCase().includes(busqueda) ||
+                tematicaEvento.toLowerCase().includes(busqueda)) {
+                resultados.push(evento);
+                return;
+            }
+        }
+    });
+
+    return resultados;
+}
+
+export function buscarArtistas(listaArtistas, busqueda) {
+    busqueda = busqueda.toLowerCase(); // Convertir la búsqueda a minúsculas
+    const resultados = [];
+
+    listaArtistas.forEach(artista => {
+        // Validar que la escultura no sea undefined y que tenga los métodos necesarios
+        if (artista && typeof artista.getNyA === 'function' && typeof artista.getRes_biografia === 'function'
+            && typeof artista.getContacto === 'function') {
+            // Verificar coincidencias en el nombre y técnica
+            const nombreArtista = artista.getNyA() || ""; // Default a vacío si no está definido
+            const biografiaArtista = artista.getRes_biografia() || ""; // Default a vacío si no está definido
+            const contactoArtista = artista.getContacto() || ""; // Default a vacío si no está definido
+
+            if (nombreArtista.toLowerCase().includes(busqueda) ||
+                biografiaArtista.toLowerCase().includes(busqueda) ||
+                contactoArtista.toLowerCase().includes(busqueda)) {
+                resultados.push(artista);
+                return;
             }
         }
     });
