@@ -202,7 +202,8 @@ app.post('/api/login', (req, res) => {
       // Aquí es donde manejamos los resultados
       if (coneccion && coneccion.length > 0) {
         // Establecer la cookie antes de enviar la respuesta
-        res.cookie('correo', correo, { httpOnly: true, maxAge: 3600000 }); // Cookie válida por 1 hora
+        const usuario = correo;
+        console.log(usuario);
         return res.status(200).json({ success: true, message: 'Inicio de sesión exitoso' });
       } else {
         return res.status(401).json({ success: false, message: 'Credenciales incorrectas' });
