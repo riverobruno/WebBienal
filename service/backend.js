@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
-import { ArtistasConsulta, EsculturasConsulta, EventosConsulta, login} from './conexiondb.js';
+import { ArtistasConsulta, EsculturasConsulta, EventosConsulta, login, ObraPorNombre, ObtenerEscultor} from './conexiondb.js';
 import { ordenarEsculturas, buscarEsculturas, ordenarEventos, buscarEventos, ordenarArtistas, buscarArtistas } from './filtrosObjetos.js';
 
 const app = express();
@@ -41,7 +41,7 @@ const obtenerArtistas = async (busqueda, criterio, orden) => {
 
       cards.push({
         id: index + 1,
-        escultorPantalla: 'Escultor ' + (index + 1),
+        escultorPantalla: nombre.replace(/ /g, ''), 
         content: biografia,
         escultorName: nombre,
         escultorFoto: imagen,
@@ -53,7 +53,7 @@ const obtenerArtistas = async (busqueda, criterio, orden) => {
 
   } catch (error) {
     console.error('Error al obtener artistas:', error);
-    return [];  // Retornar un array vacío en caso de error
+    return [];
   }
 };
 
@@ -90,7 +90,7 @@ const obtenerEsculturas = async (busqueda, criterio, orden) => {
       cards.push({
         id: index + 1,
         title: 'Carta' + (index + 1),
-        obraPantalla: '/obras/' + obraNombre.replace(/ /g, ''),
+        obraPantalla: obraNombre.replace(/ /g, ''),
         obraImage: obraImagen,
         content: tecnica,
         obraName: obraNombre,
@@ -107,6 +107,34 @@ const obtenerEsculturas = async (busqueda, criterio, orden) => {
   } catch (error) {
     console.error('Error al obtener esculturas:', error);
     return [];  // Retornar un array vacío en caso de error
+  }
+};
+
+const obtenerObraPorNombre = async (nombre) => {
+  try {
+    // Eliminar espacios en blanco y reemplazar espacios por guiones bajos o cualquier formato que uses en tu base de datos
+    const nombreConEspacios = nombre.replace(/([A-Z])/g, ' $1').trim();
+    console.log(nombreConEspacios)
+    // Llama a la función que obtiene la obra de la base de datos
+    const obra = await ObraPorNombre(nombreConEspacios); // Usa el argumento 'nombreSinEspacios' aquí
+
+    // Asegúrate de que estás verificando si obra tiene resultados
+    if (!obra || obra.length === 0) {
+      throw new Error('Obra no encontrada');
+    }
+
+    // Construir el objeto 'cards' con la información de la obra
+    const cards = {
+      content: obra.getAntecedente(), // Asegúrate de que este método exista en tu clase Obra
+      obraName: obra.getNombre(), // Asegúrate de que este método exista en tu clase Obra
+      obraFoto: obra.getImagenes()[0]?.getURL() || '', // Asegúrate de que este método exista y maneja el caso de que no haya imágenes
+      tecnica: obra.getTecnica(), // Asegúrate de que este método exista en tu clase Obra
+    };
+
+    return cards;
+  } catch (error) {
+    console.error('Error al obtener obra:', error);
+    throw error; // Propaga el error para manejarlo más adelante
   }
 };
 
@@ -133,7 +161,6 @@ const obtenerEventos = async (busqueda, criterio, orden) => {
       const lugar = evento.getLugar();
       const horaInicio = evento.getHoraInicio();
       const horaFin = evento.getHoraFin();
-
       const options = {month: 'long', day: 'numeric' };
       const formattedFechaInicio = fechaInicio.toLocaleDateString('es-ES', options);
       const formattedFechaFin = fechaFin.toLocaleDateString('es-ES', options);
@@ -144,8 +171,8 @@ const obtenerEventos = async (busqueda, criterio, orden) => {
 
       cards.push({
         title: 'evento' + (index + 1),
-        href: titulo.replace(/ /g, ''),
         eventName: titulo,
+        eventoPantalla: titulo.replace(/ /g, ''),
         eventStartDate: formattedFechaInicio,
         eventFinishDate: formattedFechaFin,
         startTime: formattedHoraInicio,
@@ -158,11 +185,38 @@ const obtenerEventos = async (busqueda, criterio, orden) => {
     return cards;
 
   } catch (error) {
-    console.error('Error al obtener artistas:', error);
+    console.error('Error al obtener eventos:', error);
     return [];  // Retornar un array vacío en caso de error
   }
 };
 
+const obtenerEscultorPorNombre = async (nombre) => {
+  try {
+    const nombreConEspacios = nombre.replace(/([A-Z])/g, ' $1').trim();
+    
+    // Cambia esto a la función que realmente obtendrá el escultor de la base de datos
+    const escultor = await ObtenerEscultor(nombreConEspacios); // Usa el argumento 'nombre' aquí
+    if (!escultor || escultor.length === 0) { // Asegúrate de que estés verificando si escultor tiene resultados
+      throw new Error('Escultor no encontrado');
+    }
+    const cards = {
+      content: escultor.getRes_biografia(),
+      escultorName: escultor.getNyA(),
+      escultorFoto: escultor.getURL_foto(),
+      contactoEmail: escultor.getContacto()
+    };
+    return (cards)
+  } catch (error) {
+    console.error('Error al obtener escultor:', error);
+    throw error; // Propaga el error para manejarlo más adelante
+  }
+};
+
+app.get('/api/escultores/:nombre', async (req, res) => {
+  const nombre = req.params.nombre; // Obtiene el nombre del parámetro de la URL
+  const cards = await obtenerEscultorPorNombre(nombre); // Función para obtener un escultor específico
+  res.json(cards);
+});
 // Endpoint para obtener escultores
 app.get('/api/escultores', async (req, res) => {
   const searchQuery = req.query.search;
@@ -179,6 +233,17 @@ app.get('/api/esculturas', async (req, res) => {
   const orden = req.query.order;
   const cards = await obtenerEsculturas(searchQuery, criterio, orden);  // Esperamos a que se procesen todas las consultas
   res.json(cards);
+});
+
+app.get('/api/obras/:nombre', async (req, res) => {
+  const nombre = req.params.nombre; // Obtiene el nombre del parámetro de la URL
+  try {
+    const cards = await obtenerObraPorNombre(nombre); // Función para obtener una obra específica
+    res.json(cards);
+  } catch (error) {
+    console.error('Error al obtener la obra:', error);
+    res.status(404).json({ message: 'Obra no encontrada' }); // Manejo de error si la obra no se encuentra
+  }
 });
 
 app.get('/api/eventos', async (req, res) => {

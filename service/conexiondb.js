@@ -51,6 +51,48 @@ export async function ArtistasConsulta() {
   });
 }
 
+export async function ObtenerEscultor(nombre) {
+  const con = crearConeccion();
+
+  return new Promise((resolve, reject) => {
+
+    con.connect(function (err) {
+      if (err) {
+        console.error('Error connecting: ' + err.stack);
+        reject(err);
+        return;
+      }
+
+      console.log("Connected!");
+
+      // Usar un placeholder para evitar inyección SQL
+      const selectQuery = `SELECT * FROM artistas WHERE NyA = ?`; 
+
+      con.query(selectQuery, nombre, function (err, results) {
+        if (err) {
+          console.error('Error selecting data: ' + err.message);
+          reject(err);
+          return;
+        }
+
+        if (results.length > 0) {
+          const row = results[0];
+          
+          // Crear un objeto con las propiedades que necesitas para las cards
+          
+          const escultor = new Artistas(row.DNI, row.NyA, row.res_biografia, row.contacto, row.URL_foto);
+          // Cerrar la conexión
+          con.end();
+          resolve(escultor); // Resolvemos el objeto escultor
+        } else {
+          console.log('Escultor no encontrado:', nombre);
+          con.end();
+          resolve(null);
+        }
+      });
+    });
+  });
+}
 export async function EsculturasConsulta() {
   return new Promise((resolve, reject) => { // Aquí creamos una nueva promesa
     let con = crearConexion();
@@ -118,6 +160,58 @@ export async function EsculturasConsulta() {
     });
   });
 };
+
+export async function ObraPorNombre(nombreObra) {
+  return new Promise((resolve, reject) => {
+    let con = crearConeccion();
+
+    con.connect(function (err) {
+      if (err) {
+        console.error('Error connecting: ' + err.stack);
+        reject(err);
+        return;
+      }
+      console.log("Connected!");
+
+      // Consulta SQL para obtener una sola obra por nombre
+      const selectQuery = `
+        SELECT *
+        FROM esculturas e 
+        INNER JOIN hechas_por h ON e.nombre = h.nombre_escultura
+        NATURAL JOIN artistas a 
+        INNER JOIN imagenes i ON e.nombre = i.nombre_escultura
+        NATURAL JOIN (
+          SELECT e.nombre, AVG(v.cant_estrellas) AS promedio
+          FROM esculturas e 
+          INNER JOIN votan v ON e.nombre = v.nombre_escultura
+          WHERE e.nombre = ?
+          GROUP BY e.nombre
+        ) AS tablaPromedios
+      `;
+
+      con.query(selectQuery, [nombreObra], function (err, results) {
+        if (err) {
+          console.error('Error selecting data: ' + err.message);
+          reject(err);
+          return;
+        }
+
+        if (results.length === 0) {
+          reject(new Error('No se encontró la obra especificada.'));
+          return;
+        }
+
+        // Crear una instancia de Esculturas con el primer resultado
+        const row = results[0];
+        const escultura = new Esculturas(row.nombre, row.f_creacion, row.antecedentes, row.tecnica);
+        escultura.setPromedio(row.promedio); // Establecer el promedio
+
+        con.end(); // Cierra la conexión
+        resolve(escultura); // Devuelve la instancia de Esculturas
+      });
+    });
+  });
+}
 
 export async function login(correo, password) {
   let con = crearConexion();
