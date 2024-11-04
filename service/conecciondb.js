@@ -205,6 +205,58 @@ export async function EsculturasConsulta(filtro, orden, busqueda, cantidad) {
   });
 };
 
+export async function ObraPorNombre(nombreObra) {
+  return new Promise((resolve, reject) => {
+    let con = crearConeccion();
+
+    con.connect(function (err) {
+      if (err) {
+        console.error('Error connecting: ' + err.stack);
+        reject(err);
+        return;
+      }
+      console.log("Connected!");
+
+      // Consulta SQL para obtener una sola obra por nombre
+      const selectQuery = `
+        SELECT *
+        FROM esculturas e 
+        INNER JOIN hechas_por h ON e.nombre = h.nombre_escultura
+        NATURAL JOIN artistas a 
+        INNER JOIN imagenes i ON e.nombre = i.nombre_escultura
+        NATURAL JOIN (
+          SELECT e.nombre, AVG(v.cant_estrellas) AS promedio
+          FROM esculturas e 
+          INNER JOIN votan v ON e.nombre = v.nombre_escultura
+          WHERE e.nombre = ?
+          GROUP BY e.nombre
+        ) AS tablaPromedios
+      `;
+
+      con.query(selectQuery, [nombreObra], function (err, results) {
+        if (err) {
+          console.error('Error selecting data: ' + err.message);
+          reject(err);
+          return;
+        }
+
+        if (results.length === 0) {
+          reject(new Error('No se encontró la obra especificada.'));
+          return;
+        }
+
+        // Crear una instancia de Esculturas con el primer resultado
+        const row = results[0];
+        const escultura = new Esculturas(row.nombre, row.f_creacion, row.antecedentes, row.tecnica);
+        escultura.setPromedio(row.promedio); // Establecer el promedio
+
+        con.end(); // Cierra la conexión
+        resolve(escultura); // Devuelve la instancia de Esculturas
+      });
+    });
+  });
+}
+
 export async function login(correo, password) {
   let con = crearConeccion();
 

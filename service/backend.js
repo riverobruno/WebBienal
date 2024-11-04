@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
-import { ArtistasConsulta, EsculturasConsulta, EventosConsulta, login, ObtenerEscultor} from './conecciondb.js';
+import { ArtistasConsulta, EsculturasConsulta, EventosConsulta, login, ObraPorNombre, ObtenerEscultor} from './conecciondb.js';
 
 const app = express();
 const port = 3001;
@@ -82,6 +82,34 @@ const obtenerEsculturas = async (busqueda) => {
   } catch (error) {
     console.error('Error al obtener esculturas:', error);
     return [];  // Retornar un array vacío en caso de error
+  }
+};
+
+const obtenerObraPorNombre = async (nombre) => {
+  try {
+    // Eliminar espacios en blanco y reemplazar espacios por guiones bajos o cualquier formato que uses en tu base de datos
+    const nombreConEspacios = nombre.replace(/([A-Z])/g, ' $1').trim();
+    console.log(nombreConEspacios)
+    // Llama a la función que obtiene la obra de la base de datos
+    const obra = await ObraPorNombre(nombreConEspacios); // Usa el argumento 'nombreSinEspacios' aquí
+
+    // Asegúrate de que estás verificando si obra tiene resultados
+    if (!obra || obra.length === 0) {
+      throw new Error('Obra no encontrada');
+    }
+
+    // Construir el objeto 'cards' con la información de la obra
+    const cards = {
+      content: obra.getAntecedente(), // Asegúrate de que este método exista en tu clase Obra
+      obraName: obra.getNombre(), // Asegúrate de que este método exista en tu clase Obra
+      obraFoto: obra.getImagenes()[0]?.getURL() || '', // Asegúrate de que este método exista y maneja el caso de que no haya imágenes
+      tecnica: obra.getTecnica(), // Asegúrate de que este método exista en tu clase Obra
+    };
+
+    return cards;
+  } catch (error) {
+    console.error('Error al obtener obra:', error);
+    throw error; // Propaga el error para manejarlo más adelante
   }
 };
 
@@ -173,6 +201,17 @@ app.get('/api/esculturas', async (req, res) => {
   const searchQuery = req.query.search;
   const cards = await obtenerEsculturas(searchQuery);  // Esperamos a que se procesen todas las consultas
   res.json(cards);
+});
+
+app.get('/api/obras/:nombre', async (req, res) => {
+  const nombre = req.params.nombre; // Obtiene el nombre del parámetro de la URL
+  try {
+    const cards = await obtenerObraPorNombre(nombre); // Función para obtener una obra específica
+    res.json(cards);
+  } catch (error) {
+    console.error('Error al obtener la obra:', error);
+    res.status(404).json({ message: 'Obra no encontrada' }); // Manejo de error si la obra no se encuentra
+  }
 });
 
 app.get('/api/eventos', async (req, res) => {
