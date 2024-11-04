@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
-import { ArtistasConsulta, EsculturasConsulta, EventosConsulta, login} from './conecciondb.js';
+import { ArtistasConsulta, EsculturasConsulta, EventosConsulta, login, ObtenerEscultor} from './conecciondb.js';
 
 const app = express();
 const port = 3001;
@@ -134,6 +134,33 @@ const obtenerEventos = async (busqueda) => {
   }
 };
 
+const obtenerEscultorPorNombre = async (nombre) => {
+  try {
+    const nombreConEspacios = nombre.replace(/([A-Z])/g, ' $1').trim();
+    
+    // Cambia esto a la función que realmente obtendrá el escultor de la base de datos
+    const escultor = await ObtenerEscultor(nombreConEspacios); // Usa el argumento 'nombre' aquí
+    if (!escultor || escultor.length === 0) { // Asegúrate de que estés verificando si escultor tiene resultados
+      throw new Error('Escultor no encontrado');
+    }
+    const cards = {
+      content: escultor.getRes_biografia(),
+      escultorName: escultor.getNyA(),
+      escultorFoto: escultor.getURL_foto(),
+      contactoEmail: escultor.getContacto()
+    };
+    return (cards)
+  } catch (error) {
+    console.error('Error al obtener escultor:', error);
+    throw error; // Propaga el error para manejarlo más adelante
+  }
+};
+
+app.get('/api/escultores/:nombre', async (req, res) => {
+  const nombre = req.params.nombre; // Obtiene el nombre del parámetro de la URL
+  const cards = await obtenerEscultorPorNombre(nombre); // Función para obtener un escultor específico
+  res.json(cards);
+});
 // Endpoint para obtener escultores
 app.get('/api/escultores', async (req, res) => {
   const searchQuery = req.query.search;

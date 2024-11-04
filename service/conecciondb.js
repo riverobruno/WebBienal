@@ -66,6 +66,48 @@ export async function ArtistasConsulta(filtro, orden, busqueda, cantidad) {
   });
 }
 
+export async function ObtenerEscultor(nombre) {
+  const con = crearConeccion();
+
+  return new Promise((resolve, reject) => {
+
+    con.connect(function (err) {
+      if (err) {
+        console.error('Error connecting: ' + err.stack);
+        reject(err);
+        return;
+      }
+
+      console.log("Connected!");
+
+      // Usar un placeholder para evitar inyección SQL
+      const selectQuery = `SELECT * FROM artistas WHERE NyA = ?`; 
+
+      con.query(selectQuery, nombre, function (err, results) {
+        if (err) {
+          console.error('Error selecting data: ' + err.message);
+          reject(err);
+          return;
+        }
+
+        if (results.length > 0) {
+          const row = results[0];
+          
+          // Crear un objeto con las propiedades que necesitas para las cards
+          
+          const escultor = new Artistas(row.DNI, row.NyA, row.res_biografia, row.contacto, row.URL_foto);
+          // Cerrar la conexión
+          con.end();
+          resolve(escultor); // Resolvemos el objeto escultor
+        } else {
+          console.log('Escultor no encontrado:', nombre);
+          con.end();
+          resolve(null);
+        }
+      });
+    });
+  });
+}
 export async function EsculturasConsulta(filtro, orden, busqueda, cantidad) {
   return new Promise((resolve, reject) => { // Aquí creamos una nueva promesa
     let con = crearConeccion();
