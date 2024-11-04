@@ -127,7 +127,7 @@ const obtenerObraPorNombre = async (nombre) => {
     const cards = {
       content: obra.getAntecedente(), // Asegúrate de que este método exista en tu clase Obra
       obraName: obra.getNombre(), // Asegúrate de que este método exista en tu clase Obra
-      obraFoto: obra.getImagenes()[0]?.getURL() || '', // Asegúrate de que este método exista y maneja el caso de que no haya imágenes
+      obraFoto: obra.getImagenes()[0].getURL(), // Asegúrate de que este método exista y maneja el caso de que no haya imágenes
       tecnica: obra.getTecnica(), // Asegúrate de que este método exista en tu clase Obra
     };
 

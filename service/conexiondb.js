@@ -52,7 +52,7 @@ export async function ArtistasConsulta() {
 }
 
 export async function ObtenerEscultor(nombre) {
-  const con = crearConeccion();
+  const con = crearConexion();
 
   return new Promise((resolve, reject) => {
 
@@ -163,7 +163,7 @@ export async function EsculturasConsulta() {
 
 export async function ObraPorNombre(nombreObra) {
   return new Promise((resolve, reject) => {
-    let con = crearConeccion();
+    let con = crearConexion();
 
     con.connect(function (err) {
       if (err) {
@@ -205,7 +205,13 @@ export async function ObraPorNombre(nombreObra) {
         const row = results[0];
         const escultura = new Esculturas(row.nombre, row.f_creacion, row.antecedentes, row.tecnica);
         escultura.setPromedio(row.promedio); // Establecer el promedio
-
+        if (!escultura.getImagenes().some(imagen => imagen.URL === row.URL)) {
+          const nuevaImagen = new Imagenes(
+            row.URL,
+            row.etapa
+        );
+          escultura.addImagen(nuevaImagen);
+        }
         con.end(); // Cierra la conexión
         resolve(escultura); // Devuelve la instancia de Esculturas
       });

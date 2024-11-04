@@ -26,6 +26,7 @@ export class Esculturas {
     addArtista(artista) { this.listaArtistas.push(artista); }
     addImagen(imagen) { this.listaImagenes.push(imagen); }
     getPromedio() { return this.promedio; }
+    setPromedio(prom){this.promedio=prom }
 }
 
 
