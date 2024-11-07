@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
-import cookieParser from 'cookie-parser';
+
 import { ArtistasConsulta, EsculturasConsulta, EventosConsulta, login} from './conexiondb.js';
 import { ordenarEsculturas, buscarEsculturas, ordenarEventos, buscarEventos, ordenarArtistas, buscarArtistas } from './filtrosObjetos.js';
 import jwt from 'jsonwebtoken';
@@ -18,7 +18,7 @@ let usuario = '';
 app.use(cors()); // Permitir CORS
 // Middleware para analizar el cuerpo de la solicitud (JSON)
 app.use(bodyParser.json());
-app.use(cookieParser());
+
 
 
 // Crear una función asincrónica para manejar las consultas a la base de datos
@@ -222,13 +222,13 @@ app.post('/api/login', (req, res) => {
   }
 
   login(correo, contraseña)
-    .then(coneccion => {
+    .then(conexion => {
       // Aquí es donde manejamos los resultados
-      if (coneccion && coneccion.length > 0) {
+      if (conexion && conexion.length > 0) {
         // Crear el token
         const token = jwt.sign({ correo }, JWT_SECRET, { expiresIn: '1h' }); // El token expirará en 1 hora
 
-        // Establecer la cookie o enviar el token
+        // enviar el token
         usuario = correo;
 
         // Responder con el token
