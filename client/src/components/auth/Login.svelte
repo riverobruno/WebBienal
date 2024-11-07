@@ -101,40 +101,47 @@
   }
 
 </style>
+
 <script>
-  // Importar la función 'login' desde el archivo conecciondb.js en la raíz del proyecto
   let correo = '';
   let contraseña = '';
 
+  // Verificar si el usuario ya tiene una sesión activa
+  if (localStorage.getItem('token')) {
+      // Redirigir al home si ya hay una sesión activa
+      window.location.href = '/inicio';
+  }
+
   const iniciarSesion = async () => {
-  if (!correo || !contraseña) {
-    alert('Por favor, ingresa tu correo y contraseña.');
-    return;
-  }
-
-  try {
-    const response = await fetch('http://localhost:3001/api/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        correo: correo,
-        contraseña: contraseña,
-      }),
-    });
-
-    const data = await response.json();
-
-    if (data.success) {
-      alert('Inicio de sesión exitoso');
-    } else {
-      alert('Credenciales incorrectas');
+    if (!correo || !contraseña) {
+        alert('Por favor, ingresa tu correo y contraseña.');
+        return;
     }
-  } catch (error) {
-    console.error('Error al intentar iniciar sesión:', error);
-    alert('Hubo un error al intentar iniciar sesión');
-  }
-};
 
+    try {
+        const response = await fetch('http://localhost:3001/api/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                correo: correo,
+                contraseña: contraseña,
+            }),
+        });
+
+        const data = await response.json();
+
+        if (data.success && data.token) {
+            alert('Inicio de sesión exitoso');
+            localStorage.setItem('token', data.token); // Almacena el token en localStorage
+            window.location.href = '/home'; // Redirige a la página principal
+        } else {
+            alert('Credenciales incorrectas');
+        }
+    } catch (error) {
+        console.error('Error al intentar iniciar sesión:', error);
+        alert('Hubo un error al intentar iniciar sesión');
+    }
+};
 </script>

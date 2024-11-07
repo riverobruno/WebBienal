@@ -4,7 +4,10 @@ import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import { ArtistasConsulta, EsculturasConsulta, EventosConsulta, login} from './conexiondb.js';
 import { ordenarEsculturas, buscarEsculturas, ordenarEventos, buscarEventos, ordenarArtistas, buscarArtistas } from './filtrosObjetos.js';
+import jwt from 'jsonwebtoken';
 
+// Clave secreta para firmar el token (debería ser almacenada de forma segura, como en variables de entorno)
+const JWT_SECRET = 'mi_clave_secreta'; // Cambir por algo más seguro
 const app = express();
 const port = 3001;
 let esculturas = [];
@@ -222,9 +225,14 @@ app.post('/api/login', (req, res) => {
     .then(coneccion => {
       // Aquí es donde manejamos los resultados
       if (coneccion && coneccion.length > 0) {
-        // Establecer la cookie antes de enviar la respuesta
+        // Crear el token
+        const token = jwt.sign({ correo }, JWT_SECRET, { expiresIn: '1h' }); // El token expirará en 1 hora
+
+        // Establecer la cookie o enviar el token
         usuario = correo;
-        return res.status(200).json({ success: true, message: 'Inicio de sesión exitoso' });
+
+        // Responder con el token
+        return res.status(200).json({ success: true, message: 'Inicio de sesión exitoso', token });
       } else {
         return res.status(401).json({ success: false, message: 'Credenciales incorrectas' });
       }
@@ -236,6 +244,29 @@ app.post('/api/login', (req, res) => {
     });
 });
 
+
+// Middleware para verificar el token
+const verificarToken = (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1]; // Obtener el token después de 'Bearer '
+
+  if (!token) return res.status(403).json({ success: false, message: 'Token no proporcionado' });
+
+  jwt.verify(token, JWT_SECRET, (err, decoded) => { // Usar JWT_SECRET aquí
+      if (err) return res.status(403).json({ success: false, message: 'Token inválido' });
+      req.user = decoded; // Guardar la información del usuario decodificada
+      next();
+  });
+};
+
+// Endpoint para verificar el token y obtener el correo
+app.get('/api/verificar', verificarToken, (req, res) => {
+    const correo = req.user.correo; // Suponiendo que el correo está en el payload del token
+    res.json({ success: true, correo });
+});
+
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
 });
+
+
