@@ -129,11 +129,12 @@ export function buscarEsculturas(listaEsculturas, busqueda) {
             const nombreEscultura = escultura.getNombre() || ""; // Default a vacío si no está definido
             const tecnicaEscultura = escultura.getTecnica() || ""; // Default a vacío si no está definido
 
-            if (nombreEscultura.toLowerCase().includes(busqueda) ||
-                tecnicaEscultura.toLowerCase().includes(busqueda)) {
+            if (nombreEscultura.toLowerCase().replace(/\s+/g, '').includes(busqueda.replace(/\s+/g, '')) ||
+                tecnicaEscultura.toLowerCase().replace(/\s+/g, '').includes(busqueda.replace(/\s+/g, ''))) {
                 resultados.push(escultura);
                 return;
             }
+
 
             // Verificar coincidencias en la lista de artistas
             const artistas = escultura.getArtistas(); // Obtener la lista de artistas
@@ -169,9 +170,9 @@ export function buscarEventos(listaEventos, busqueda) {
             const lugarEvento = evento.getLugar() || ""; // Default a vacío si no está definido
             const tematicaEvento = evento.getTematica() || ""; // Default a vacío si no está definido
 
-            if (nombreEvento.toLowerCase().includes(busqueda) ||
-                lugarEvento.toLowerCase().includes(busqueda) ||
-                tematicaEvento.toLowerCase().includes(busqueda)) {
+            if (nombreEvento.toLowerCase().replace(/\s+/g, '').includes(busqueda.replace(/\s+/g, '')) ||
+                lugarEvento.toLowerCase().replace(/\s+/g, '').includes(busqueda.replace(/\s+/g, '')) ||
+                tematicaEvento.toLowerCase().replace(/\s+/g, '').includes(busqueda.replace(/\s+/g, ''))) {
                 resultados.push(evento);
                 return;
             }
@@ -194,9 +195,9 @@ export function buscarArtistas(listaArtistas, busqueda) {
             const biografiaArtista = artista.getRes_biografia() || ""; // Default a vacío si no está definido
             const contactoArtista = artista.getContacto() || ""; // Default a vacío si no está definido
 
-            if (nombreArtista.toLowerCase().includes(busqueda) ||
-                biografiaArtista.toLowerCase().includes(busqueda) ||
-                contactoArtista.toLowerCase().includes(busqueda)) {
+            if (nombreArtista.toLowerCase().replace(/\s+/g, '').includes(busqueda.replace(/\s+/g, '')) ||
+                biografiaArtista.toLowerCase().replace(/\s+/g, '').includes(busqueda.replace(/\s+/g, '')) ||
+                contactoArtista.toLowerCase().replace(/\s+/g, '').includes(busqueda.replace(/\s+/g, ''))) {
                 resultados.push(artista);
                 return;
             }

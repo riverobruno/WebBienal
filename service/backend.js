@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
-import { ArtistasConsulta, EsculturasConsulta, EventosConsulta, login, ObraPorNombre, ObtenerEscultor} from './conexiondb.js';
+import { ArtistasConsulta, EsculturasConsulta, EventosConsulta, login} from './conexiondb.js';
 import { ordenarEsculturas, buscarEsculturas, ordenarEventos, buscarEventos, ordenarArtistas, buscarArtistas } from './filtrosObjetos.js';
 
 const app = express();
@@ -10,6 +10,7 @@ const port = 3001;
 let esculturas = [];
 let eventos = [];
 let artistas = [];
+let usuario = '';
 
 app.use(cors()); // Permitir CORS
 // Middleware para analizar el cuerpo de la solicitud (JSON)
@@ -83,6 +84,7 @@ const obtenerEsculturas = async (busqueda, criterio, orden) => {
       const average = escultura.getPromedio();
       const fecha_creacion = escultura.getFechaCreacion();
       const promedioEstrellas = escultura.getPromedio();
+      const antecedente = escultura.getAntecedente();
 
       const options = { year: 'numeric', month: 'long', day: 'numeric' };
       const formattedFecha_creacion = fecha_creacion.toLocaleDateString('es-ES', options);
@@ -98,7 +100,8 @@ const obtenerEsculturas = async (busqueda, criterio, orden) => {
         obraEscultorFoto: obraEscultorFoto,
         promedio: average,
         f_creacion: formattedFecha_creacion,
-        promedio: promedioEstrellas
+        promedio: promedioEstrellas,
+        antecedente: antecedente
       });
     }
 
@@ -107,34 +110,6 @@ const obtenerEsculturas = async (busqueda, criterio, orden) => {
   } catch (error) {
     console.error('Error al obtener esculturas:', error);
     return [];  // Retornar un array vacío en caso de error
-  }
-};
-
-const obtenerObraPorNombre = async (nombre) => {
-  try {
-    // Eliminar espacios en blanco y reemplazar espacios por guiones bajos o cualquier formato que uses en tu base de datos
-    const nombreConEspacios = nombre.replace(/([A-Z])/g, ' $1').trim();
-    console.log(nombreConEspacios)
-    // Llama a la función que obtiene la obra de la base de datos
-    const obra = await ObraPorNombre(nombreConEspacios); // Usa el argumento 'nombreSinEspacios' aquí
-
-    // Asegúrate de que estás verificando si obra tiene resultados
-    if (!obra || obra.length === 0) {
-      throw new Error('Obra no encontrada');
-    }
-
-    // Construir el objeto 'cards' con la información de la obra
-    const cards = {
-      content: obra.getAntecedente(), // Asegúrate de que este método exista en tu clase Obra
-      obraName: obra.getNombre(), // Asegúrate de que este método exista en tu clase Obra
-      obraFoto: obra.getImagenes()[0].getURL(), // Asegúrate de que este método exista y maneja el caso de que no haya imágenes
-      tecnica: obra.getTecnica(), // Asegúrate de que este método exista en tu clase Obra
-    };
-
-    return cards;
-  } catch (error) {
-    console.error('Error al obtener obra:', error);
-    throw error; // Propaga el error para manejarlo más adelante
   }
 };
 
@@ -190,38 +165,18 @@ const obtenerEventos = async (busqueda, criterio, orden) => {
   }
 };
 
-const obtenerEscultorPorNombre = async (nombre) => {
-  try {
-    const nombreConEspacios = nombre.replace(/([A-Z])/g, ' $1').trim();
-    
-    // Cambia esto a la función que realmente obtendrá el escultor de la base de datos
-    const escultor = await ObtenerEscultor(nombreConEspacios); // Usa el argumento 'nombre' aquí
-    if (!escultor || escultor.length === 0) { // Asegúrate de que estés verificando si escultor tiene resultados
-      throw new Error('Escultor no encontrado');
-    }
-    const cards = {
-      content: escultor.getRes_biografia(),
-      escultorName: escultor.getNyA(),
-      escultorFoto: escultor.getURL_foto(),
-      contactoEmail: escultor.getContacto()
-    };
-    return (cards)
-  } catch (error) {
-    console.error('Error al obtener escultor:', error);
-    throw error; // Propaga el error para manejarlo más adelante
-  }
-};
-
 app.get('/api/escultores/:nombre', async (req, res) => {
   const nombre = req.params.nombre; // Obtiene el nombre del parámetro de la URL
-  const cards = await obtenerEscultorPorNombre(nombre); // Función para obtener un escultor específico
-  res.json(cards);
+  const cards = await obtenerArtistas(nombre, 'nombre', 'DESC');; // Función para obtener un escultor específico
+  res.json(cards[0]);
 });
+
 // Endpoint para obtener escultores
 app.get('/api/escultores', async (req, res) => {
   const searchQuery = req.query.search;
   const criterio = req.query.sortBy;
   const orden = req.query.order;
+  console.log(usuario);
   const cards = await obtenerArtistas(searchQuery, criterio, orden);  // Esperamos a que se procesen todas las consultas
   res.json(cards);
 });
@@ -237,13 +192,8 @@ app.get('/api/esculturas', async (req, res) => {
 
 app.get('/api/obras/:nombre', async (req, res) => {
   const nombre = req.params.nombre; // Obtiene el nombre del parámetro de la URL
-  try {
-    const cards = await obtenerObraPorNombre(nombre); // Función para obtener una obra específica
-    res.json(cards);
-  } catch (error) {
-    console.error('Error al obtener la obra:', error);
-    res.status(404).json({ message: 'Obra no encontrada' }); // Manejo de error si la obra no se encuentra
-  }
+  const cards = await obtenerEsculturas(nombre, 'nombre', 'DESC');
+  res.json(cards[0]);
 });
 
 app.get('/api/eventos', async (req, res) => {
@@ -252,6 +202,12 @@ app.get('/api/eventos', async (req, res) => {
   const orden = req.query.order;
   const cards = await obtenerEventos(searchQuery, criterio, orden);  // Esperamos a que se procesen todas las consultas
   res.json(cards);
+});
+
+app.get('/api/eventos/:nombre', async (req, res) => {
+  const nombre = req.params.nombre; // Obtiene el nombre del parámetro de la URL
+  const cards = await obtenerEventos(nombre, 'nombre', 'DESC');
+  res.json(cards[0]);
 });
 
 app.post('/api/login', (req, res) => {
@@ -267,8 +223,7 @@ app.post('/api/login', (req, res) => {
       // Aquí es donde manejamos los resultados
       if (coneccion && coneccion.length > 0) {
         // Establecer la cookie antes de enviar la respuesta
-        const usuario = correo;
-        console.log(usuario);
+        usuario = correo;
         return res.status(200).json({ success: true, message: 'Inicio de sesión exitoso' });
       } else {
         return res.status(401).json({ success: false, message: 'Credenciales incorrectas' });
