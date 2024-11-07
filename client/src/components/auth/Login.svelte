@@ -135,7 +135,7 @@
         if (data.success && data.token) {
             alert('Inicio de sesión exitoso');
             localStorage.setItem('token', data.token); // Almacena el token en localStorage
-            window.location.href = '/home'; // Redirige a la página principal
+            window.location.href = '/inicio'; // Redirige a la página principal
         } else {
             alert('Credenciales incorrectas');
         }
