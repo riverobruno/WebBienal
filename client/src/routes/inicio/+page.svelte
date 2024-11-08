@@ -1,6 +1,6 @@
 <!-- src/routes/inicio/+page.svelte -->
 <script>
-  let fondo = "https://raw.githubusercontent.com/FRRe-DS/2024-06-TPI/main/client/src/public/inicio.png"
+  import fondo from '$lib/../public/inicio.png'
 </script>
 
 <style>

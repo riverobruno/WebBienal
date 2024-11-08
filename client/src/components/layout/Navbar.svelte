@@ -1,6 +1,15 @@
 <script>
   let isNavOpen = false;
-  let logo = "https://raw.githubusercontent.com/FRRe-DS/2024-06-TPI/main/client/src/public/bienal_logo.png";
+  import logo from '$lib/../public/bienal_logo.png'
+  import { goto } from '$app/navigation'
+  let isDropdownOpen = false;
+  function toggleDropdown() {
+  isDropdownOpen = !isDropdownOpen;
+  }
+  function cerrarSesion() {
+    localStorage.removeItem('token'); // Elimina el token de autenticación
+    goto('/login');  // Redirige a la página de inicio de sesión
+  }
 </script>
 
 <!-- Main navigation container -->
@@ -55,14 +64,25 @@
       </ul>
     </div>
 
-    <!-- Login -->
-    <div class="flex items-center space-x-4">
-      <a href="login" class="text-neutral-600 dark:text-white hover:text-pink-500">
+    
+      <!-- Icono de perfil -->
+      <div class="relative flex items-center space-x-4">
+        <button on:click={toggleDropdown} class="text-neutral-600 dark:text-white hover:text-pink-500">
           <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-person-circle" viewBox="0 0 16 16">
-              <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/>
-              <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1"/>
+            <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/>
+            <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1"/>
           </svg>
-      </a>
-    </div>
+        </button>
+      
+        <!-- Menú desplegable para cerrar sesión -->
+        {#if isDropdownOpen}
+          <div class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 shadow-lg rounded-lg py-2 z-10">
+            <button on:click={cerrarSesion} class="block px-4 py-2 text-sm text-neutral-600 dark:text-white hover:bg-pink-500 hover:text-white cursor-pointer">
+              Cerrar sesión
+            <button/>
+          </div>
+        {/if}
+      </div>
+    
   </div>
 </nav>
