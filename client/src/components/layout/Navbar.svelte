@@ -4,7 +4,11 @@
   import { goto } from '$app/navigation'
   let isDropdownOpen = false;
   function toggleDropdown() {
-  isDropdownOpen = !isDropdownOpen;
+    if (localStorage.getItem('token')){
+      isDropdownOpen = !isDropdownOpen;
+    }else{
+      goto('/login')
+    }
   }
   function cerrarSesion() {
     localStorage.removeItem('token'); // Elimina el token de autenticación
@@ -76,11 +80,11 @@
       
         <!-- Menú desplegable para cerrar sesión -->
         {#if isDropdownOpen}
-          <div class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 shadow-lg rounded-lg py-2 z-10">
-            <button on:click={cerrarSesion} class="block px-4 py-2 text-sm text-neutral-600 dark:text-white hover:bg-pink-500 hover:text-white cursor-pointer">
-              Cerrar sesión
-            <button/>
-          </div>
+            <div class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 shadow-lg rounded-lg py-2 z-10">
+              <button on:click={cerrarSesion} class="block px-4 py-2 text-sm text-neutral-600 dark:text-white hover:bg-pink-500 hover:text-white cursor-pointer">
+                Cerrar sesión
+              <button/>
+            </div>
         {/if}
       </div>
     
