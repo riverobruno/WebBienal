@@ -47,6 +47,7 @@
   }
 
   function cerrarSesion() {
+    isDropdownOpen= false
     localStorage.removeItem('token'); // Elimina el token de autenticación
     goto('/login');  // Redirige a la página de inicio de sesión
   }
