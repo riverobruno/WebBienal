@@ -1,15 +1,51 @@
 <script>
+  import { goto } from '$app/navigation';
+  import logo from '$lib/../public/bienal_logo.png'; // Asumí que necesitas importar el logo
   let isNavOpen = false;
-  import logo from '$lib/../public/bienal_logo.png'
-  import { goto } from '$app/navigation'
   let isDropdownOpen = false;
-  function toggleDropdown() {
-    if (localStorage.getItem('token')){
-      isDropdownOpen = !isDropdownOpen;
-    }else{
-      goto('/login')
+  let isEscultor = false;
+
+  /**
+   * @param {string} token
+   */
+  function decodificarToken(token) {
+    try {
+      const payload = token.split('.')[1]; // Extraemos el payload del JWT (parte del medio)
+      const decoded = atob(payload); // Decodificamos la base64
+      return JSON.parse(decoded); // Convertimos el JSON
+    } catch (error) {
+      console.error('Error al decodificar el token:', error);
+      return null;
     }
   }
+
+  /**
+   * @param {string} token
+   */
+  function verificarPermisos(token) {
+    const decoded = decodificarToken(token);
+    if (decoded && decoded.permisos) {
+      const permisos = decoded.permisos;
+      if (permisos === 'escultor') {
+        isEscultor = true; // Establecemos 'isEscultor' si el permiso es "escultor"
+      } else {
+        isEscultor = false; // Restablecemos 'isEscultor' si el permiso no es "escultor"
+      }
+    } else {
+      console.error('El token no contiene permisos válidos');
+    }
+  }
+
+  function toggleDropdown() {
+    const token = localStorage.getItem('token');
+    if (token) {
+      isDropdownOpen = !isDropdownOpen;
+      verificarPermisos(token); // Verificamos la autenticación cada vez que se abre el dropdown
+    } else {
+      goto('/login'); // Redirige si no hay token
+    }
+  }
+
   function cerrarSesion() {
     localStorage.removeItem('token'); // Elimina el token de autenticación
     goto('/login');  // Redirige a la página de inicio de sesión
@@ -79,14 +115,21 @@
         </button>
       
         <!-- Menú desplegable para cerrar sesión -->
-        {#if isDropdownOpen}
-            <div class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 shadow-lg rounded-lg py-2 z-10">
-              <button on:click={cerrarSesion} class="block px-4 py-2 text-sm text-neutral-600 dark:text-white hover:bg-pink-500 hover:text-white cursor-pointer">
-                Cerrar sesión
-              <button/>
-            </div>
+      {#if isDropdownOpen}
+      <div class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 shadow-lg rounded-lg py-2 z-10">
+        <!-- Botón para cerrar sesión -->
+        <button on:click={cerrarSesion} class="block px-4 py-2 text-sm text-neutral-600 dark:text-white hover:bg-pink-500 hover:text-white cursor-pointer">
+          Cerrar sesión
+        </button>
+
+        <!-- Botón QR, solo visible si isEscultor es true -->
+        {#if isEscultor}
+          <button on:click={() => goto('/votacion')} class="block px-4 py-2 mt-2 text-sm text-neutral-600 dark:text-white hover:bg-pink-500 hover:text-white cursor-pointer">
+            Generar QR
+          </button>
         {/if}
       </div>
+      {/if}
     
   </div>
 </nav>

@@ -225,11 +225,8 @@ app.post('/api/login', (req, res) => {
     .then(conexion => {
       // Aquí es donde manejamos los resultados
       if (conexion && conexion.length > 0) {
-        // Crear el token
-        const token = jwt.sign({ correo }, JWT_SECRET, { expiresIn: '1h' }); // El token expirará en 1 hora
-
-        // enviar el token
-        usuario = correo;
+        // Crear el token con correo y permisos de la respuesta de la base de datos
+        const token = jwt.sign({ correo: conexion[0].email, permisos: conexion[0].permisos }, JWT_SECRET, { expiresIn: '1h' });
 
         // Responder con el token
         return res.status(200).json({ success: true, message: 'Inicio de sesión exitoso', token });
