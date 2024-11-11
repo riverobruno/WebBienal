@@ -178,3 +178,47 @@ export async function EventosConsulta() {
     });
   });
 }
+
+
+// Función para consultar la información del artista y su obra más reciente
+export async function obtenerArtistaYObraReciente(email) {
+  const con = crearConexion();
+
+  return new Promise((resolve, reject) => {
+    con.connect((err) => {
+      if (err) {
+        console.error('Error al conectar:', err.stack);
+        reject(err);
+        return;
+      }
+
+      const query = `
+        SELECT artistaNombre, artistaDNI, temp.res_biografia AS biografia,
+               obraNombre, obraFechaCreacion, temp.tecnica, im.URL AS imagen_url
+        FROM (
+          SELECT a.NyA AS artistaNombre, a.DNI AS artistaDNI, a.res_biografia,
+                 o.nombre AS obraNombre, o.f_creacion AS obraFechaCreacion, o.tecnica
+          FROM artistas a
+          INNER JOIN hechas_por h ON a.DNI = h.DNI
+          INNER JOIN esculturas o ON h.nombre_escultura = o.nombre
+          WHERE a.contacto = ?
+          ORDER BY o.f_creacion DESC
+          LIMIT 1
+        ) AS temp
+        INNER JOIN imagenes im ON obraNombre = im.nombre_escultura
+      `;
+
+      con.query(query, [email], (error, results) => {
+        con.end();
+
+        if (error) {
+          console.error('Error en la consulta:', error.message);
+          reject(error);
+          return;
+        }
+
+        resolve(results[0]); // Retornamos solo el primer resultado
+      });
+    });
+  });
+}

@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 
-import { ArtistasConsulta, EsculturasConsulta, EventosConsulta, login} from './conexiondb.js';
+import { ArtistasConsulta, EsculturasConsulta, EventosConsulta, login, obtenerArtistaYObraReciente } from './conexiondb.js';
 import { ordenarEsculturas, buscarEsculturas, ordenarEventos, buscarEventos, ordenarArtistas, buscarArtistas } from './filtrosObjetos.js';
 import jwt from 'jsonwebtoken';
 
@@ -267,3 +267,33 @@ app.listen(port, () => {
 });
 
 
+app.get('/api/artista/:email', async (req, res) => {
+  const email = req.params.email;
+
+  try {
+    const artistaObra = await obtenerArtistaYObraReciente(email);
+
+    if (!artistaObra) {
+      return res.status(404).json({ success: false, message: 'Artista no encontrado o sin obras recientes' });
+    }
+
+    res.json({
+      success: true,
+      artista: {
+        nombre: artistaObra.artistaNombre,
+        dni: artistaObra.artistaDNI,
+        biografia: artistaObra.biografia,
+        contacto: email, // Puede que quieras incluir el contacto o eliminar este campo
+      },
+      obraReciente: {
+        nombre: artistaObra.obraNombre,
+        fechaCreacion: artistaObra.obraFechaCreacion,
+        tecnica: artistaObra.tecnica,
+        imagenURL: artistaObra.imagen_url
+      }
+    });
+  } catch (error) {
+    console.error("Error en el endpoint de artista:", error);
+    res.status(500).json({ success: false, message: 'Error interno del servidor' });
+  }
+});
