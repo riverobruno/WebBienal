@@ -11,6 +11,7 @@
   let obra = {}; // Objeto vacío para los datos de la obra
   let qrCodeData = ""; //QR
   let qrCodeUrl = ""; //QR
+  let secretToken = ""; //QR
 
   async function fetchObra(slug) {
     console.log("Buscando obra con slug:", slug); // Verifica el slug antes de la petición
@@ -32,8 +33,8 @@
   async function generateQRCode() {
     // Generar un token único que cambia cada minuto
     const timestamp = Math.floor(Date.now() / 60000); // Cada minuto cambia
-    const uniqueSlug = `${slug}-${timestamp}`;
-    const url = `http://localhost:5173/votacion?slug=${uniqueSlug}`;
+    secretToken = btoa(`${slug}-${timestamp}`); // Encriptar el token usando Base64
+    const url = `http://localhost:3001/votacion?token=${secretToken}`;
 
     // Generar el código QR
     qrCodeUrl = url;
