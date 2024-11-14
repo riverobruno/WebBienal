@@ -62,7 +62,7 @@
      const timestamp = Math.floor(Date.now() / 60000); // Cada minuto cambia
      const uniqueSlug = `${nombreObra}-${timestamp}`;
 
-     const url = `http://localhost:5173/votacion?slug=${uniqueSlug}`;
+     const url = `http://localhost:3333/votacion?slug=${uniqueSlug}`;
      // Generar el código QR
      qrCodeUrl = url;
      console.log(qrCodeUrl)
