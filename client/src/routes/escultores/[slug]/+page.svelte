@@ -8,6 +8,8 @@
     let escultor = {}; // Objeto vacío para los datos del escultor
     let data = {};
     let obras = []; // Cambié a un array para manejar varias obras
+    let mostrandoCarga = true;
+
     async function fetchEscultor(slug) {
         mostrandoCarga = true;
         try {
@@ -26,7 +28,6 @@
     onMount(() => {
       fetchEscultor(slug);
     });
-    export let mostrandoCarga = false;
   </script>
 
 <!-- Mostrar el ícono de carga solo cuando mostrandoCarga es true -->
@@ -34,23 +35,25 @@
     <div class="loading-icon"></div>
 {/if}
 
+{#if !mostrandoCarga}
+  <article class="escultor-detail-container max-w-2xl mx-auto mt-8 p-6 bg-white shadow-lg rounded-lg animate">
+      <header class="text-center">
+          <img src={escultor.escultorFoto} alt="{escultor.escultorName}" class="w-32 h-32 rounded-full mx-auto" />
+          <h1 class="text-3xl font-bold mt-4">{escultor.escultorName}</h1>
+      </header>
 
-<article class="escultor-detail-container max-w-2xl mx-auto mt-8 p-6 bg-white shadow-lg rounded-lg animate">
-    <header class="text-center">
-        <img src={escultor.escultorFoto} alt="{escultor.escultorName}" class="w-32 h-32 rounded-full mx-auto" />
-        <h1 class="text-3xl font-bold mt-4">{escultor.escultorName}</h1>
-    </header>
+      <section class="mt-4">
+          <h2 class="text-xl font-semibold">Biografía</h2>
+          <p>{escultor.content}</p>
+      </section>
 
-    <section class="mt-4">
-        <h2 class="text-xl font-semibold">Biografía</h2>
-        <p>{escultor.content}</p>
-    </section>
+      <section class="mt-4">
+          <h2 class="text-xl font-semibold">Contacto</h2>
+          <p>Email: <a href="mailto:{escultor.contactoEmail}" class="text-blue-600 hover:underline">{escultor.contactoEmail}</a></p>
+      </section>
+  </article>
+{/if}
 
-    <section class="mt-4">
-        <h2 class="text-xl font-semibold">Contacto</h2>
-        <p>Email: <a href="mailto:{escultor.contactoEmail}" class="text-blue-600 hover:underline">{escultor.contactoEmail}</a></p>
-    </section>
-</article>
 <!-- Contenedor de las obras -->
 <div class="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 p-4">
     {#each obras as card}
