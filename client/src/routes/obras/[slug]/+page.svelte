@@ -9,13 +9,34 @@
   let qrCodeData=""
   let mostrarQR=false
   let userRole=null
+  let nombreusu=""
+  
   let slug;
+  let nombreObra=""
+
   $: slug = $page.params.slug;
 
+  console.log(slug)
+  
   let obra = {}; // Objeto vacío para los datos de la obra
+
+  function decodificarToken(token) {
+    try {
+      const payload = token.split('.')[1]; // Extraemos el payload del JWT (parte del medio)
+      const decoded = atob(payload); // Decodificamos la base64
+      return JSON.parse(decoded); // Convertimos el JSON
+    } catch (error) {
+      console.error('Error al decodificar el token:', error);
+      return null;
+    }
+  }
+
+
+
 
   async function fetchObra(slug) {
     console.log("Buscando obra con slug:", slug); // Verifica el slug antes de la petición
+    nombreObra=slug
     try {
       const response = await axios.get(
         `http://localhost:3001/api/obras/${slug}`,
@@ -26,6 +47,16 @@
       );
       console.log("Datos de la obra recibidos:", response.data); // Verifica los datos que se reciben
       obra = response.data;
+      if(obra.obraEscultor == nombreusu ){
+       mostrarQR=true
+       
+      generateQRCode()
+      setInterval(generateQRCode, 60000); // 60000 ms = 1 minuto
+    }
+    else{
+       mostrarQR=false
+    }
+    
     } catch (error) {
       console.log("Error al obtener la obra:", error);
     }
@@ -34,29 +65,28 @@
  async function generateQRCode() {
      // Generar un token único que cambia cada minuto
      const timestamp = Math.floor(Date.now() / 60000); // Cada minuto cambia
-     const uniqueSlug = `${slug}-${timestamp}`;
+     const uniqueSlug = `${nombreObra}-${timestamp}`;
+
      const url = `http://localhost:5173/votacion?slug=${uniqueSlug}`;
      // Generar el código QR
      qrCodeUrl = url;
+     console.log(qrCodeUrl)
      qrCodeData = await QRCode.toDataURL(url);
    }
-   generateQRCode()
-//   // Actualizar el QR cada minuto
-   setInterval(generateQRCode, 60000); // 60000 ms = 1 minuto
-
-
+   
+   
    onMount(() => {
-    userRole = localStorage.getItem('role');
-    console.log(userRole)
-    if(userRole === 'artista'){
-       mostrarQR=true
-    }
-    else{
-       mostrarQR=false
-    }
-    fetchObra(slug);
+     let token = localStorage.getItem('token');
+     let userRole=localStorage.getItem('role');
+     
+     let decoded=decodificarToken(token)
+     nombreusu=decoded.nombre
+     fetchObra(slug);     
+    });
 
-   });
+    
+ //   // Actualizar el QR cada minuto
+ 
 </script>
 
 <!-- Renderizado de la página de detalle de la obra -->
@@ -85,7 +115,6 @@
 
   {#if mostrarQR}
   <section class="mt-2">
-    <h2 class="text-xl font-semibold">qr</h2>
     <img src={qrCodeData}/>
     <!-- Muestra el antecedente de la obra -->
   </section>

@@ -11,9 +11,7 @@
   function decodificarToken(token) {
     try {
       const payload = token.split('.')[1]; // Extraemos el payload del JWT (parte del medio)
-      console.log(payload)
       const decoded = atob(payload); // Decodificamos la base64
-      console.log(decoded)
       return JSON.parse(decoded); // Convertimos el JSON
     } catch (error) {
       console.error('Error al decodificar el token:', error);
@@ -21,9 +19,6 @@
     }
   }
 
-  /**
-   * @param {string} token
-   */
   function verificarPermisos(token) {
     const decoded = decodificarToken(token);
     if (decoded && decoded.permisos) {
