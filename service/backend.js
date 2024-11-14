@@ -43,6 +43,7 @@ const obtenerArtistas = async (busqueda, criterio, orden) => {
       const imagen = artista.getURL_foto();
       const biografia = artista.getRes_biografia();
       const contacto = artista.getContacto();
+      const promedio = artista.getPromedio();
 
       cards.push({
         id: index + 1,
@@ -50,10 +51,10 @@ const obtenerArtistas = async (busqueda, criterio, orden) => {
         content: biografia,
         escultorName: nombre,
         escultorFoto: imagen,
-        contactoEmail: contacto
+        contactoEmail: contacto,
+        promedio: promedio
       });
     }
-
     return cards;
 
   } catch (error) {
@@ -142,6 +143,7 @@ const obtenerEventos = async (busqueda, criterio, orden) => {
       const lugar = evento.getLugar();
       const horaInicio = evento.getHoraInicio();
       const horaFin = evento.getHoraFin();
+      const promedio = evento.getPromedio();
       const options = {month: 'long', day: 'numeric' };
       const formattedFechaInicio = fechaInicio.toLocaleDateString('es-ES', options);
       const formattedFechaFin = fechaFin.toLocaleDateString('es-ES', options);
@@ -159,7 +161,8 @@ const obtenerEventos = async (busqueda, criterio, orden) => {
         startTime: formattedHoraInicio,
         finishTime: formattedHoraFin,
         location: lugar,
-        content: tematica
+        content: tematica,
+        promedio: promedio
       });
     }
 
