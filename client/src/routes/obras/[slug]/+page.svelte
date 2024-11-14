@@ -3,7 +3,12 @@
   import { onMount } from "svelte";
   import axios from "axios";
   import { page } from "$app/stores";
+  import QRCode from "qrcode"
 
+  let qrCodeUrl='loading'
+  let qrCodeData=""
+  let mostrarQR=false
+  let userRole=null
   let slug;
   $: slug = $page.params.slug;
 
@@ -26,24 +31,31 @@
     }
   }
 
-// async function generateQRCode() {
-//     // Generar un token único que cambia cada minuto
-//     const timestamp = Math.floor(Date.now() / 60000); // Cada minuto cambia
-//     const uniqueSlug = `${slug}-${timestamp}`;
-//     const url = `http://localhost:5173/votacion?slug=${uniqueSlug}`;
-
-//     // Generar el código QR
-//     qrCodeUrl = url;
-//     qrCodeData = await QRCode.toDataURL(url);
-//   }
-
+ async function generateQRCode() {
+     // Generar un token único que cambia cada minuto
+     const timestamp = Math.floor(Date.now() / 60000); // Cada minuto cambia
+     const uniqueSlug = `${slug}-${timestamp}`;
+     const url = `http://localhost:5173/votacion?slug=${uniqueSlug}`;
+     // Generar el código QR
+     qrCodeUrl = url;
+     qrCodeData = await QRCode.toDataURL(url);
+   }
+   generateQRCode()
 //   // Actualizar el QR cada minuto
-//   setInterval(generateQRCode, 60000); // 60000 ms = 1 minuto
+   setInterval(generateQRCode, 60000); // 60000 ms = 1 minuto
 
-//   //de la 31 a las 45 QR
 
    onMount(() => {
-     fetchObra(slug);
+    userRole = localStorage.getItem('role');
+    console.log(userRole)
+    if(userRole === 'artista'){
+       mostrarQR=true
+    }
+    else{
+       mostrarQR=false
+    }
+    fetchObra(slug);
+
    });
 </script>
 
@@ -70,6 +82,15 @@
     <p>{obra.antecedente}</p>
     <!-- Muestra el antecedente de la obra -->
   </section>
+
+  {#if mostrarQR}
+  <section class="mt-2">
+    <h2 class="text-xl font-semibold">qr</h2>
+    <img src={qrCodeData}/>
+    <!-- Muestra el antecedente de la obra -->
+  </section>
+  {/if}
+
 
 </article>
 
