@@ -99,14 +99,14 @@ export async function EsculturasConsulta() {
           }
 
           // Verificar y agregar imagen
-          if (!escultura.getImagenes().some(imagen => imagen.URL === row.URL)) {
+          if (!escultura.getImagenes().some(imagen => imagen.url === row.URL)) {
             const nuevaImagen = new Imagenes(
               row.URL,
               row.etapa
           );
             escultura.addImagen(nuevaImagen);
           }
-
+          
         });
 
         // Convertir el Map a un array de esculturas
@@ -158,7 +158,7 @@ export async function EventosConsulta() {
       }
 
       console.log("Connected!");
-      
+
       // Seleccionar datos de la tabla "eventos"
       con.query('CALL cons_eventos()', function (err, results) {
         if (err) {
@@ -174,6 +174,141 @@ export async function EventosConsulta() {
         // Cerrar la conexión
         con.end();
         resolve(listEventos);
+      });
+    });
+  });
+}
+
+
+export async function ObrasdeUnEvento(evento) {
+  const con = crearConexion();
+  return new Promise((resolve, reject) => {
+    con.connect(function (err) {
+      if (err) {
+        console.error('Error connecting: ' + err.stack);
+        reject(err);
+        return;
+      }
+
+      console.log("Connected!");
+
+      // Seleccionar datos de la tabla "eventos"
+      con.query('CALL obrasDeUnEvento(?)', [evento], function (err, results) {
+        if (err) {
+          console.error('Error selecting data: ' + err.message);
+          reject(err);
+          return;
+        }
+        const esculturasMap = new Map();
+
+        results[0].forEach((row) => {
+          const esculturaNombre = row.nombre;
+
+          // Verificar si la escultura ya está en el map
+          if (!esculturasMap.has(esculturaNombre)) {
+            // Si no existe, crear una nueva instancia de Esculturas
+            const nuevaEscultura = new Esculturas(row.nombre, row.f_creacion, row.antecedentes, row.tecnica, row.promedio);
+            esculturasMap.set(esculturaNombre, nuevaEscultura);
+          }
+
+          // Obtener la escultura actual del map
+          const escultura = esculturasMap.get(esculturaNombre);
+
+          // Verificar y agregar artista
+          if (!escultura.getArtistas().some(artista => artista.DNI === row.DNI)) {
+            const nuevoArtista = new Artistas(
+              row.DNI,
+              row.NyA,
+              row.res_biografia,
+              row.contacto,
+              row.URL_foto,
+              0
+            );
+            escultura.addArtista(nuevoArtista);
+          }
+
+          // Verificar y agregar imagen
+          if (!escultura.getImagenes().some(imagen => imagen.URL === row.URL)) {
+            const nuevaImagen = new Imagenes(
+              row.URL,
+              row.etapa
+            );
+            escultura.addImagen(nuevaImagen);
+          }
+
+        });
+
+        // Convertir el Map a un array de esculturas
+        const listEsculturas = Array.from(esculturasMap.values());
+
+        con.end(); // Cierra la conexión
+        resolve(listEsculturas); // Resolvemos la promesa con el resultado
+      });
+    });
+  });
+}
+
+export async function ObrasdeUnArtista(artista) {
+  const con = crearConexion();
+  return new Promise((resolve, reject) => {
+    con.connect(function (err) {
+      if (err) {
+        console.error('Error connecting: ' + err.stack);
+        reject(err);
+        return;
+      }
+      console.log("Connected!");
+
+      con.query('CALL obrasDeUnArtista(?)', [artista], function (err, results) {
+        if (err) {
+          console.error('Error selecting data: ' + err.message);
+          reject(err);
+          return;
+        }
+        const esculturasMap = new Map();
+
+        results[0].forEach((row) => {
+          const esculturaNombre = row.nombre;
+
+          // Verificar si la escultura ya está en el map
+          if (!esculturasMap.has(esculturaNombre)) {
+            // Si no existe, crear una nueva instancia de Esculturas
+            const nuevaEscultura = new Esculturas(row.nombre, row.f_creacion, row.antecedentes, row.tecnica, row.promedio);
+            esculturasMap.set(esculturaNombre, nuevaEscultura);
+          }
+
+          // Obtener la escultura actual del map
+          const escultura = esculturasMap.get(esculturaNombre);
+
+          // Verificar y agregar artista
+          if (!escultura.getArtistas().some(artista => artista.DNI === row.DNI)) {
+            const nuevoArtista = new Artistas(
+              row.DNI,
+              row.NyA,
+              row.res_biografia,
+              row.contacto,
+              row.URL_foto,
+              0
+            );
+            escultura.addArtista(nuevoArtista);
+          }
+
+          // Verificar y agregar imagen
+          if (!escultura.getImagenes().some(imagen => imagen.URL === row.URL)) {
+            const nuevaImagen = new Imagenes(
+              row.URL,
+              row.etapa
+            );
+            escultura.addImagen(nuevaImagen);
+          }
+
+        });
+
+        // Convertir el Map a un array de esculturas
+        const listEsculturas = Array.from(esculturasMap.values());
+
+        con.end(); // Cierra la conexión
+        resolve(listEsculturas); // Resolvemos la promesa con el resultado
       });
     });
   });

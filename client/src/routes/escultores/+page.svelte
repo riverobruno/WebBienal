@@ -91,7 +91,7 @@
         <a href={`/escultores/${encodeURIComponent(card.escultorPantalla)}`}>
           <img
             src={card.escultorFoto}
-            class="w-32 rounded-full"
+            class="w-40 rounded-full mx-auto pt-2"
             alt="Avatar" />
           <div class="absolute bottom-0 left-0 right-0 top-0 h-full w-full overflow-hidden bg-[hsla(0,0%,98%,0.15)] bg-fixed opacity-0 transition duration-300 ease-in-out hover:opacity-100"></div>
         </a>    

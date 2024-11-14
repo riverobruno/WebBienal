@@ -1,8 +1,7 @@
-
 <!-- src/routes/+layout.svelte -->
 <script>
   let logo = "https://raw.githubusercontent.com/FRRe-DS/2024-06-TPI/main/client/src/public/bienal_logo_corto.png";
-  let anio= 2024;
+  let anio = 2024;
   import Navbar from '../components/layout/Navbar.svelte';
   import Footer from '../components/layout/Footer.svelte';
 </script>
@@ -14,7 +13,7 @@
 
 <main>
 
-  <Navbar />
+  <Navbar/>
   
   <slot></slot> <!-- Aquí se renderizarán las páginas hijas -->
   

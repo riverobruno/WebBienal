@@ -92,19 +92,43 @@
 <div class="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 p-4 auto-rows-auto {animate ? 'animate' : ''}">
     {#each displayedCards as card}
         <div class="card block bg-white shadow-secondary-1 m-2.5 border-2 border-gray-300 rounded-md">
+            <div class="relative overflow-hidden bg-cover bg-no-repeat">
+                <!-- Contenedor con scroll horizontal para las imágenes -->
+                <div class="absolute bottom-0 left-0 right-0 top-0 h-full w-full overflow-hidden bg-[hsla(0,0%,98%,0.15)] bg-fixed opacity-0 transition duration-300 ease-in-out hover:opacity-100"></div>
+            </div>
             <a href={`/obras/${card.obraPantalla}`}>
-                <div class="relative overflow-hidden bg-cover bg-no-repeat">
-                    <img class="rounded-t-lg" src={card.obraImage} alt={card.title} />
-                    <div class="absolute bottom-0 left-0 right-0 top-0 h-full w-full overflow-hidden bg-[hsla(0,0%,98%,0.15)] bg-fixed opacity-0 transition duration-300 ease-in-out hover:opacity-100"></div>
+                <div class="scroll-container">
+                    {#each card.obraImage as image}
+                        <div class="scroll-item">
+                            <img class="scroll-image rounded-t-lg" src={image} alt={card.title} />
+                        </div>
+                    {/each}
                 </div>
                 <div class="p-6 text-surface dark:text-white">
                     <h5 class="mb-2 text-xl font-medium leading-tight text-black">{card.obraName}</h5>
                     <span class="text-cyan-900">
-                        <img
-                            src={card.obraEscultorFoto}
-                            class="w-32 rounded-full"
-                            alt="Avatar" />
-                        <a href={card.obraEscultor}>{card.obraEscultor}</a>
+                        <div class="flex items-center space-x-2">
+                            {#each card.obraEscultor.escultoresNombre.slice(0, 4) as nombre, index}
+                                <div class="escultor-item">
+                                    {#if index === 0}
+                                        <!-- Imagen grande con nombre para el primer escultor -->
+                                        <img
+                                            src={card.obraEscultor.escultoresFotos[index]}
+                                            class="w-32 h-32 rounded-full"
+                                            alt="Avatar"
+                                        />
+                                        <h2>{nombre}</h2>
+                                    {:else}
+                                        <!-- Imágenes pequeñas sin nombre para el resto -->
+                                        <img
+                                            src={card.obraEscultor.escultoresFotos[index]}
+                                            class="w-16 h-16 rounded-full"
+                                            alt="Avatar"
+                                        />
+                                    {/if}
+                                </div>
+                            {/each}
+                        </div>
                     </span>
                     <p class="mb-4 text-base text-left text-black">{card.content}</p>
                     <p class="text-gray-600 text-sm">Fecha de creación: {card.f_creacion}</p>
@@ -136,6 +160,22 @@
 </div>
 
 <style>
+    .scroll-container {
+        display: flex;
+        overflow-x: scroll;
+        scroll-snap-type: x mandatory; /* Habilita el deslizamiento en incrementos fijos */
+        width: 100%; /* Ancho del contenedor */
+        scroll-behavior: smooth;
+    }
+
+    .scroll-item {
+        flex: 0 0 100%; /* Cada elemento ocupa el 100% del ancho del contenedor */
+        scroll-snap-align: start; /* Define dónde se "ajusta" el desplazamiento */
+        padding: 00px;
+        text-align: center;
+        background-color: #f1f1f1;
+        border: 0px solid #ccc;
+    }
     @keyframes fadeIn {
         from {
             opacity: 0;
