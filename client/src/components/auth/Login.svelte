@@ -36,7 +36,7 @@
       alert('Inicio de sesión exitoso');
       localStorage.setItem('token', data.token);
       localStorage.setItem('role', data.role); // Guardamos el rol en localStorage
-      
+      console.log(data.role)
       // Redirigir según el rol
       if (data.role === 'admin') {
         window.location.href = '/admin';

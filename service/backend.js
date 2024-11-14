@@ -229,14 +229,15 @@ app.post('/api/login', (req, res) => {
       if (conexion && conexion.length > 0) {
         // Determinar el rol del usuario
         let role;
-        
         if (adminEmails.includes(correo)) {
           role = 'admin';
-        } else if (conexion[0].permisos === 'artista') { // Si 'permisos' indica que es un artista
+        } else if (conexion[0].permisos === 'escultor') { // Si 'permisos' indica que es un artista
           role = 'escultor';
         } else {
           role = 'usuario';
         }
+        console.log(conexion)
+        console.log(role)
 
         // Crear el token con el correo y el rol determinado
         const token = jwt.sign({ correo, role }, JWT_SECRET, { expiresIn: '1h' });
