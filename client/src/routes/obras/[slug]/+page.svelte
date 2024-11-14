@@ -3,14 +3,40 @@
   import { onMount } from "svelte";
   import axios from "axios";
   import { page } from "$app/stores";
+  import QRCode from "qrcode"
 
+  let qrCodeUrl='loading'
+  let qrCodeData=""
+  let mostrarQR=false
+  let userRole=null
+  let nombreusu=""
+  
   let slug;
+  let nombreObra=""
+
   $: slug = $page.params.slug;
 
+  console.log(slug)
+  
   let obra = {}; // Objeto vacío para los datos de la obra
+
+  function decodificarToken(token) {
+    try {
+      const payload = token.split('.')[1]; // Extraemos el payload del JWT (parte del medio)
+      const decoded = atob(payload); // Decodificamos la base64
+      return JSON.parse(decoded); // Convertimos el JSON
+    } catch (error) {
+      console.error('Error al decodificar el token:', error);
+      return null;
+    }
+  }
+
+
+
 
   async function fetchObra(slug) {
     console.log("Buscando obra con slug:", slug); // Verifica el slug antes de la petición
+    nombreObra=slug
     try {
       const response = await axios.get(
         `http://localhost:3001/api/obras/${slug}`,
@@ -21,30 +47,46 @@
       );
       console.log("Datos de la obra recibidos:", response.data); // Verifica los datos que se reciben
       obra = response.data;
+      if(obra.obraEscultor == nombreusu ){
+       mostrarQR=true
+       
+      generateQRCode()
+      setInterval(generateQRCode, 60000); // 60000 ms = 1 minuto
+    }
+    else{
+       mostrarQR=false
+    }
+    
     } catch (error) {
       console.log("Error al obtener la obra:", error);
     }
   }
 
-// async function generateQRCode() {
-//     // Generar un token único que cambia cada minuto
-//     const timestamp = Math.floor(Date.now() / 60000); // Cada minuto cambia
-//     const uniqueSlug = `${slug}-${timestamp}`;
-//     const url = `http://localhost:5173/votacion?slug=${uniqueSlug}`;
+ async function generateQRCode() {
+     // Generar un token único que cambia cada minuto
+     const timestamp = Math.floor(Date.now() / 60000); // Cada minuto cambia
+     const uniqueSlug = `${nombreObra}-${timestamp}`;
 
-//     // Generar el código QR
-//     qrCodeUrl = url;
-//     qrCodeData = await QRCode.toDataURL(url);
-//   }
-
-//   // Actualizar el QR cada minuto
-//   setInterval(generateQRCode, 60000); // 60000 ms = 1 minuto
-
-//   //de la 31 a las 45 QR
-
+     const url = `http://localhost:5173/votacion?slug=${uniqueSlug}`;
+     // Generar el código QR
+     qrCodeUrl = url;
+     console.log(qrCodeUrl)
+     qrCodeData = await QRCode.toDataURL(url);
+   }
+   
+   
    onMount(() => {
-     fetchObra(slug);
-   });
+     let token = localStorage.getItem('token');
+     let userRole=localStorage.getItem('role');
+     
+     let decoded=decodificarToken(token)
+     nombreusu=decoded.nombre
+     fetchObra(slug);     
+    });
+
+    
+ //   // Actualizar el QR cada minuto
+ 
 </script>
 
 <!-- Renderizado de la página de detalle de la obra -->
@@ -70,6 +112,14 @@
     <p>{obra.antecedente}</p>
     <!-- Muestra el antecedente de la obra -->
   </section>
+
+  {#if mostrarQR}
+  <section class="mt-2">
+    <img src={qrCodeData}/>
+    <!-- Muestra el antecedente de la obra -->
+  </section>
+  {/if}
+
 
 </article>
 

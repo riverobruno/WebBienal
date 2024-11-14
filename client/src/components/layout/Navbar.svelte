@@ -19,9 +19,6 @@
     }
   }
 
-  /**
-   * @param {string} token
-   */
   function verificarPermisos(token) {
     const decoded = decodificarToken(token);
     if (decoded && decoded.permisos) {
