@@ -1,6 +1,7 @@
 <script>
     import { onMount } from "svelte";
     import axios from "axios";
+    import Cargando from '../escultores/+page.svelte'; // Importa el componente de carga
 
     let searchQuery = ""; // Valor de la búsqueda
     let criterio = 'promedio'; // Criterio de orden por defecto
@@ -16,6 +17,7 @@
     let totalPages = 0; // Total de páginas
 
     async function fetchEventos(query = "", criterio = 'promedio', orden = 'DESC') {
+        mostrandoCarga = true;
         try {
             const res = await axios.get(`http://localhost:3001/api/eventos`, {
                 params: {
@@ -37,6 +39,7 @@
         } catch (error) {
             console.log(error);
         }
+        mostrandoCarga = false;
     }
 
     // Ejecutar la consulta inicial cuando se monta la página
@@ -59,6 +62,7 @@
             animate = true; // Activa la animación
         }, 0);
     }
+    export let mostrandoCarga = false;
 </script>
 
 <div class="search-container">
@@ -75,6 +79,11 @@
         <option value="nombre">Nombre</option>
         <option value="fecha_inicio">Fecha de inicio</option>
     </select>
+
+    <!-- Mostrar el ícono de carga solo cuando mostrandoCarga es true -->   
+    {#if mostrandoCarga}
+        <div class="loading-icon"></div>
+    {/if}
 
     <!-- Lista desplegable para el orden ascendente/descendente -->
     <select class="search-select" bind:value="{orden}">
@@ -117,6 +126,30 @@
 </div>
 
 <style>
+    /* Estilos para el ícono de carga */
+    .loading-icon {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 50px;
+        height: 50px;
+        border: 6px solid #f3f3f3;
+        border-top: 6px solid #3498db;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        z-index: 1000;
+    }
+
+    /* Animación de giro */
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
     @keyframes fadeIn {
         from {
             opacity: 0;

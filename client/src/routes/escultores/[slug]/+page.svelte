@@ -1,6 +1,5 @@
 <script>
-// @ts-nocheck
-
+    // @ts-nocheck
     import { onMount } from "svelte";
     import axios from "axios";
     import { page } from "$app/stores";
@@ -25,9 +24,9 @@
     onMount(() => {
       fetchEscultor(slug);
     });
-</script>
-
-<article class="max-w-2xl mx-auto mt-8 p-6 bg-white shadow-md rounded-lg">
+  </script>
+  
+  <article class="escultor-detail-container max-w-2xl mx-auto mt-8 p-6 bg-white shadow-lg rounded-lg animate">
     <header class="text-center">
         <img src={escultor.escultorFoto} alt="{escultor.escultorName}" class="w-32 h-32 rounded-full mx-auto" />
         <h1 class="text-3xl font-bold mt-4">{escultor.escultorName}</h1>
@@ -43,7 +42,6 @@
         <p>Email: <a href="mailto:{escultor.contactoEmail}" class="text-blue-600 hover:underline">{escultor.contactoEmail}</a></p>
     </section>
 </article>
-
 <!-- Contenedor de las obras -->
 <div class="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 p-4">
     {#each obras as card}
@@ -62,3 +60,68 @@
         </div>
     {/each}
 </div>
+<style>
+    /* Estilos generales */
+    .escultor-detail-container {
+      background-color: #f9f9f9;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+    }
+  
+    /* Animación de entrada */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(100px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  
+    .animate {
+      animation: fadeIn 0.5s ease-in-out forwards;
+    }
+  
+    /* Estilos de imagen con bordes suaves */
+    .image-style {
+      border-radius: 50%;
+      box-shadow: 0 4px 15px rgba(113, 51, 7, 0.4);  /* Sombra difusa marrón */
+      border: 2px solid rgba(113, 51, 7, 0.2);  /* Borde suave con color marrón */
+    }
+  
+    h1 {
+      font-family: 'Arial', sans-serif;
+      color: #713307;
+    }
+  
+    /* Títulos y texto */
+    h2 {
+      color: #86512c;
+      font-weight: bold;
+    }
+  
+    p {
+      color: #4a4a4a;
+      font-size: 1rem;
+      line-height: 1.6;
+      margin-top: 10px;
+    }
+  
+    /* Color personalizado marrón */
+    .text-brown {
+      color: #86512c;
+    }
+  
+    /* Enlaces */
+    a {
+      color: #713307;
+    }
+  
+    a:hover {
+      text-decoration: underline;
+      color: #86512c;
+    }
+  </style>
