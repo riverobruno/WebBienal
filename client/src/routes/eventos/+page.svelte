@@ -1,7 +1,6 @@
 <script>
     import { onMount } from "svelte";
     import axios from "axios";
-    import Cargando from '../escultores/+page.svelte'; // Importa el componente de carga
 
     let searchQuery = ""; // Valor de la búsqueda
     let criterio = 'promedio'; // Criterio de orden por defecto
@@ -45,6 +44,7 @@
     // Ejecutar la consulta inicial cuando se monta la página
     onMount(() => {
         fetchEventos(); // Sin query al principio
+        console.log("montando")
     });
     
     // Calcula las cartas a mostrar en la página actual

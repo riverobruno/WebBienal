@@ -55,9 +55,9 @@
 {#if mostrandoCarga}
     <div class="loading-icon"></div>
 {:else}
-    <!-- Mostrar las tarjetas solo cuando mostrandoCarga sea false -->
-    {#each obras as card}
-        <div class="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 p-4">
+    <div class="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 p-4">
+        <!-- Mostrar las tarjetas solo cuando mostrandoCarga sea false -->
+        {#each obras as card}
             <div class="card block bg-white shadow-secondary-1 m-2.5 border-2 border-gray-300 rounded-md">
                 <a href={`/obras/${card.obraPantalla}`}>
                     <div class="relative overflow-hidden bg-cover bg-no-repeat">
@@ -78,8 +78,8 @@
                     </div>
                 </a>
             </div>
-        </div>
-    {/each}
+        {/each}
+    </div>
 {/if}
 
 <style>

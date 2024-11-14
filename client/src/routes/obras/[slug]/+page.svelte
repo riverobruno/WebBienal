@@ -30,10 +30,6 @@
       return null;
     }
   }
-
-
-
-
   async function fetchObra(slug) {
     console.log("Buscando obra con slug:", slug); // Verifica el slug antes de la petición
     nombreObra=slug
@@ -47,15 +43,14 @@
       );
       console.log("Datos de la obra recibidos:", response.data); // Verifica los datos que se reciben
       obra = response.data;
-      if(obra.obraEscultor == nombreusu ){
-       mostrarQR=true
-       
-      generateQRCode()
-      setInterval(generateQRCode, 60000); // 60000 ms = 1 minuto
-    }
-    else{
-       mostrarQR=false
-    }
+      if(obra.obraEscultor.escultoresNombre.includes(nombreusu)){
+        mostrarQR=true
+        generateQRCode()
+        setInterval(generateQRCode, 60000); // 60000 ms = 1 minuto
+      }
+      else{
+        mostrarQR=false
+      }
     
     } catch (error) {
       console.log("Error al obtener la obra:", error);

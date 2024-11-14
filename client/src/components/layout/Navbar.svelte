@@ -37,6 +37,19 @@
     }
   }
 
+function irAPerfil() {
+    const token = localStorage.getItem('token');
+    if (token) {
+      // Decodificar el token (asegurándote de tener una función de decodificación como decodificarToken)
+      const decoded = decodificarToken(token);
+      const nombre = decoded.nombre.replace(/ /g, ''); // Eliminar los espacios del nombre
+      // Redirigir al perfil del escultor
+      window.location.href = `/escultores/${nombre}`;
+    } else {
+      console.error('Token no encontrado en localStorage');
+    }
+  }
+
   function toggleDropdown() {
     const token = localStorage.getItem('token');
     if (token) {
@@ -126,9 +139,9 @@
 
         <!-- Botón QR, solo visible si isEscultor es true -->
         {#if isEscultor}
-          <button on:click={() => goto('/votacion')} class="block px-4 py-2 mt-2 text-sm text-neutral-600 dark:text-white hover:bg-pink-500 hover:text-white cursor-pointer">
-            Generar QR
-          </button>
+          <button on:click={irAPerfil} class="block px-4 py-2 text-sm text-neutral-600 dark:text-white hover:bg-pink-500 hover:text-white cursor-pointer">
+          Ir al perfil
+        </button>
         {/if}
       </div>
       {/if}

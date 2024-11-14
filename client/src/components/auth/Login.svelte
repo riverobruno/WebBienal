@@ -47,7 +47,6 @@
     const data = await response.json();
 
     if (data.success && data.token) {
-      alert('Inicio de sesión exitoso');
       localStorage.setItem('token', data.token);
       localStorage.setItem('role', data.role); // Guardamos el rol en localStorage
       console.log(data.role)
@@ -55,9 +54,8 @@
       if (data.role === 'admin') {
         window.location.href = '/admin';
       } else if (data.role === 'escultor') {
-        console.log()
-        let nombre = (decodificarToken(data.token)).nombre
-        window.location.href = `/escultores/${encodeURIComponent(nombre)}`;
+        let nombre = ((decodificarToken(data.token)).nombre).replace(/ /g, '')
+        window.location.href = `/escultores/${nombre}`;
       } else {
         window.location.href = '/inicio';
       }
