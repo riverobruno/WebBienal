@@ -26,6 +26,7 @@
     "jsonwebtoken": "^8.5.1",
     "mysql2": "^3.11.3",
     "npm": "^10.9.0",
+    "svelte-qrcode": "^1.0.1",
     "tw-elements": "^2.0.0"
   },
   "devDependencies": {
