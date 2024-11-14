@@ -12,6 +12,20 @@
     }
   });
 
+  /**
+   * @param {string} token
+   */
+  function decodificarToken(token) {
+    try {
+      const payload = token.split('.')[1]; // Extraemos el payload del JWT (parte del medio)
+      const decoded = atob(payload); // Decodificamos la base64
+      return JSON.parse(decoded); // Convertimos el JSON
+    } catch (error) {
+      console.error('Error al decodificar el token:', error);
+      return null;
+    }
+  }
+
   const iniciarSesion = async () => {
   if (!correo || !contraseña) {
     alert('Por favor, ingresa tu correo y contraseña.');
@@ -41,7 +55,9 @@
       if (data.role === 'admin') {
         window.location.href = '/admin';
       } else if (data.role === 'escultor') {
-        window.location.href = '/artista';
+        console.log()
+        let nombre = (decodificarToken(data.token)).nombre
+        window.location.href = `/escultores/${encodeURIComponent(nombre)}`;
       } else {
         window.location.href = '/inicio';
       }

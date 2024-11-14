@@ -183,7 +183,6 @@ app.get('/api/escultores', async (req, res) => {
   const searchQuery = req.query.search;
   const criterio = req.query.sortBy;
   const orden = req.query.order;
-  console.log(usuario);
   const cards = await obtenerArtistas(searchQuery, criterio, orden);  // Esperamos a que se procesen todas las consultas
   res.json(cards);
 });
@@ -236,8 +235,6 @@ app.post('/api/login', (req, res) => {
         } else {
           role = 'usuario';
         }
-        console.log(conexion)
-        console.log(role)
 
         // Crear el token con el correo y el rol determinado
         const token = jwt.sign({ correo: conexion[0].email, permisos: conexion[0].permisos,nombre:conexion[0].NyA }, JWT_SECRET, { expiresIn: '1h' });
