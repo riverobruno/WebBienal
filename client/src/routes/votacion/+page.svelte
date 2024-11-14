@@ -1,9 +1,11 @@
 <script>
   import { onMount } from 'svelte';
+  import { goto } from '$app/navigation';
+  import QRCode from 'qrcode';
 
   let artista = null;
   let obraReciente = null;
-  let puntuacion = 0;
+  let qrCodeDataUrl = '';  let puntuacion = 0;
   let userRole;
 
   onMount(() => {
@@ -34,6 +36,8 @@
       if (data.success) {
         artista = data.artista;
         obraReciente = data.obraReciente;
+        const enlaceVotacion = `votacion/${artista.nombre.replace(/\s+/g, '')}`;
+        generarQRCode(enlaceVotacion);
       } else {
         console.error('No se encontraron datos del artista o la obra');
       }
@@ -86,8 +90,9 @@
     <button on:click={votar}>Votar</button>
   </div>
 {/if}
-
 <style>
+  
+  
   .full-page {
     padding: 20px;
   }
@@ -95,5 +100,81 @@
     max-width: 200px;
     height: auto;
     margin-top: 10px;
+  }
+  @keyframes fadeIn {
+      from {
+          opacity: 0;
+          transform: translateY(100px);
+      }
+      to {
+          opacity: 1;
+          transform: translateY(0);
+      }
+  }
+
+  .full-page {
+      display: flex;
+      justify-content: center;
+      padding: 20px;
+      font-family: Arial, sans-serif;
+  }
+
+  .content {
+      display: flex;
+      gap: 30px;
+      animation: fadeIn 0.5s ease forwards;
+      background: #f9f9f9;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
+
+  .artist-details {
+      flex: 1;
+  }
+
+  .artist-details h2 {
+      color: #86512c;
+      margin-bottom: 10px;
+  }
+
+  .artist-details p {
+      font-size: 16px;
+      color: #333;
+      margin: 5px 0;
+  }
+
+  .art-image {
+      max-width: 100%;
+      max-height: 300px;
+      height: auto;
+      border-radius: 8px;
+      margin-top: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  .qr-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      width: 200px;
+  }
+
+  .qr-section h2 {
+      font-size: 18px;
+      color: #86512c;
+      text-align: center;
+      margin-bottom: 10px;
+  }
+
+  .qr-code {
+      width: 300px;
+      height: auto;
+      margin-top: 10px;
   }
 </style>
