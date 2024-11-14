@@ -72,11 +72,12 @@
    
    onMount(() => {
      let token = localStorage.getItem('token');
-     let userRole=localStorage.getItem('role');
-     
-     let decoded=decodificarToken(token)
-     nombreusu=decoded.nombre
-     fetchObra(slug);     
+     let userRole = localStorage.getItem('role');
+     if (token){
+      let decoded=decodificarToken(token)
+      nombreusu=decoded.nombre
+      }
+    fetchObra(slug);     
     });
 
     
