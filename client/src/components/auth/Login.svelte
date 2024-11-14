@@ -13,37 +13,47 @@
   });
 
   const iniciarSesion = async () => {
-    if (!correo || !contraseña) {
-      alert('Por favor, ingresa tu correo y contraseña.');
-      return;
-    }
+  if (!correo || !contraseña) {
+    alert('Por favor, ingresa tu correo y contraseña.');
+    return;
+  }
 
-    try {
-      const response = await fetch('http://localhost:3001/api/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          correo: correo,
-          contraseña: contraseña,
-        }),
-      });
+  try {
+    const response = await fetch('http://localhost:3001/api/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        correo: correo,
+        contraseña: contraseña,
+      }),
+    });
 
-      const data = await response.json();
+    const data = await response.json();
 
-      if (data.success && data.token) {
-        alert('Inicio de sesión exitoso');
-        localStorage.setItem('token', data.token);
-        window.location.href = '/inicio';
+    if (data.success && data.token) {
+      alert('Inicio de sesión exitoso');
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('role', data.role); // Guardamos el rol en localStorage
+      console.log(data.role)
+      // Redirigir según el rol
+      if (data.role === 'admin') {
+        window.location.href = '/admin';
+      } else if (data.role === 'escultor') {
+        window.location.href = '/artista';
       } else {
-        alert('Credenciales incorrectas');
+        window.location.href = '/inicio';
       }
-    } catch (error) {
-      console.error('Error al intentar iniciar sesión:', error);
-      alert('Hubo un error al intentar iniciar sesión');
+    } else {
+      alert('Credenciales incorrectas');
     }
-  };
+  } catch (error) {
+    console.error('Error al intentar iniciar sesión:', error);
+    alert('Hubo un error al intentar iniciar sesión');
+  }
+};
+
 </script>
 
 <section class="gradient-form h-full dark:bg-neutral-700 mx-auto my-auto">

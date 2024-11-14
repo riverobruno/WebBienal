@@ -5,8 +5,23 @@
 
   let artista = null;
   let obraReciente = null;
+  let puntuacion = 0;
+  let userRole;
+
   let qrCodeDataUrl = '';
   
+  onMount(() => {
+    // Verifica el rol del usuario
+    userRole = localStorage.getItem('role');
+
+    if (userRole !== 'usuario') {
+      alert('Acceso denegado. Redirigiendo a la página principal.');
+      window.location.href = '/inicio';
+    } else {
+      obtenerArtistaYObra();
+    }
+  });
+
   async function obtenerArtistaYObra() {
       const token = localStorage.getItem('token');
       const email = token ? decodificarToken(token).correo : '';
@@ -42,6 +57,11 @@
       }
   }
 
+  
+  function votar() {
+    // Aquí harías la solicitud para enviar el voto al backend
+    console.log(`Votando con puntuación: ${puntuacion}`);
+  }
   async function generarQRCode(url) {
       try {
           qrCodeDataUrl = await QRCode.toDataURL(url);
@@ -50,7 +70,6 @@
       }
   }
 
-  onMount(obtenerArtistaYObra);
 </script>
 
 <div class="full-page">

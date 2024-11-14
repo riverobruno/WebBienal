@@ -15,6 +15,10 @@ let eventos = [];
 let artistas = [];
 let usuario = '';
 
+// Lista de correos electrónicos de administradores
+const adminEmails = ['admin1@example.com', 'admin2@example.com'];
+
+
 app.use(cors()); // Permitir CORS
 // Middleware para analizar el cuerpo de la solicitud (JSON)
 app.use(bodyParser.json());
@@ -216,54 +220,85 @@ app.get('/api/eventos/:nombre', async (req, res) => {
 app.post('/api/login', (req, res) => {
   const { correo, contraseña } = req.body;
 
-  // Verificar si se ingresaron correo y contraseña
   if (!correo || !contraseña) {
     return res.status(400).json({ message: 'Por favor ingrese correo y contraseña' });
   }
 
   login(correo, contraseña)
     .then(conexion => {
-      // Aquí es donde manejamos los resultados
       if (conexion && conexion.length > 0) {
-        // Crear el token con correo y permisos de la respuesta de la base de datos
-        const token = jwt.sign({ correo: conexion[0].email, permisos: conexion[0].permisos }, JWT_SECRET, { expiresIn: '1h' });
+        // Determinar el rol del usuario
+        let role;
+        if (adminEmails.includes(correo)) {
+          role = 'admin';
+        } else if (conexion[0].permisos === 'escultor') { // Si 'permisos' indica que es un artista
+          role = 'escultor';
+        } else {
+          role = 'usuario';
+        }
+        console.log(conexion)
+        console.log(role)
 
-        // Responder con el token
-        return res.status(200).json({ success: true, message: 'Inicio de sesión exitoso', token });
+        // Crear el token con el correo y el rol determinado
+        const token = jwt.sign({ correo, role }, JWT_SECRET, { expiresIn: '1h' });
+        return res.status(200).json({ success: true, message: 'Inicio de sesión exitoso', token, role});
       } else {
         return res.status(401).json({ success: false, message: 'Credenciales incorrectas' });
       }
     })
     .catch(error => {
-      // En caso de error, enviamos una respuesta con estado 500
       console.error('Error en la conexión:', error);
       return res.status(500).json({ success: false, message: 'Error en el servidor' });
     });
 });
 
 
-// Middleware para verificar el token
-const verificarToken = (req, res, next) => {
+
+// Middleware para verificar token y rol
+const verificarTokenYRol = (rolesPermitidos) => (req, res, next) => {
   const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1]; // Obtener el token después de 'Bearer '
+  const token = authHeader && authHeader.split(' ')[1];
 
   if (!token) return res.status(403).json({ success: false, message: 'Token no proporcionado' });
 
-  jwt.verify(token, JWT_SECRET, (err, decoded) => { // Usar JWT_SECRET aquí
-      if (err) return res.status(403).json({ success: false, message: 'Token inválido' });
-      req.user = decoded; // Guardar la información del usuario decodificada
-      next();
+  jwt.verify(token, JWT_SECRET, (err, decoded) => {
+    if (err) return res.status(403).json({ success: false, message: 'Token inválido' });
+
+    if (!rolesPermitidos.includes(decoded.role)) {
+      return res.status(403).json({ success: false, message: 'No tiene permisos para acceder a esta ruta' });
+    }
+
+    req.user = decoded; // Guarda la información del usuario decodificada en la solicitud
+    next();
   });
 };
 
+
+
+
 // Endpoint para verificar el token y obtener el correo
-app.get('/api/verificar', verificarToken, (req, res) => {
+app.get('/api/verificar', verificarTokenYRol, (req, res) => {
     const correo = req.user.correo; // Suponiendo que el correo está en el payload del token
     res.json({ success: true, correo });
 });
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
+});
+
+// Ruta solo para administradores
+app.get('/api/admin', verificarTokenYRol(['admin']), (req, res) => {
+  res.json({ message: 'Acceso permitido solo para administradores' });
+});
+
+// Ruta solo para escultores
+app.get('/api/escultor', verificarTokenYRol(['escultor']), (req, res) => {
+  res.json({ message: 'Acceso permitido solo para escultores' });
+});
+
+// Ruta accesible tanto para escultores como para administradores
+app.get('/api/escultores-y-admins', verificarTokenYRol(['escultor', 'admin']), (req, res) => {
+  res.json({ message: 'Acceso permitido para escultores y administradores' });
 });
 
 

@@ -26,6 +26,7 @@
     const decoded = decodificarToken(token);
     if (decoded && decoded.permisos) {
       const permisos = decoded.permisos;
+      console.log(permisos)
       if (permisos === 'escultor') {
         isEscultor = true; // Establecemos 'isEscultor' si el permiso es "escultor"
       } else {
