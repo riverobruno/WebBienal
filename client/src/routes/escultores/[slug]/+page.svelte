@@ -3,54 +3,100 @@
     import { onMount } from "svelte";
     import axios from "axios";
     import { page } from "$app/stores";
-  
     let slug;
     $: slug = $page.params.slug;
-  
-    let cards = {};
-  
+    let escultor = {}; // Objeto vacío para los datos del escultor
+    let data = {};
+    let obras = []; // Cambié a un array para manejar varias obras
+    let mostrandoCarga = true;
+
     async function fetchEscultor(slug) {
-      console.log('Buscando escultor con slug:', slug); // Verifica el slug antes de la petición
-      try {
-        const response = await axios.get(`http://localhost:3001/api/escultores/${slug}`, {
-          params: { nombre: slug }
-        });
-        console.log('Datos del escultor recibidos:', response.data); // Verifica los datos que se reciben
-        cards = response.data; // Asegúrate de que cards sea un array, aquí puede ser un solo objeto
-      } catch (error) {
-        console.log("Error al obtener escultor:", error);
-      }
+        mostrandoCarga = true;
+        try {
+            const response = await axios.get(`http://localhost:3001/api/escultores/${slug}`, {
+                params: { nombre: slug }
+            });
+            data = response.data;
+            escultor = data.escultor;
+            obras = data.obras; // Asigno las obras correctamente
+        } catch (error) {
+            console.log("Error al obtener escultor:", error);
+        }
+        mostrandoCarga = false;
     }
   
     onMount(() => {
       fetchEscultor(slug);
     });
   </script>
-  
+
+<!-- Mostrar el ícono de carga solo cuando mostrandoCarga es true -->
+{#if mostrandoCarga}
+    <div class="loading-icon"></div>
+{/if}
+
+{#if !mostrandoCarga}
   <article class="escultor-detail-container max-w-2xl mx-auto mt-8 p-6 bg-white shadow-lg rounded-lg animate">
-    <header class="text-center">
-      <img
-        src={cards.escultorFoto}
-        alt="{cards.escultorName}"
-        class="w-32 h-32 rounded-full mx-auto image-style"
-      />
-      <h1 class="text-3xl font-bold mt-4 text-brown">{cards.escultorName}</h1>
-    </header>
-  
-    <section class="mt-6">
-      <h2 class="text-xl font-semibold text-brown">Biografía</h2>
-      <p>{cards.content}</p>
-    </section>
-  
-    <section class="mt-6">
-      <h2 class="text-xl font-semibold text-brown">Contacto</h2>
-      <p>Email: 
-        <a href="mailto:{cards.contactoEmail}" class="text-blue-600 hover:underline">{cards.contactoEmail}</a>
-      </p>
-    </section>
+      <header class="text-center">
+          <img src={escultor.escultorFoto} alt="{escultor.escultorName}" class="w-32 h-32 rounded-full mx-auto" />
+          <h1 class="text-3xl font-bold mt-4">{escultor.escultorName}</h1>
+      </header>
+
+      <section class="mt-4">
+          <h2 class="text-xl font-semibold">Biografía</h2>
+          <p>{escultor.content}</p>
+      </section>
+
+      <section class="mt-4">
+          <h2 class="text-xl font-semibold">Contacto</h2>
+          <p>Email: <a href="mailto:{escultor.contactoEmail}" class="text-blue-600 hover:underline">{escultor.contactoEmail}</a></p>
+      </section>
   </article>
-  
-  <style>
+{/if}
+
+<!-- Contenedor de las obras -->
+<div class="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 p-4">
+    {#each obras as card}
+        <div class="card block bg-white shadow-secondary-1 m-2.5 border-2 border-gray-300 rounded-md">
+            <a href={`/obras/${card.obraPantalla}`}>
+                <div class="relative overflow-hidden bg-cover bg-no-repeat">
+                    <img class="rounded-t-lg" src={card.obraImage} alt={card.title} />
+                    <div class="absolute bottom-0 left-0 right-0 top-0 h-full w-full overflow-hidden bg-[hsla(0,0%,98%,0.15)] bg-fixed opacity-0 transition duration-300 ease-in-out hover:opacity-100"></div>
+                </div>
+                <div class="p-6 text-surface dark:text-white">
+                    <h5 class="mb-2 text-xl font-medium leading-tight text-black">{card.obraName}</h5>
+                    <p class="mb-4 text-base text-left text-black">{card.content}</p>
+                    <p class="text-gray-600 text-sm">Fecha de creación: {card.f_creacion}</p>
+                </div>
+            </a>
+        </div>
+    {/each}
+</div>
+<style>
+     /* Estilos para el ícono de carga */
+    .loading-icon {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 50px;
+      height: 50px;
+      border: 6px solid #f3f3f3;
+      border-top: 6px solid #3498db;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      z-index: 1000;
+    }
+
+    /* Animación de giro */
+  @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+  }
+
     /* Estilos generales */
     .escultor-detail-container {
       background-color: #f9f9f9;
@@ -75,13 +121,6 @@
       animation: fadeIn 0.5s ease-in-out forwards;
     }
   
-    /* Estilos de imagen con bordes suaves */
-    .image-style {
-      border-radius: 50%;
-      box-shadow: 0 4px 15px rgba(113, 51, 7, 0.4);  /* Sombra difusa marrón */
-      border: 2px solid rgba(113, 51, 7, 0.2);  /* Borde suave con color marrón */
-    }
-  
     h1 {
       font-family: 'Arial', sans-serif;
       color: #713307;
@@ -100,11 +139,6 @@
       margin-top: 10px;
     }
   
-    /* Color personalizado marrón */
-    .text-brown {
-      color: #86512c;
-    }
-  
     /* Enlaces */
     a {
       color: #713307;
@@ -115,4 +149,3 @@
       color: #86512c;
     }
   </style>
-  

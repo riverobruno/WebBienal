@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 
-import { ArtistasConsulta, EsculturasConsulta, EventosConsulta, login, obtenerArtistaYObraReciente } from './conexiondb.js';
+import { ArtistasConsulta, EsculturasConsulta, EventosConsulta, login, obtenerArtistaYObraReciente, ObrasdeUnEvento, ObrasdeUnArtista } from './conexiondb.js';
 import { ordenarEsculturas, buscarEsculturas, ordenarEventos, buscarEventos, ordenarArtistas, buscarArtistas } from './filtrosObjetos.js';
 import jwt from 'jsonwebtoken';
 
@@ -13,7 +13,8 @@ const port = 3001;
 let esculturas = [];
 let eventos = [];
 let artistas = [];
-let usuario = '';
+let esculturasEvento = null;
+let esculturasArtista = null;
 
 // Lista de correos electrónicos de administradores
 const adminEmails = ['admin1@example.com', 'admin2@example.com'];
@@ -46,6 +47,7 @@ const obtenerArtistas = async (busqueda, criterio, orden) => {
       const imagen = artista.getURL_foto();
       const biografia = artista.getRes_biografia();
       const contacto = artista.getContacto();
+      const promedio = artista.getPromedio();
 
       cards.push({
         id: index + 1,
@@ -53,10 +55,10 @@ const obtenerArtistas = async (busqueda, criterio, orden) => {
         content: biografia,
         escultorName: nombre,
         escultorFoto: imagen,
-        contactoEmail: contacto
+        contactoEmail: contacto,
+        promedio: promedio
       });
     }
-
     return cards;
 
   } catch (error) {
@@ -77,6 +79,114 @@ const obtenerEsculturas = async (busqueda, criterio, orden) => {
 
     const esculturasFiltradas = buscarEsculturas(esculturas, busqueda);
     const esculturasOrdenadas = ordenarEsculturas(esculturasFiltradas, criterio, orden);
+    const cards = [];
+    for (const [index, escultura] of esculturasOrdenadas.entries()) {
+      // Accede a los métodos de la clase Esculturas
+      const listaObraImagenes = escultura.getImagenes();
+      const obraImagen = listaObraImagenes.map((imagen) => imagen.getURL());
+      const tecnica = escultura.getTecnica();
+      const obraNombre = escultura.getNombre();
+      const obraArtistas = escultura.getArtistas();
+      const obraArtista = obraArtistas.map((artista) => artista.getNyA());
+      const obraEscultorFoto = obraArtistas.map((artista) => artista.getURL_foto());
+      const obraEscultor = {
+        escultoresFotos: obraEscultorFoto,
+        escultoresNombre: obraArtista
+      }
+      const average = escultura.getPromedio();
+      const fecha_creacion = escultura.getFechaCreacion();
+      const promedioEstrellas = escultura.getPromedio();
+      const antecedente = escultura.getAntecedente();
+
+      const options = { year: 'numeric', month: 'long', day: 'numeric' };
+      const formattedFecha_creacion = fecha_creacion.toLocaleDateString('es-ES', options);
+
+      cards.push({
+        id: index + 1,
+        title: 'Carta' + (index + 1),
+        obraPantalla: obraNombre.replace(/ /g, ''),
+        obraImage: obraImagen,
+        content: tecnica,
+        obraName: obraNombre,
+        obraEscultor: obraEscultor,
+        promedio: average,
+        f_creacion: formattedFecha_creacion,
+        promedio: promedioEstrellas,
+        antecedente: antecedente
+      });
+    }
+
+    return cards;
+
+  } catch (error) {
+    console.error('Error al obtener esculturas:', error);
+    return [];  // Retornar un array vacío en caso de error
+  }
+};
+
+const obtenerEventos = async (busqueda, criterio, orden) => {
+  try {
+    if (eventos.length == 0) {
+      eventos = await EventosConsulta();
+    }
+    // Asegúrate de que esculturas es un array
+    if (!Array.isArray(eventos)) {
+      throw new Error('La consulta no devolvió un array');
+    }
+
+    const eventosFiltrados = buscarEventos(eventos, busqueda);
+    const eventosOrdenados = ordenarEventos(eventosFiltrados, criterio, orden);
+
+    const cards = [];
+    for (const [index, evento] of eventosOrdenados.entries()) {
+      // Accede a los métodos de la clase Eventos
+      const titulo = evento.getNombre();
+      const fechaInicio = new Date(evento.getFechaInicio());
+      const fechaFin = new Date(evento.getFechaFin());
+      const tematica = evento.getTematica();
+      const lugar = evento.getLugar();
+      const horaInicio = evento.getHoraInicio();
+      const horaFin = evento.getHoraFin();
+      const promedio = evento.getPromedio();
+      const options = {month: 'long', day: 'numeric' };
+      const formattedFechaInicio = fechaInicio.toLocaleDateString('es-ES', options);
+      const formattedFechaFin = fechaFin.toLocaleDateString('es-ES', options);
+
+      const formattedHoraInicio = horaInicio.split(':').slice(0, 2).join(':');  // De "09:30:00" a "09:30"
+      const formattedHoraFin = horaFin.split(':').slice(0, 2).join(':');        // De "15:00:00" a "15:00"
+
+
+      cards.push({
+        title: 'evento' + (index + 1),
+        eventName: titulo,
+        eventoPantalla: titulo.replace(/ /g, ''),
+        eventStartDate: formattedFechaInicio,
+        eventFinishDate: formattedFechaFin,
+        startTime: formattedHoraInicio,
+        finishTime: formattedHoraFin,
+        location: lugar,
+        content: tematica,
+        promedio: promedio
+      });
+    }
+
+    return cards;
+
+  } catch (error) {
+    console.error('Error al obtener eventos:', error);
+    return [];  // Retornar un array vacío en caso de error
+  }
+};
+
+const obtenerObrasdeEvento = async (evento) => {
+  try {
+    esculturasEvento = await ObrasdeUnEvento(evento);
+    // Asegúrate de que esculturas es un array
+    if (!Array.isArray(esculturasEvento)) {
+      throw new Error('La consulta no devolvió un array');
+    }
+
+    const esculturasOrdenadas = ordenarEsculturas(esculturasEvento, 'promedio', 'DESC');
 
     const cards = [];
     for (const [index, escultura] of esculturasOrdenadas.entries()) {
@@ -118,64 +228,63 @@ const obtenerEsculturas = async (busqueda, criterio, orden) => {
     console.error('Error al obtener esculturas:', error);
     return [];  // Retornar un array vacío en caso de error
   }
-};
+}
 
-const obtenerEventos = async (busqueda, criterio, orden) => {
+const obtenerObrasdeArtista = async (artista) => {
   try {
-    if (esculturas.length == 0) {
-      eventos = await EventosConsulta();
-    }
+    esculturasArtista = await ObrasdeUnArtista(artista);
     // Asegúrate de que esculturas es un array
-    if (!Array.isArray(eventos)) {
+    if (!Array.isArray(esculturasArtista)) {
       throw new Error('La consulta no devolvió un array');
     }
-
-    const eventosFiltrados = buscarEventos(eventos, busqueda);
-    const eventosOrdenados = ordenarEventos(eventosFiltrados, criterio, orden);
+    const esculturasOrdenadas = ordenarEsculturas(esculturasArtista, 'promedio', 'DESC');
 
     const cards = [];
-    for (const [index, evento] of eventosOrdenados.entries()) {
-      // Accede a los métodos de la clase Eventos
-      const titulo = evento.getNombre();
-      const fechaInicio = new Date(evento.getFechaInicio());
-      const fechaFin = new Date(evento.getFechaFin());
-      const tematica = evento.getTematica();
-      const lugar = evento.getLugar();
-      const horaInicio = evento.getHoraInicio();
-      const horaFin = evento.getHoraFin();
-      const options = {month: 'long', day: 'numeric' };
-      const formattedFechaInicio = fechaInicio.toLocaleDateString('es-ES', options);
-      const formattedFechaFin = fechaFin.toLocaleDateString('es-ES', options);
+    for (const [index, escultura] of esculturasOrdenadas.entries()) {
+      // Accede a los métodos de la clase Esculturas
+      const listaObraImagenes = escultura.getImagenes();
+      const obraImagen = listaObraImagenes[0].getURL();
+      const tecnica = escultura.getTecnica();
+      const obraNombre = escultura.getNombre();
+      const average = escultura.getPromedio();
+      const fecha_creacion = escultura.getFechaCreacion();
+      const promedioEstrellas = escultura.getPromedio();
+      const antecedente = escultura.getAntecedente();
 
-      const formattedHoraInicio = horaInicio.split(':').slice(0, 2).join(':');  // De "09:30:00" a "09:30"
-      const formattedHoraFin = horaFin.split(':').slice(0, 2).join(':');        // De "15:00:00" a "15:00"
-
+      const options = { year: 'numeric', month: 'long', day: 'numeric' };
+      const formattedFecha_creacion = fecha_creacion.toLocaleDateString('es-ES', options);
 
       cards.push({
-        title: 'evento' + (index + 1),
-        eventName: titulo,
-        eventoPantalla: titulo.replace(/ /g, ''),
-        eventStartDate: formattedFechaInicio,
-        eventFinishDate: formattedFechaFin,
-        startTime: formattedHoraInicio,
-        finishTime: formattedHoraFin,
-        location: lugar,
-        content: tematica
+        id: index + 1,
+        title: 'Carta' + (index + 1),
+        obraPantalla: obraNombre.replace(/ /g, ''),
+        obraImage: obraImagen,
+        content: tecnica,
+        obraName: obraNombre,
+        promedio: average,
+        f_creacion: formattedFecha_creacion,
+        promedio: promedioEstrellas,
+        antecedente: antecedente
       });
     }
 
     return cards;
 
   } catch (error) {
-    console.error('Error al obtener eventos:', error);
+    console.error('Error al obtener esculturas:', error);
     return [];  // Retornar un array vacío en caso de error
   }
-};
+}
 
 app.get('/api/escultores/:nombre', async (req, res) => {
   const nombre = req.params.nombre; // Obtiene el nombre del parámetro de la URL
   const cards = await obtenerArtistas(nombre, 'nombre', 'DESC');; // Función para obtener un escultor específico
-  res.json(cards[0]);
+  const cardsObras = await obtenerObrasdeArtista(nombre)
+  const respuesta = {
+    escultor: cards[0],
+    obras: cardsObras
+  };
+  res.json(respuesta);
 });
 
 // Endpoint para obtener escultores
@@ -211,10 +320,16 @@ app.get('/api/eventos', async (req, res) => {
 });
 
 app.get('/api/eventos/:nombre', async (req, res) => {
-  const nombre = req.params.nombre; // Obtiene el nombre del parámetro de la URL
+  const nombre = req.params.nombre;
   const cards = await obtenerEventos(nombre, 'nombre', 'DESC');
-  res.json(cards[0]);
+  const cardsObras = await obtenerObrasdeEvento(nombre);
+  const respuesta = {
+    evento: cards[0],
+    obras: cardsObras
+  };
+  res.json(respuesta);
 });
+
 
 app.post('/api/login', (req, res) => {
   const { correo, contraseña } = req.body;
