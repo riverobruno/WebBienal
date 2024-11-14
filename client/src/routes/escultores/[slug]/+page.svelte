@@ -9,6 +9,7 @@
     let data = {};
     let obras = []; // Cambié a un array para manejar varias obras
     async function fetchEscultor(slug) {
+        mostrandoCarga = true;
         try {
             const response = await axios.get(`http://localhost:3001/api/escultores/${slug}`, {
                 params: { nombre: slug }
@@ -19,14 +20,22 @@
         } catch (error) {
             console.log("Error al obtener escultor:", error);
         }
+        mostrandoCarga = false;
     }
   
     onMount(() => {
       fetchEscultor(slug);
     });
+    export let mostrandoCarga = false;
   </script>
-  
-  <article class="escultor-detail-container max-w-2xl mx-auto mt-8 p-6 bg-white shadow-lg rounded-lg animate">
+
+<!-- Mostrar el ícono de carga solo cuando mostrandoCarga es true -->
+{#if mostrandoCarga}
+    <div class="loading-icon"></div>
+{/if}
+
+
+<article class="escultor-detail-container max-w-2xl mx-auto mt-8 p-6 bg-white shadow-lg rounded-lg animate">
     <header class="text-center">
         <img src={escultor.escultorFoto} alt="{escultor.escultorName}" class="w-32 h-32 rounded-full mx-auto" />
         <h1 class="text-3xl font-bold mt-4">{escultor.escultorName}</h1>
@@ -61,6 +70,30 @@
     {/each}
 </div>
 <style>
+     /* Estilos para el ícono de carga */
+    .loading-icon {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 50px;
+      height: 50px;
+      border: 6px solid #f3f3f3;
+      border-top: 6px solid #3498db;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      z-index: 1000;
+    }
+
+    /* Animación de giro */
+  @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+  }
+
     /* Estilos generales */
     .escultor-detail-container {
       background-color: #f9f9f9;
@@ -85,13 +118,6 @@
       animation: fadeIn 0.5s ease-in-out forwards;
     }
   
-    /* Estilos de imagen con bordes suaves */
-    .image-style {
-      border-radius: 50%;
-      box-shadow: 0 4px 15px rgba(113, 51, 7, 0.4);  /* Sombra difusa marrón */
-      border: 2px solid rgba(113, 51, 7, 0.2);  /* Borde suave con color marrón */
-    }
-  
     h1 {
       font-family: 'Arial', sans-serif;
       color: #713307;
@@ -108,11 +134,6 @@
       font-size: 1rem;
       line-height: 1.6;
       margin-top: 10px;
-    }
-  
-    /* Color personalizado marrón */
-    .text-brown {
-      color: #86512c;
     }
   
     /* Enlaces */
