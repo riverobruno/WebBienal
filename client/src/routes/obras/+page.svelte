@@ -28,6 +28,7 @@
                 }
             });
             cards = res.data;
+            console.log(cards)
             currentPage = 1;
             // Calcula el total de páginas
             totalPages = Math.ceil(cards.length / itemsPerPage);

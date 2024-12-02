@@ -192,12 +192,16 @@ const obtenerObrasdeEvento = async (evento) => {
     for (const [index, escultura] of esculturasOrdenadas.entries()) {
       // Accede a los métodos de la clase Esculturas
       const listaObraImagenes = escultura.getImagenes();
-      const obraImagen = listaObraImagenes[0].getURL();
+      const obraImagen = listaObraImagenes.map((imagen) => imagen.getURL());
       const tecnica = escultura.getTecnica();
       const obraNombre = escultura.getNombre();
       const obraArtistas = escultura.getArtistas();
-      const obraArtista = obraArtistas[0].getNyA();
-      const obraEscultorFoto = obraArtistas[0].getURL_foto();
+      const obraArtista = obraArtistas.map((artista) => artista.getNyA());
+      const obraEscultorFoto = obraArtistas.map((artista) => artista.getURL_foto());
+      const obraEscultor = {
+        escultoresFotos: obraEscultorFoto,
+        escultoresNombre: obraArtista
+      }
       const average = escultura.getPromedio();
       const fecha_creacion = escultura.getFechaCreacion();
       const promedioEstrellas = escultura.getPromedio();
@@ -213,8 +217,7 @@ const obtenerObrasdeEvento = async (evento) => {
         obraImage: obraImagen,
         content: tecnica,
         obraName: obraNombre,
-        obraEscultor: obraArtista,
-        obraEscultorFoto: obraEscultorFoto,
+        obraEscultor: obraEscultor,
         promedio: average,
         f_creacion: formattedFecha_creacion,
         promedio: promedioEstrellas,
@@ -243,7 +246,7 @@ const obtenerObrasdeArtista = async (artista) => {
     for (const [index, escultura] of esculturasOrdenadas.entries()) {
       // Accede a los métodos de la clase Esculturas
       const listaObraImagenes = escultura.getImagenes();
-      const obraImagen = listaObraImagenes[0].getURL();
+      const obraImagen = listaObraImagenes.map((imagen) => imagen.getURL());
       const tecnica = escultura.getTecnica();
       const obraNombre = escultura.getNombre();
       const average = escultura.getPromedio();

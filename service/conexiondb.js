@@ -228,14 +228,14 @@ export async function ObrasdeUnEvento(evento) {
           }
 
           // Verificar y agregar imagen
-          if (!escultura.getImagenes().some(imagen => imagen.URL === row.URL)) {
+          if (!escultura.getImagenes().some(imagen => imagen.url === row.URL)) {
             const nuevaImagen = new Imagenes(
               row.URL,
               row.etapa
-            );
+          );
             escultura.addImagen(nuevaImagen);
           }
-
+          
         });
 
         // Convertir el Map a un array de esculturas
