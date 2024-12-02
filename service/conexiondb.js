@@ -314,46 +314,62 @@ export async function ObrasdeUnArtista(artista) {
   });
 }
 
-
-// Función para consultar la información del artista y su obra más reciente
-export async function obtenerArtistaYObraReciente(email) {
+export async function EventosYEsculturasDeObra(obra) {
   const con = crearConexion();
-
   return new Promise((resolve, reject) => {
-    con.connect((err) => {
+    con.connect(function (err) {
       if (err) {
-        console.error('Error al conectar:', err.stack);
+        console.error('Error connecting: ' + err.stack);
         reject(err);
         return;
       }
+      console.log("Connected!");
 
-      const query = `
-        SELECT artistaNombre, artistaDNI, temp.res_biografia AS biografia,
-               obraNombre, obraFechaCreacion, temp.tecnica, im.URL AS imagen_url
-        FROM (
-          SELECT a.NyA AS artistaNombre, a.DNI AS artistaDNI, a.res_biografia,
-                 o.nombre AS obraNombre, o.f_creacion AS obraFechaCreacion, o.tecnica
-          FROM artistas a
-          INNER JOIN hechas_por h ON a.DNI = h.DNI
-          INNER JOIN esculturas o ON h.nombre_escultura = o.nombre
-          WHERE a.contacto = ?
-          ORDER BY o.f_creacion DESC
-          LIMIT 1
-        ) AS temp
-        INNER JOIN imagenes im ON obraNombre = im.nombre_escultura
-      `;
-
-      con.query(query, [email], (error, results) => {
-        con.end();
-
-        if (error) {
-          console.error('Error en la consulta:', error.message);
-          reject(error);
+      con.query('CALL EventosYEsculturasDeObra(?)', [obra], function (err, results) {
+        if (err) {
+          console.error('Error selecting data: ' + err.message);
+          reject(err);
           return;
         }
+        const artistasMap = new Map(); // Para asegurar artistas únicos
+        const eventosMap = new Map(); // Para asegurar eventos únicos
+        results[0].forEach((row) => {
+            // Procesar artistas
+            if (!artistasMap.has(row.DNI)) { // Verifica si el artista ya está en el mapa
+              const nuevoArtista = new Artistas(
+                row.DNI,
+                row.NyA,
+                row.res_biografia,
+                row.contacto,
+                row.URL_foto,
+                0
+              );
+              artistasMap.set(row.DNI, nuevoArtista); // Agrega al mapa
+            }
 
-        resolve(results[0]); // Retornamos solo el primer resultado
+            // Procesar eventos
+            if (!eventosMap.has(row.nombre)) { // Verifica si el evento ya está en el mapa
+              const nuevoEvento = new Eventos(
+                row.nombre,
+                row.lugar,
+                row.fecha_inicio,
+                row.fecha_fin,
+                row.tematica,
+                row.hora_inicio,
+                row.hora_fin,
+                0
+              );
+              eventosMap.set(row.nombre, nuevoEvento); // Agrega al mapa
+            }
+          });
+        // Convertir los mapas a listas
+        const listas = {
+          listaArtistas: Array.from(artistasMap.values()), // Artistas únicos
+          listaEventos: Array.from(eventosMap.values()),  // Eventos únicos
+        };
+        con.end(); // Cierra la conexión
+        resolve(listas); // Resolvemos la promesa con el resultado
+        });
       });
     });
-  });
 }

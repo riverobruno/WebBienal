@@ -22,7 +22,6 @@
             data = res.data;
             evento = data.evento;
             obras = data.obras; // Asigno las obras correctamente
-            console.log(obras)
         } catch (error) {
             console.log('Error al obtener el evento:', error);
         }
@@ -206,9 +205,9 @@
     }
 
     /* Animación de giro */
-  @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-  }
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
 </style>
 
