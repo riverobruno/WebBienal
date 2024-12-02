@@ -1,6 +1,7 @@
 <script>
   import { goto } from '$app/navigation';
-  import logo from '$lib/../public/bienal_logo.png'; // Asumí que necesitas importar el logo
+  import logo from '$lib/../public/bienal_logo.png';
+  import { onMount } from "svelte"; // Asumí que necesitas importar el logo
   let isNavOpen = false;
   let isDropdownOpen = false;
   let isEscultor = false;
@@ -65,6 +66,11 @@ function irAPerfil() {
     localStorage.removeItem('token'); // Elimina el token de autenticación
     goto('/login');  // Redirige a la página de inicio de sesión
   }
+  function clickAfuera(event) { if (!event.target.closest("#botonperfil")) { isDropdownOpen = false; } }
+  
+  onMount(() => { document.addEventListener("click", clickAfuera); return () => document.removeEventListener("click", clickAfuera); });
+  
+  
 </script>
 
 <!-- Main navigation container -->
@@ -121,7 +127,7 @@ function irAPerfil() {
 
     
       <!-- Icono de perfil -->
-      <div class="relative flex items-center space-x-4">
+      <div class="relative flex items-center space-x-4" id="botonperfil">
         <button on:click={toggleDropdown} class="text-neutral-600 dark:text-white hover:text-pink-500">
           <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-person-circle" viewBox="0 0 16 16">
             <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/>
