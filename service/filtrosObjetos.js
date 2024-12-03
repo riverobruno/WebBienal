@@ -138,13 +138,11 @@ export function buscarEsculturas(listaEsculturas, busqueda) {
 
             // Verificar coincidencias en la lista de artistas
             const artistas = escultura.getArtistas(); // Obtener la lista de artistas
-
             if (Array.isArray(artistas)) {
                 for (const artista of artistas) {
                     // Validar que el artista tenga nombre y apellido
-                    if (artista && artista.nombre && artista.apellido) {
-                        if (artista.nombre.toLowerCase().includes(busqueda) ||
-                            artista.apellido.toLowerCase().includes(busqueda)) {
+                    if (artista && artista.NyA) {
+                        if (artista.NyA.toLowerCase().replace(/\s+/g, '').includes(busqueda.toLowerCase().replace(/\s+/g, ''))) {
                             resultados.push(escultura);
                             break; // No es necesario seguir buscando más artistas
                         }

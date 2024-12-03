@@ -16,6 +16,7 @@
   
   // Función para realizar la búsqueda
   async function fetchEscultores(query = "", criterio = "promedio", orden = "DESC") {
+    mostrandoCarga = true;
     try {
       const res = await axios.get(`http://localhost:3001/api/escultores`, {
         params: {
@@ -36,6 +37,7 @@
     } catch (error) {
       console.log(error);
     }
+    mostrandoCarga = false;
   }
 
   // Ejecutar la consulta inicial cuando se monta la página
@@ -58,7 +60,14 @@
       animate = true;
     }, 0);
   }
+
+  export let mostrandoCarga = false;
 </script>
+
+<!-- Mostrar el ícono de carga solo cuando mostrandoCarga es true -->
+{#if mostrandoCarga}
+    <div class="loading-icon"></div>
+{/if}
 
 <div class="search-container">
   <input
@@ -91,7 +100,7 @@
         <a href={`/escultores/${encodeURIComponent(card.escultorPantalla)}`}>
           <img
             src={card.escultorFoto}
-            class="w-32 rounded-full"
+            class="w-40 rounded-full mx-auto pt-2"
             alt="Avatar" />
           <div class="absolute bottom-0 left-0 right-0 top-0 h-full w-full overflow-hidden bg-[hsla(0,0%,98%,0.15)] bg-fixed opacity-0 transition duration-300 ease-in-out hover:opacity-100"></div>
         </a>    
@@ -101,7 +110,17 @@
           {card.escultorName}
         </h5>
         <p class="mb-4 text-base text-left text-black">{card.content}</p>
-        
+        <div class="stars">
+            {#each Array(5) as _, index}
+                {#if index < Math.floor(card.promedio)} <!-- Estrella completa -->
+                    <span class="star filled">★</span>
+                {:else if index < card.promedio} <!-- Media estrella -->
+                    <span class="star half-filled">★</span>
+                {:else} <!-- Estrella vacía -->
+                    <span class="star">★</span>
+                {/if}
+            {/each}
+        </div>
         <!-- Nuevo bloque para el contacto -->
         <p class="text-sm text-left text-gray-600">
           Contacto: <a href="mailto:{card.contactoEmail}" class="text-blue-600 hover:underline">{card.contactoEmail}</a>
@@ -121,6 +140,54 @@
 </div>
 
 <style>
+    .stars {
+        margin-top: 8px; /* Espaciado superior */
+    }
+
+    .star {
+        font-size: 20px; /* Tamaño de las estrellas */
+        color: lightgray; /* Color por defecto de las estrellas */
+        margin-right: 2px; /* Espaciado entre las estrellas */
+        transition: color 0.3s; /* Transición para el color */
+    }
+
+    .star.filled {
+        color: gold; /* Color de las estrellas llenas */
+    }
+
+    .star.half-filled {
+        background: linear-gradient(90deg, gold 50%, lightgray 50%); /* Gradiente para media estrella */
+        background-clip: text;
+        -webkit-background-clip: text; /* Clip para texto en navegadores WebKit */
+        color: transparent; /* Oculta el color base */
+        display: inline-block; /* Necesario para el fondo */
+        width: 20px; /* Ancho para media estrella */
+        text-align: center; /* Centra el texto */
+    }
+  /* Estilos para el ícono de carga */
+    .loading-icon {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 50px;
+      height: 50px;
+      border: 6px solid #f3f3f3;
+      border-top: 6px solid #3498db;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      z-index: 1000;
+    }
+
+    /* Animación de giro */
+  @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+  }
+
   @keyframes fadeIn {
     from {
       opacity: 0;
