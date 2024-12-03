@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 
-import { ArtistasConsulta, EsculturasConsulta, EventosConsulta, login, obtenerArtistaYObraReciente, ObrasdeUnEvento, ObrasdeUnArtista } from './conexiondb.js';
+import { ArtistasConsulta, EsculturasConsulta, EventosConsulta, login, obtenerArtistaYObraReciente, ObrasdeUnEvento, ObrasdeUnArtista, register} from './conexiondb.js';
 import { ordenarEsculturas, buscarEsculturas, ordenarEventos, buscarEventos, ordenarArtistas, buscarArtistas } from './filtrosObjetos.js';
 import jwt from 'jsonwebtoken';
 
@@ -19,12 +19,9 @@ let esculturasArtista = null;
 // Lista de correos electrónicos de administradores
 const adminEmails = ['admin1@example.com', 'admin2@example.com'];
 
-
 app.use(cors()); // Permitir CORS
 // Middleware para analizar el cuerpo de la solicitud (JSON)
 app.use(bodyParser.json());
-
-
 
 // Crear una función asincrónica para manejar las consultas a la base de datos
 const obtenerArtistas = async (busqueda, criterio, orden) => {
@@ -413,7 +410,6 @@ app.get('/api/escultores-y-admins', verificarTokenYRol(['escultor', 'admin']), (
   res.json({ message: 'Acceso permitido para escultores y administradores' });
 });
 
-
 app.get('/api/artista/:email', async (req, res) => {
   const email = req.params.email;
 
@@ -443,4 +439,16 @@ app.get('/api/artista/:email', async (req, res) => {
     console.error("Error en el endpoint de artista:", error);
     res.status(500).json({ success: false, message: 'Error interno del servidor' });
   }
+});
+
+
+app.post('/api/registro', (req, res) => {
+  const { nombreapellido, correo, contraseña } = req.body;
+
+  if (!nombreapellido || !correo || !contraseña) {
+    return res.status(400).json({ message: 'Por favor ingrese nombre y apellido, correo y contraseña' });
+  }
+
+  register(nombreapellido, correo, contraseña)
+  return res.status(200).json({ success: true, message: 'Registro correcto' });
 });

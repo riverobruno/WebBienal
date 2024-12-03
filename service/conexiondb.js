@@ -357,3 +357,30 @@ export async function obtenerArtistaYObraReciente(email) {
     });
   });
 }
+
+export async function register(nombreapellido, correo, contraseña) {
+  let con = crearConexion();
+
+  return new Promise((resolve, reject) => {
+    con.connect((err) => {
+      if (err) {
+        console.error('Error connecting: ' + err.stack);
+        reject(err); // Rechazar la promesa en caso de error de conexión
+        return;
+      }
+      console.log("Connected!");
+
+      // Realizamos la consulta a la base de datos pasando los parámetros
+      const query = 'CALL register(?, ?, ?)'; // Definimos los placeholders
+      con.query(query, [nombreapellido, correo, contraseña], (err, results) => { // Pasamos los valores
+        if (err) {
+          console.error('Error querying the database:', err);
+          reject(err); // Rechazar la promesa en caso de error en la consulta
+        } else {
+          resolve(results[0]); // Resolver la promesa con los resultados
+        }
+        con.end(); // Cerramos la conexión
+      });
+    });
+  });
+}

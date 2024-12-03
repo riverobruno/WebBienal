@@ -139,7 +139,7 @@
                   Bienvenido a la bienal
                 </h4>
                 <p class="text-sm">
-                  Si quiere votar a las esculturas y no tiene cuenta, Registrese Aqui (implementar)<br><br>
+                  Si quiere votar a las esculturas y no tiene cuenta, <a href="/registro" class="text-primary font-bold">Registrese Aquí</a>.<br><br>
                   Si es un escultor y no tiene perfil comuniquese con administracion
                 </p>
               </div>
