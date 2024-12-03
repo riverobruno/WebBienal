@@ -22,7 +22,6 @@
 
   $: slug = $page.params.slug;
 
-  console.log(slug)
   
   let obra = {}; // Objeto vacío para los datos de la obra
 
@@ -77,10 +76,10 @@
     const uniqueSlug = `${nombreObra}-${timestamp}`;
 
     // Concatenar con la clave secreta y hashear
-    const hash = CryptoJS.SHA256(`${timestamp}-desarrollo2024`).toString(CryptoJS.enc.Base64);
+    const hash = CryptoJS.SHA256(`${nombreObra}-${timestamp}-desarrollo2024`).toString(CryptoJS.enc.Base64);
 
-    // Tomar los primeros 8 caracteres del hash
-    const hashedSlug = hash.substring(0, 8);
+    // Tomar los primeros 12 caracteres del hash
+    const hashedSlug = hash.substring(0, 12);
 
     const url = `http://localhost:3333/votacion?slug=${nombreObra}-${hashedSlug}`;
     

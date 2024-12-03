@@ -1,178 +1,92 @@
 <script>
-  import { onMount } from 'svelte';
-  import { goto } from '$app/navigation';
-  import QRCode from 'qrcode';
+    import { onMount } from 'svelte';
+    import { page } from "$app/stores";
+    import CryptoJS from "crypto-js"; // Importar la librería
 
-  let artista = null;
-  let obraReciente = null;
-  let puntuacion = 0;
-  let userRole;
+    let rating = 0;
+    let userRole;
+    let slug;
 
-  let qrCodeDataUrl = '';
-  
-  onMount(() => {
-    // Verifica el rol del usuario
-    userRole = localStorage.getItem('role');
+    $: slug = $page.url.searchParams.get('slug');
+    $: [name, code] = slug ? slug.replace(/\/$/, '').split('-') : [null, null];
 
-    if (userRole !== 'usuario') {
-      alert('Acceso denegado. Redirigiendo a la página principal.');
-      window.location.href = '/inicio';
-    } else {
-      obtenerArtistaYObra();
+
+    function obtenerCodigoValido() {
+        // Generar un token único que cambia cada minuto
+        const timestamp = Math.floor(Date.now() / 60000); // Cada minuto cambia
+        // Concatenar con la clave secreta y hashear
+        const hash = CryptoJS.SHA256(`${name}-${timestamp}-desarrollo2024`).toString(CryptoJS.enc.Base64);
+        // Tomar los primeros 12 caracteres del hash
+        const hashedSlug = hash.substring(0, 12);
+        return hashedSlug;
     }
-  });
 
-  async function obtenerArtistaYObra() {
-      const token = localStorage.getItem('token');
-      const email = token ? decodificarToken(token).correo : '';
+    // Función para actualizar el parámetro basado en la calificación
+    /**
+     * @param {number} value
+     */
+    function updateParameter(value) {
+        rating = value; // Actualizamos la calificación
+    }
 
-      try {
-          const response = await fetch(`http://localhost:3001/api/artista/${email}`);
-          
-          if (!response.ok) throw new Error('Error en la respuesta del servidor');
-
-          const data = await response.json();
-
-          if (data.success) {
-              artista = data.artista;
-              obraReciente = data.obraReciente;
-              const enlaceVotacion = `votacion/${artista.nombre.replace(/\s+/g, '')}`;
-              generarQRCode(enlaceVotacion);
-          } else {
-              console.error('No se encontraron datos del artista o la obra');
-          }
-      } catch (error) {
-          console.error('Error al obtener los datos del artista:', error);
-      }
-  }
-
-  function decodificarToken(token) {
-      try {
-          const payload = token.split('.')[1];
-          const decoded = atob(payload);
-          return JSON.parse(decoded);
-      } catch (error) {
-          console.error('Error al decodificar el token:', error);
-          return null;
-      }
-  }
-
-  
-  function votar() {
-    // Aquí harías la solicitud para enviar el voto al backend
-    console.log(`Votando con puntuación: ${puntuacion}`);
-  }
-  async function generarQRCode(url) {
-      try {
-          qrCodeDataUrl = await QRCode.toDataURL(url);
-      } catch (error) {
-          console.error('Error al generar el código QR:', error);
-      }
-  }
+    onMount(() => {
+    /* // Verifica el rol del usuario
+    userRole = localStorage.getItem('role');
+    if (!userRole || userRole !== 'usuario') {
+        alert('Acceso denegado. Redirigiendo a la página principal.');
+        window.location.href = '/inicio';
+    }
+    let codigoValido = obtenerCodigoValido()
+    if (codigoValido != code) {
+        alert('Tiempo de votación fuera de término. Por favor volver a escanear el QR');
+        window.location.href = '/inicio';
+    } */
+    });
 
 </script>
 
-<div class="full-page">
-  <div class="content animate">
-      <div class="artist-details">
-          <h2>Información del Artista</h2>
-          <p><strong>Nombre:</strong> {artista ? artista.nombre : 'undefined'}</p>
-          <p><strong>DNI:</strong> {artista ? artista.dni : 'undefined'}</p>
-          <p><strong>Biografía:</strong> {artista ? artista.biografia : 'undefined'}</p>
-
-          <h2>Obra Más Reciente</h2>
-          <p><strong>Nombre de la Obra:</strong> {obraReciente ? obraReciente.nombre : 'undefined'}</p>
-          <p><strong>Fecha de Creación:</strong> {obraReciente ? obraReciente.fechaCreacion : 'undefined'}</p>
-          <p><strong>Técnica:</strong> {obraReciente ? obraReciente.tecnica : 'undefined'}</p>
-          {#if obraReciente && obraReciente.imagenURL}
-              <img src={obraReciente.imagenURL} alt="Imagen de la obra reciente" class="art-image" />
-          {/if}
-      </div>
-
-      <div class="qr-section">
-          <h2>Código QR para votar</h2>
-          {#if qrCodeDataUrl}
-              <img src={qrCodeDataUrl} alt="Código QR para votar" class="qr-code" />
-          {/if}
-      </div>
+<div class="centered-container">
+  <div>
+    {#each Array(5).fill(0) as _, i}
+      <button
+        type="button"
+        class="star {i < rating ? 'selected' : ''}"
+        aria-label="Rate {i + 1} star{(i === 0 ? '' : 's')}"
+        on:click={() => updateParameter(i + 1)}
+        on:keydown={(e) => (e.key === 'Enter' || e.key === ' ') && updateParameter(i + 1)}
+      >
+        ★
+      </button>
+    {/each}
   </div>
+
+  <p class="rating-text">Valor seleccionado: {rating}</p>
 </div>
 
 <style>
-  @keyframes fadeIn {
-      from {
-          opacity: 0;
-          transform: translateY(100px);
-      }
-      to {
-          opacity: 1;
-          transform: translateY(0);
-      }
+
+  /* Contenedor principal centrado */
+  .centered-container {
+    display: flex;
+    justify-content: center; /* Centrado horizontal */
+    align-items: center; /* Centrado vertical */
+    flex-direction: column; /* Asegura que los elementos se apilen verticalmente */
   }
 
-  .full-page {
-      display: flex;
-      justify-content: center;
-      padding: 20px;
-      font-family: Arial, sans-serif;
+  .star {
+    font-size: 4rem;
+    color: gray;
+    border: none;
+    background: none;
+    cursor: pointer;
   }
 
-  .content {
-      display: flex;
-      gap: 30px;
-      animation: fadeIn 0.5s ease forwards;
-      background: #f9f9f9;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  .star.selected {
+    color: gold;
   }
 
-  .artist-details {
-      flex: 1;
-  }
-
-  .artist-details h2 {
-      color: #86512c;
-      margin-bottom: 10px;
-  }
-
-  .artist-details p {
-      font-size: 16px;
-      color: #333;
-      margin: 5px 0;
-  }
-
-  .art-image {
-      max-width: 100%;
-      max-height: 300px;
-      height: auto;
-      border-radius: 8px;
-      margin-top: 10px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  }
-
-  .qr-section {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      background: #fff;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      width: 200px;
-  }
-
-  .qr-section h2 {
-      font-size: 18px;
-      color: #86512c;
-      text-align: center;
-      margin-bottom: 10px;
-  }
-
-  .qr-code {
-      width: 300px;
-      height: auto;
-      margin-top: 10px;
+  .rating-text {
+    font-size: 2rem; /* Cambia el tamaño del texto */
+    font-weight: bold; /* Puedes hacer el texto más grueso si lo deseas */
   }
 </style>

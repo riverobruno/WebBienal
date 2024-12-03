@@ -452,9 +452,9 @@ const uploadStreamPromise = promisify(cloudinary.uploader.upload_stream);
 
 // Configuración de Cloudinary
 cloudinary.config({
-  cloud_name: "dkreomcdb",
-  api_key: "519139417673166",
-  api_secret: "F4P4FcD5toi8QvG17119nTQUCRk"
+  cloud_name: process.env.cloud_name,
+  api_key: process.env.api_key,
+  api_secret: process.env.api_secret
 });
 
 // Función para insertar un artista
