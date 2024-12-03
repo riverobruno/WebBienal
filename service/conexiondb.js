@@ -9,6 +9,22 @@ const __dirname = dirname(__filename);
 dotenv.config({ path: join(__dirname, '../.env') });
 
 
+// Crear un pool de conexiones reutilizable
+const pool = mysql.createPool({
+  host: process.env.DB_HOST,
+  port: process.env.DB_PORT,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0,
+});
+
+
+
+
+
 export function crearConexion(){
   return mysql.createConnection({
     host: process.env.DB_HOST,
@@ -372,4 +388,135 @@ export async function EventosYEsculturasDeObra(obra) {
         });
       });
     });
+};
+
+
+
+//InsertarEventos
+export function insertarEvento(evento) {
+  console.log("Insertando evento...");
+
+  const query = `
+    INSERT INTO eventos 
+    SET nombre = '${evento.nombre}', 
+        lugar = '${evento.lugar}', 
+        tematica = '${evento.tematica}', 
+        fecha_inicio = '${evento.fecha_inicio}', 
+        fecha_fin = '${evento.fecha_fin}', 
+        hora_inicio = '${evento.hora_inicio}', 
+        hora_fin = '${evento.hora_fin}';
+  `;
+
+  // Retornar una promesa manualmente, envolviendo la llamada a pool.execute
+  return new Promise((resolve, reject) => {
+    pool.execute(query, (error, result) => {
+      if (error) {
+        reject(error); // Rechazamos la promesa en caso de error
+      } else {
+        console.log('Evento insertado:', result);
+        // Ahora, accedemos directamente a insertId desde el objeto result
+        resolve(result.insertId);
+      }
+    });
+  }).catch(error => {
+    console.error('Error al insertar evento:', error);
+    throw error; // Propaga el error para manejo externo
+  });
 }
+
+/*
+const EventoNuevo = {
+  nombre: "AAAnuevotest2",
+  lugar: "Lugar del evento",
+  tematica: "Temática del evento",
+  fecha_inicio: "2024-12-05",
+  fecha_fin: "2024-12-06",
+  hora_inicio: "10:00:00",
+  hora_fin: "18:00:00"
+};*/
+
+
+// Llamar a la función
+//insertarEvento(EventoNuevo).catch(console.error);
+//console.log("Listo?")
+
+
+
+
+//Convertir Foto y Subir artista
+//import cloudinary from 'cloudinary';
+import { v2 as cloudinary } from 'cloudinary';
+import { Readable } from 'stream'; // Para convertir el buffer en un flujo legible
+import { promisify } from 'util'; // Para utilizar promesas con la función de Cloudinary
+const uploadStreamPromise = promisify(cloudinary.uploader.upload_stream);
+
+// Configuración de Cloudinary
+cloudinary.config({
+  cloud_name: "dkreomcdb",
+  api_key: "519139417673166",
+  api_secret: "F4P4FcD5toi8QvG17119nTQUCRk"
+});
+
+// Función para insertar un artista
+export async function insertarArtista(artista, imagenPerfil) {
+  console.log("Insertando artista...");
+  console.log(imagenPerfil); // Para verificar que el archivo se recibe correctamente
+  console.log("Datos del artista:", artista); // Para revisar el contenido del objeto artista
+
+  // Validación básica de entrada
+  if (!artista || !artista.DNI || !imagenPerfil || !imagenPerfil.buffer) {
+    throw new Error("Faltan datos obligatorios: DNI o imagen.");
+  }
+
+  try {
+    // Convertir el buffer de la imagen en un stream legible
+    const bufferStream = new Readable();
+    bufferStream.push(imagenPerfil.buffer);
+    bufferStream.push(null); // Indica el final del stream
+
+    // Subir la imagen de perfil a Cloudinary usando upload_stream
+    const result = await new Promise((resolve, reject) => {
+      const stream = cloudinary.uploader.upload_stream(
+        {
+          folder: 'profile-picture',
+          public_id: `artista_${artista.DNI}`, // Usamos el DNI como ID único
+          resource_type: 'auto',
+        },
+        (error, result) => {
+          if (error) {
+            return reject(error);
+          }
+          resolve(result);
+        }
+      );
+      bufferStream.pipe(stream); // Pasar el stream al uploader de Cloudinary
+    });
+
+    const urlFoto = result.secure_url;
+    console.log("URL DE LA FOTO:", urlFoto);
+
+    // Crear el query de inserción en la base de datos
+    const query = `
+      INSERT INTO artistas 
+      (DNI, NyA, res_biografia, contacto, URL_foto, contrasena)
+      VALUES ('${artista.DNI}', '${artista.NyA}', '${artista.res_biografia}', '${artista.contacto}', '${urlFoto}', '${artista.contrasena}');
+    `;
+
+    // Ejecutar el query para insertar el artista
+    return new Promise((resolve, reject) => {
+      pool.execute(query, (error, result) => {
+        if (error) {
+          console.error("Error al insertar el artista:", error);
+          reject(error);
+        } else {
+          console.log("Artista insertado:", result);
+          resolve(result.insertId);
+        }
+      });
+    });
+  } catch (error) {
+    console.error("Error al subir la imagen o insertar el artista:", error);
+    throw error;
+  }
+}
+
