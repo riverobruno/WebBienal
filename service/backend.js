@@ -530,7 +530,7 @@ app.get('/api/artista/:email', async (req, res) => {
 
 
 //InsertarEventos
-app.post('/api/eventos', async (req, res) => {
+app.post('/api/eventoNuevo', async (req, res) => {
   //console.log("Se llamó al insertar evento")
   const { nombre, lugar, tematica, fecha_inicio, fecha_fin, hora_inicio, hora_fin } = req.body;
 
@@ -548,7 +548,7 @@ app.post('/api/eventos', async (req, res) => {
 
 
 // Endpoint para registrar un nuevo artista
-app.post('/api/artistas', upload.single('imagenPerfil'), async (req, res) => {
+app.post('/api/artistaNuevo', upload.single('imagenPerfil'), async (req, res) => {
   console.log(req.body)
   const { dni, nombre, apellido, biografia, telefono, email } = req.body;
   const imagenPerfil = req.file; // La imagen viene en 'imagenPerfil' debido a 'upload.single('imagenPerfil')'

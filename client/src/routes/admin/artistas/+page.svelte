@@ -30,7 +30,7 @@
       formData.append('email', email);
       formData.append('imagenPerfil', imagenPerfil);
 
-      const res = await axios.post('http://localhost:3001/api/artistas', formData, {
+      const res = await axios.post('http://localhost:3001/api/artistaNuevo', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },

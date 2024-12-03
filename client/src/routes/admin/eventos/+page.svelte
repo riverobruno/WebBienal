@@ -25,7 +25,7 @@
         hora_inicio,
         hora_fin,
       };
-      const res = await axios.post('http://localhost:3001/api/eventos', nuevoEvento);
+      const res = await axios.post('http://localhost:3001/api/eventoNuevo', nuevoEvento);
       mensaje = res.data.mensaje || 'Evento creado con éxito';
     } catch (error) {
       console.error(error);
