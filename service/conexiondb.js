@@ -539,7 +539,7 @@ export async function register(nombreapellido, correo, contraseña) {
           console.error('Error querying the database:', err);
           reject(err); // Rechazar la promesa en caso de error en la consulta
         } else {
-          resolve(results[0]); // Resolver la promesa con los resultados
+          resolve('hecho'); // Resolver la promesa con los resultados
         }
         con.end(); // Cerramos la conexión
       });

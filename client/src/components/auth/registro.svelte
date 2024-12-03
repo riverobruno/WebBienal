@@ -27,11 +27,15 @@
     const data = await response.json();
     console.log('Respuesta del servidor:', data); // Para depuración
 
-    if (data.success) {
-      alert('Usuario registrado exitosamente');
-      window.location.href = '/login'; // Redirigir al login
-    } else {
-      alert(data.message || 'Error al registrar usuario');
+    if (data.success && data.token) {
+      console.log(data.token)
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('role', 'usuario');
+      console.log('usuario');
+      window.location.href = '/inicio'; // Redirigir al login
+    } else  if(response.status === 409) { alert(data.message); }
+      else{ 
+        alert(data.message || 'Error al registrar usuario');
     }
   } catch (error) {
     console.error('Error al intentar registrar usuario:', error);

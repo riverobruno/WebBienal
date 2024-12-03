@@ -528,11 +528,26 @@ app.post('/api/registro', (req, res) => {
   const { nombreapellido, correo, contraseña } = req.body;
 
   if (!nombreapellido || !correo || !contraseña) {
-    return res.status(400).json({ message: 'Por favor ingrese nombre y apellido, correo y contraseña' });
+    return res.status(400).json({ message: 'Por favor ingrese todos los campos' });
   }
 
   register(nombreapellido, correo, contraseña)
-  return res.status(200).json({ success: true, message: 'Registro correcto' });
+  .then(conexion => {
+    if (conexion == 'hecho') {
+      const token = jwt.sign({correo: correo, permisos: 'visitante', nombreapellido}, JWT_SECRET, {expiresIn: '1h'});
+      return res.status(200).json({ success: true, message: 'Registro correcto', token});
+    } else {
+      return res.status(401).json({ success: false, message: 'Registro invalido'});
+    }
+
+  })
+  .catch(error => {
+    console.error('Error en la conexión:', error);
+    if (error.code == 'ER_DUP_ENTRY') {
+      return res.status(409).json({ success: false, message: 'El correo ya está en uso. Por favor use uno diferente' });	
+    }
+    return res.status(500).json({ success: false, message: 'Error en el servidor' });
+  });
 });
 
 
