@@ -1,18 +1,19 @@
 import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
+import jwt from 'jsonwebtoken';
+import NodeCache from 'node-cache';
 
 import { ArtistasConsulta, EsculturasConsulta, EventosConsulta, login, ObrasdeUnEvento, ObrasdeUnArtista, EventosYEsculturasDeObra } from './conexiondb.js';
 import { ordenarEsculturas, buscarEsculturas, ordenarEventos, buscarEventos, ordenarArtistas, buscarArtistas } from './filtrosObjetos.js';
-import jwt from 'jsonwebtoken';
+
 
 // Clave secreta para firmar el token (debería ser almacenada de forma segura, como en variables de entorno)
 const JWT_SECRET = 'mi_clave_secreta'; // Cambir por algo más seguro
 const app = express();
 const port = 3001;
-let esculturas = [];
-let eventos = [];
-let artistas = [];
+const cache = new NodeCache();
+const ttl = 1800; // 30 minutos en segundos
 
 // Lista de correos electrónicos de administradores
 const adminEmails = ['admin1@example.com', 'admin2@example.com'];
@@ -27,15 +28,13 @@ app.use(bodyParser.json());
 // Crear una función asincrónica para manejar las consultas a la base de datos
 const obtenerArtistas = async (busqueda, criterio, orden) => {
   try {
-    if (artistas.length == 0) {
-      artistas = await ArtistasConsulta();
-    }
-    // Asegúrate de que esculturas es un array
-    if (!Array.isArray(artistas)) {
-      throw new Error('La consulta no devolvió un array');
+    let artistasCache = cache.get('artistas');
+    if (!artistasCache) {
+      artistasCache = await ArtistasConsulta();
+      cache.set('artistas', artistasCache, ttl);
     }
 
-    const artistasFiltrados = buscarArtistas(artistas, busqueda);
+    const artistasFiltrados = buscarArtistas(artistasCache, busqueda);
     const ArtistasOrdenados = ordenarArtistas(artistasFiltrados, criterio, orden);
 
     const cards = [];
@@ -67,15 +66,13 @@ const obtenerArtistas = async (busqueda, criterio, orden) => {
 
 const obtenerEsculturas = async (busqueda, criterio, orden) => {
   try {
-    if (esculturas.length == 0) {
-      esculturas = await EsculturasConsulta();
-    }
-    // Asegúrate de que esculturas es un array
-    if (!Array.isArray(esculturas)) {
-      throw new Error('La consulta no devolvió un array');
+    let esculturasCache = cache.get('esculturas');
+    if (!esculturasCache) {
+      esculturasCache = await EsculturasConsulta();
+      cache.set('esculturas', esculturasCache, ttl);
     }
 
-    const esculturasFiltradas = buscarEsculturas(esculturas, busqueda);
+    const esculturasFiltradas = buscarEsculturas(esculturasCache, busqueda);
     const esculturasOrdenadas = ordenarEsculturas(esculturasFiltradas, criterio, orden);
     const cards = [];
     for (const [index, escultura] of esculturasOrdenadas.entries()) {
@@ -124,15 +121,13 @@ const obtenerEsculturas = async (busqueda, criterio, orden) => {
 
 const obtenerEventos = async (busqueda, criterio, orden) => {
   try {
-    if (eventos.length == 0) {
-      eventos = await EventosConsulta();
-    }
-    // Asegúrate de que esculturas es un array
-    if (!Array.isArray(eventos)) {
-      throw new Error('La consulta no devolvió un array');
+    let eventosCache = cache.get('eventos');
+    if (!eventosCache) {
+      eventosCache = await EventosConsulta();
+      cache.set('eventos', eventosCache, ttl);
     }
 
-    const eventosFiltrados = buscarEventos(eventos, busqueda);
+    const eventosFiltrados = buscarEventos(eventosCache, busqueda);
     const eventosOrdenados = ordenarEventos(eventosFiltrados, criterio, orden);
 
     const cards = [];
@@ -179,11 +174,6 @@ const obtenerEventos = async (busqueda, criterio, orden) => {
 const obtenerObrasdeEvento = async (evento) => {
   try {
     const esculturasEvento = await ObrasdeUnEvento(evento);
-    // Asegúrate de que esculturas es un array
-    if (!Array.isArray(esculturasEvento)) {
-      throw new Error('La consulta no devolvió un array');
-    }
-
     const esculturasOrdenadas = ordenarEsculturas(esculturasEvento, 'promedio', 'DESC');
 
     const cards = [];
@@ -234,10 +224,6 @@ const obtenerObrasdeEvento = async (evento) => {
 const obtenerObrasdeArtista = async (artista) => {
   try {
     const esculturasArtista = await ObrasdeUnArtista(artista);
-    // Asegúrate de que esculturas es un array
-    if (!Array.isArray(esculturasArtista)) {
-      throw new Error('La consulta no devolvió un array');
-    }
     const esculturasOrdenadas = ordenarEsculturas(esculturasArtista, 'promedio', 'DESC');
 
     const cards = [];

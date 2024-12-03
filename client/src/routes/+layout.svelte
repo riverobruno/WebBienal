@@ -47,6 +47,5 @@
   /* Contenedor para el contenido que se expandirá según el tamaño del contenido */
   .content {
     flex-grow: 1; /* Hace que el contenido ocupe todo el espacio disponible */
-    padding: 20px;
   }
 </style>
