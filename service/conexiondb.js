@@ -547,4 +547,29 @@ export async function register(nombreapellido, correo, contraseña) {
   });
 }
 
+export async function registrar_voto(rating, nombre, email) {
+  let con = crearConexion();
 
+  return new Promise((resolve, reject) => {
+    con.connect((err) => {
+      if (err) {
+        console.error('Error connecting: ' + err.stack);
+        reject(err); // Rechazar la promesa en caso de error de conexión
+        return;
+      }
+      console.log("Connected!");
+
+      // Realizamos la consulta a la base de datos pasando los parámetros
+      const query = 'CALL registrar_voto(?, ?, ?)'; // Definimos los placeholders
+      con.query(query, [email, nombre, rating], (err, results) => { // Pasamos los valores
+        if (err) {
+          console.error('Error querying the database:', err);
+          reject(err); // Rechazar la promesa en caso de error en la consulta
+        } else {
+          resolve('hecho'); // Resolver la promesa con los resultados
+        }
+        con.end(); // Cerramos la conexión
+      });
+    });
+  });
+}

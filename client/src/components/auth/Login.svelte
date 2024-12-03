@@ -50,6 +50,7 @@
       localStorage.setItem('token', data.token);
       localStorage.setItem('role', data.role); // Guardamos el rol en localStorage
       console.log(data.role)
+      console.log(data.token)
       // Redirigir según el rol
       if (data.role === 'admin') {
         window.location.href = '/admin';

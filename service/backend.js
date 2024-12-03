@@ -5,7 +5,7 @@ import jwt from 'jsonwebtoken';
 import NodeCache from 'node-cache';
 import multer from 'multer';
 
-import { ArtistasConsulta, EsculturasConsulta, EventosConsulta, login, ObrasdeUnEvento, ObrasdeUnArtista, EventosYEsculturasDeObra,insertarEvento, insertarArtista, register} from './conexiondb.js';
+import { ArtistasConsulta, EsculturasConsulta, EventosConsulta, login, ObrasdeUnEvento, ObrasdeUnArtista, EventosYEsculturasDeObra, insertarEvento, insertarArtista, register, registrar_voto } from './conexiondb.js';
 import { ordenarEsculturas, buscarEsculturas, ordenarEventos, buscarEventos, ordenarArtistas, buscarArtistas } from './filtrosObjetos.js';
 
 
@@ -17,16 +17,12 @@ const port = 3001;
 const cache = new NodeCache();
 const ttl = 1800; // 30 minutos en segundos
 
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Configuración de Multer para manejar la carga de archivos
 const storage = multer.memoryStorage(); // Guardar archivo en memoria (como buffer)
 const upload = multer({ storage: storage });
-
-
-
 
 // Lista de correos electrónicos de administradores
 const adminEmails = ['admin1@example.com', 'admin2@example.com'];
@@ -550,7 +546,31 @@ app.post('/api/registro', (req, res) => {
   });
 });
 
+app.post('/api/votacion', (req, res) => {
+  const { rating, nombre, email } = req.body;
 
+  if (!rating || rating == 0) {
+    return res.status(400).json({ message: 'Por favor, ingrese un puntaje' });
+  }
+
+  registrar_voto(rating, nombre, email)
+    .then(conexion => {
+      if (conexion == 'hecho') {
+        cache.del(['artistas', 'esculturas', 'eventos']);
+        return res.status(200).json({ success: true, message: 'Voto realizado correctamente'});
+      } else {
+        return res.status(401).json({ success: false, message: 'Voto no realizado' });
+      }
+
+    })
+    .catch(error => {
+      console.error('Error en la conexión:', error);
+      if (error.code == 'ER_DUP_ENTRY') {
+        return res.status(409).json({ success: false, message: 'Ya votaste esta obra' });
+      }
+      return res.status(500).json({ success: false, message: 'Error en el servidor' });
+    });
+});
 
 //InsertarEventos
 app.post('/api/eventoNuevo', async (req, res) => {
@@ -566,22 +586,15 @@ app.post('/api/eventoNuevo', async (req, res) => {
   }
 });
 
-
-
-
-
 // Endpoint para registrar un nuevo artista
 app.post('/api/artistaNuevo', upload.single('imagenPerfil'), async (req, res) => {
   console.log(req.body)
   const { dni, nombre, apellido, biografia, telefono, email } = req.body;
   const imagenPerfil = req.file; // La imagen viene en 'imagenPerfil' debido a 'upload.single('imagenPerfil')'
-  
   // Verifica si la imagen fue cargada
   if (!imagenPerfil) {
     return res.status(400).json({ error: 'La imagen de perfil es requerida' });
   }
-
-
   // Llamar a la función insertarArtista para subir la imagen y registrar al artista
   try {
     const artista = {
@@ -591,7 +604,6 @@ app.post('/api/artistaNuevo', upload.single('imagenPerfil'), async (req, res) =>
       contacto: telefono,
       contrasena: email,  // Suponiendo que la contraseña es el email en este caso (deberías verificarlo)
     };
-
     const artistaId = await insertarArtista(artista, imagenPerfil);
     res.status(200).json({ mensaje: 'Artista registrado con éxito', artistaId });
   } catch (error) {
