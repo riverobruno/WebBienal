@@ -1,8 +1,9 @@
 import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
+import multer from 'multer';
 
-import { ArtistasConsulta, EsculturasConsulta, EventosConsulta, login, ObrasdeUnEvento, ObrasdeUnArtista, EventosYEsculturasDeObra } from './conexiondb.js';
+import { ArtistasConsulta, EsculturasConsulta, EventosConsulta, login, ObrasdeUnEvento, ObrasdeUnArtista, EventosYEsculturasDeObra,insertarEvento, insertarArtista } from './conexiondb.js';
 import { ordenarEsculturas, buscarEsculturas, ordenarEventos, buscarEventos, ordenarArtistas, buscarArtistas } from './filtrosObjetos.js';
 import jwt from 'jsonwebtoken';
 
@@ -10,9 +11,21 @@ import jwt from 'jsonwebtoken';
 const JWT_SECRET = 'mi_clave_secreta'; // Cambir por algo más seguro
 const app = express();
 const port = 3001;
+
 let esculturas = [];
 let eventos = [];
 let artistas = [];
+
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Configuración de Multer para manejar la carga de archivos
+const storage = multer.memoryStorage(); // Guardar archivo en memoria (como buffer)
+const upload = multer({ storage: storage });
+
+
+
 
 // Lista de correos electrónicos de administradores
 const adminEmails = ['admin1@example.com', 'admin2@example.com'];
@@ -525,5 +538,55 @@ app.get('/api/artista/:email', async (req, res) => {
   } catch (error) {
     console.error("Error en el endpoint de artista:", error);
     res.status(500).json({ success: false, message: 'Error interno del servidor' });
+  }
+});
+
+
+
+//InsertarEventos
+app.post('/api/eventos', async (req, res) => {
+  //console.log("Se llamó al insertar evento")
+  const { nombre, lugar, tematica, fecha_inicio, fecha_fin, hora_inicio, hora_fin } = req.body;
+
+  try {
+    const resultado = await insertarEvento({ nombre, lugar, tematica, fecha_inicio, fecha_fin, hora_inicio, hora_fin });
+    res.json({ mensaje: 'Evento creado con éxito', resultado });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Error al insertar el evento en la base de datos' });
+  }
+});
+
+
+
+
+
+// Endpoint para registrar un nuevo artista
+app.post('/api/artistas', upload.single('imagenPerfil'), async (req, res) => {
+  console.log(req.body)
+  const { dni, nombre, apellido, biografia, telefono, email } = req.body;
+  const imagenPerfil = req.file; // La imagen viene en 'imagenPerfil' debido a 'upload.single('imagenPerfil')'
+  
+  // Verifica si la imagen fue cargada
+  if (!imagenPerfil) {
+    return res.status(400).json({ error: 'La imagen de perfil es requerida' });
+  }
+
+
+  // Llamar a la función insertarArtista para subir la imagen y registrar al artista
+  try {
+    const artista = {
+      DNI: dni,           // Asignar los valores con los nombres que espera tu función
+      NyA: `${nombre} ${apellido}`,
+      res_biografia: biografia,
+      contacto: telefono,
+      contrasena: email,  // Suponiendo que la contraseña es el email en este caso (deberías verificarlo)
+    };
+
+    const artistaId = await insertarArtista(artista, imagenPerfil);
+    res.status(200).json({ mensaje: 'Artista registrado con éxito', artistaId });
+  } catch (error) {
+    console.error('Error al registrar artista:', error);
+    res.status(500).json({ error: 'Hubo un error al registrar el artista' });
   }
 });
