@@ -8,7 +8,6 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 dotenv.config({ path: join(__dirname, '../.env') });
 
-
 // Crear un pool de conexiones reutilizable
 const pool = mysql.createPool({
   host: process.env.DB_HOST,
@@ -20,10 +19,6 @@ const pool = mysql.createPool({
   connectionLimit: 10,
   queueLimit: 0,
 });
-
-
-
-
 
 export function crearConexion(){
   return mysql.createConnection({

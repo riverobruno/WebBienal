@@ -4,13 +4,18 @@ import bodyParser from 'body-parser';
 import jwt from 'jsonwebtoken';
 import NodeCache from 'node-cache';
 import multer from 'multer';
-
+import dotenv from 'dotenv';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+dotenv.config({ path: join(__dirname, '../.env') });
 import { ArtistasConsulta, EsculturasConsulta, EventosConsulta, login, ObrasdeUnEvento, ObrasdeUnArtista, EventosYEsculturasDeObra, insertarEvento, insertarArtista, register, registrar_voto } from './conexiondb.js';
 import { ordenarEsculturas, buscarEsculturas, ordenarEventos, buscarEventos, ordenarArtistas, buscarArtistas } from './filtrosObjetos.js';
 
 
 // Clave secreta para firmar el token (debería ser almacenada de forma segura, como en variables de entorno)
-const JWT_SECRET = 'mi_clave_secreta'; // Cambir por algo más seguro
+const JWT_SECRET = process.env.JWT_SECRET; // Cambir por algo más seguro
 const app = express();
 const port = 3001;
 

@@ -73,11 +73,12 @@
  async function generateQRCode() {
     // Generar un token único que cambia cada minuto
     const timestamp = Math.floor(Date.now() / 60000); // Cada minuto cambia
-    const uniqueSlug = `${nombreObra}-${timestamp}`;
-
+    const hashURL = import.meta.env.VITE_HASH_URLS;
     // Concatenar con la clave secreta y hashear
-    const hash = CryptoJS.SHA256(`${nombreObra}-${timestamp}-desarrollo2024`).toString(CryptoJS.enc.Base64);
-
+    const hash = CryptoJS.SHA256(`${nombreObra}-${timestamp}-${hashURL}`).toString(CryptoJS.enc.Base64);
+    console.log(nombreObra)
+    console.log(timestamp)
+    console.log(hashURL)
     // Tomar los primeros 12 caracteres del hash
     const hashedSlug = hash.substring(0, 12);
 

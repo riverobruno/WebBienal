@@ -30,7 +30,12 @@
         // Generar un token único que cambia cada minuto
         const timestamp = Math.floor(Date.now() / 60000); // Cada minuto cambia
         // Concatenar con la clave secreta y hashear
-        const hash = CryptoJS.SHA256(`${name}-${timestamp}-desarrollo2024`).toString(CryptoJS.enc.Base64);
+        const hashURL = import.meta.env.VITE_HASH_URLS;
+        // Concatenar con la clave secreta y hashear
+        const hash = CryptoJS.SHA256(`${name}-${timestamp}-${hashURL}`).toString(CryptoJS.enc.Base64);
+        console.log(name)
+        console.log(timestamp)
+        console.log(hashURL)
         // Tomar los primeros 12 caracteres del hash
         const hashedSlug = hash.substring(0, 12);
         return hashedSlug;
@@ -116,13 +121,17 @@
     if (!userRole || userRole !== 'usuario') {
         alert('Acceso denegado. Redirigiendo a la página principal.');
         window.location.href = '/inicio';
-    }
-    let codigoValido = obtenerCodigoValido()
-    if (codigoValido != code) {
-        alert('Tiempo de votación fuera de término. Por favor volver a escanear el QR');
-        window.location.href = '/inicio';
-    }
-    fetchVotacion();
+    } else {
+      let codigoValido = obtenerCodigoValido()
+      console.log(codigoValido);
+      console.log(code)
+      if (codigoValido != code) {
+          alert('Tiempo de votación fuera de término. Por favor volver a escanear el QR');
+          window.location.href = '/inicio';
+      } else {
+        fetchVotacion();
+      }
+    } 
     });
 
 </script>
