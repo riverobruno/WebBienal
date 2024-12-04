@@ -417,31 +417,44 @@ app.post('/api/login', (req, res) => {
   if (!correo || !contraseña) {
     return res.status(400).json({ message: 'Por favor ingrese correo y contraseña' });
   }
-
-  login(correo, contraseña)
-    .then(conexion => {
-      if (conexion && conexion.length > 0) {
-        // Determinar el rol del usuario
-        let role;
-        if (adminEmails.includes(correo)) {
-          role = 'admin';
-        } else if (conexion[0].permisos === 'escultor') { // Si 'permisos' indica que es un artista
-          role = 'escultor';
+  // Obtener la lista de los 
+  const emailList = process.env.EMAIL_LIST.split(',').map(item => {
+    const [nombre, email, password] = item.split(':');
+    return {nombre, email, password };
+  });
+  const esAdmin = emailList.some(
+    entry => entry.email === correo && entry.password === contraseña
+  );
+  if (esAdmin) {
+    const user = emailList.find(
+      entry => entry.email === correo && entry.password === contraseña
+    );
+    let role = 'admin';
+    const token = jwt.sign({ correo: correo, permisos: role, nombre: user.nombre }, JWT_SECRET, { expiresIn: '1h' });
+    return res.status(200).json({ success: true, message: 'Inicio de sesión exitoso', token, role });
+  } else {
+    login(correo, contraseña)
+      .then(conexion => {
+        if (conexion && conexion.length > 0) {
+          // Determinar el rol del usuario
+          let role;
+          if (conexion[0].permisos === 'escultor') { // Si 'permisos' indica que es un artista
+            role = 'escultor';
+          } else {
+            role = 'usuario';
+          }
+          // Crear el token con el correo y el rol determinado
+          const token = jwt.sign({ correo: conexion[0].email, permisos: conexion[0].permisos, nombre: conexion[0].NyA }, JWT_SECRET, { expiresIn: '1h' });
+          return res.status(200).json({ success: true, message: 'Inicio de sesión exitoso', token, role });
         } else {
-          role = 'usuario';
+          return res.status(401).json({ success: false, message: 'Credenciales incorrectas' });
         }
-
-        // Crear el token con el correo y el rol determinado
-        const token = jwt.sign({ correo: conexion[0].email, permisos: conexion[0].permisos,nombre:conexion[0].NyA }, JWT_SECRET, { expiresIn: '1h' });
-        return res.status(200).json({ success: true, message: 'Inicio de sesión exitoso', token, role});
-      } else {
-        return res.status(401).json({ success: false, message: 'Credenciales incorrectas' });
-      }
-    })
-    .catch(error => {
-      console.error('Error en la conexión:', error);
-      return res.status(500).json({ success: false, message: 'Error en el servidor' });
-    });
+      })
+      .catch(error => {
+        console.error('Error en la conexión:', error);
+        return res.status(500).json({ success: false, message: 'Error en el servidor' });
+      });
+  }
 });
 
 // Middleware para verificar token y rol
