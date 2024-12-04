@@ -79,8 +79,8 @@
     console.log(nombreObra)
     console.log(timestamp)
     console.log(hashURL)
-    // Tomar los primeros 12 caracteres del hash
-    const hashedSlug = hash.substring(0, 12);
+    // Tomar los primeros 8 caracteres del hash
+    const hashedSlug = hash.substring(0, 8);
 
     const url = `http://localhost:3333/votacion?slug=${nombreObra}-${hashedSlug}`;
     

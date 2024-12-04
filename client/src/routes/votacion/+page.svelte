@@ -36,8 +36,8 @@
         console.log(name)
         console.log(timestamp)
         console.log(hashURL)
-        // Tomar los primeros 12 caracteres del hash
-        const hashedSlug = hash.substring(0, 12);
+        // Tomar los primeros 8 caracteres del hash
+        const hashedSlug = hash.substring(0, 8);
         return hashedSlug;
     }
 
