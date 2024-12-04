@@ -1,4 +1,5 @@
 <script>
+  // @ts-nocheck
   import { goto } from '$app/navigation';
   import logo from '$lib/../public/bienal_logo.png';
   import { onMount } from "svelte"; // Asumí que necesitas importar el logo

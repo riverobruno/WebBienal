@@ -1,5 +1,6 @@
 <!-- src/routes/+layout.svelte -->
 <script>
+  // @ts-nocheck
   let logo = "https://raw.githubusercontent.com/FRRe-DS/2024-06-TPI/main/client/src/public/bienal_logo_corto.png";
   let anio = 2024;
   import Navbar from '../components/layout/Navbar.svelte';

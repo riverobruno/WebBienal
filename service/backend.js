@@ -444,8 +444,6 @@ app.post('/api/login', (req, res) => {
     });
 });
 
-
-
 // Middleware para verificar token y rol
 const verificarTokenYRol = (rolesPermitidos) => (req, res, next) => {
   const authHeader = req.headers['authorization'];
@@ -464,9 +462,6 @@ const verificarTokenYRol = (rolesPermitidos) => (req, res, next) => {
     next();
   });
 };
-
-
-
 
 // Endpoint para verificar el token y obtener el correo
 app.get('/api/verificar', verificarTokenYRol, (req, res) => {
