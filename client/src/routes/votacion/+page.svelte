@@ -37,7 +37,7 @@
         console.log(timestamp)
         console.log(hashURL)
         // Tomar los primeros 8 caracteres del hash
-        const hashedSlug = hash.substring(0, 8);
+        const hashedSlug = hash.substring(0, 8).replace(/ /g, '+');
         return hashedSlug;
     }
 
@@ -125,7 +125,7 @@
       let codigoValido = obtenerCodigoValido()
       console.log(codigoValido);
       console.log(code)
-      if (codigoValido != code) {
+      if (codigoValido.replace(/ /g, '+') != code.replace(/ /g, '+')) {
           alert('Tiempo de votación fuera de término. Por favor volver a escanear el QR');
           window.location.href = '/inicio';
       } else {
