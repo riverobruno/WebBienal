@@ -1,27 +1,27 @@
 <script>
-  // import { onMount } from 'svelte';
+  import { onMount } from 'svelte';
 
-  // let userRole;
-  // let accesoPermitido = false; // Variable para controlar el acceso
+  let userRole;
+  let accesoPermitido = false; // Variable para controlar el acceso
 
-  // onMount(() => {
-  //   userRole = localStorage.getItem('role');
+  onMount(() => {
+    userRole = localStorage.getItem('role');
 
-  //   // Verifica si el usuario tiene el rol adecuado
-  //   if (userRole === 'admin') {
-  //     accesoPermitido = true; // Permite el acceso si es administrador
-  //   } else {
-  //     alert('Acceso denegado. Redirigiendo a la página principal.');
-  //     window.location.href = '/inicio';
-  //   }
-  // });
+    // Verifica si el usuario tiene el rol adecuado
+    if (userRole === 'admin') {
+      accesoPermitido = true; // Permite el acceso si es administrador
+    } else {
+      alert('Acceso denegado. Redirigiendo a la página principal.');
+      window.location.href = '/inicio';
+    }
+  });
 
    function redirigir(ruta) {
     window.location.href = ruta; // Redirige a la ruta especificada
    }
 </script>
 
-<!-- {#if accesoPermitido} -->
+{#if accesoPermitido}
 <section>
   <h1>Bienvenido, Administrador</h1>
   <p>Selecciona una opción para gestionar:</p>
@@ -40,7 +40,7 @@
     </button>
   </div>
 </section>
-<!-- {/if} -->
+{/if}
 
 <style>
   section {

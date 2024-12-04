@@ -1,6 +1,21 @@
 <script>
   import { onMount } from 'svelte';
 
+  let userRole;
+  let accesoPermitido = false; // Variable para controlar el acceso
+
+  onMount(() => {
+    userRole = localStorage.getItem('role');
+
+    // Verifica si el usuario tiene el rol adecuado
+    if (userRole === 'admin') {
+      accesoPermitido = true; // Permite el acceso si es administrador
+    } else {
+      alert('Acceso denegado. Redirigiendo a la página principal.');
+      window.location.href = '/inicio';
+    }
+  });
+
   let artistas = [];
   let eventos = [];
   let nombre = '';
@@ -42,59 +57,60 @@
       alert('Datos enviados con éxito');
   }
 </script>
+{#if accesoPermitido}
 
-<section>
-  <h1>Registrar Escultura</h1>
-  <form on:submit|preventDefault={enviarFormulario} class="formulario">
-      <div class="campo">
-          <label for="nombre">Nombre de la escultura</label>
-          <input type="text" id="nombre" bind:value={nombre} required />
-      </div>
+  <section>
+    <h1>Registrar Escultura</h1>
+    <form on:submit|preventDefault={enviarFormulario} class="formulario">
+        <div class="campo">
+            <label for="nombre">Nombre de la escultura</label>
+            <input type="text" id="nombre" bind:value={nombre} required />
+        </div>
 
-      <div class="campo">
-          <label for="fechaCreacion">Fecha de creación</label>
-          <input type="date" id="fechaCreacion" bind:value={fechaCreacion} required />
-      </div>
+        <div class="campo">
+            <label for="fechaCreacion">Fecha de creación</label>
+            <input type="date" id="fechaCreacion" bind:value={fechaCreacion} required />
+        </div>
 
-      <div class="campo">
-          <label for="tecnica">Técnica</label>
-          <input type="text" id="tecnica" bind:value={tecnica} required />
-      </div>
+        <div class="campo">
+            <label for="tecnica">Técnica</label>
+            <input type="text" id="tecnica" bind:value={tecnica} required />
+        </div>
 
-      <div class="campo">
-          <label for="antecedentes">Antecedentes</label>
-          <textarea id="antecedentes" bind:value={antecedentes} rows="4" required></textarea>
-      </div>
+        <div class="campo">
+            <label for="antecedentes">Antecedentes</label>
+            <textarea id="antecedentes" bind:value={antecedentes} rows="4" required></textarea>
+        </div>
 
-      <div class="campo">
-          <label for="artistaSeleccionado">Artista</label>
-          <select id="artistaSeleccionado" bind:value={artistaSeleccionado} required>
-              <option value="" disabled selected>Selecciona un artista</option>
-              {#each artistas as artista}
-                  <option value={artista}>{artista}</option>
-              {/each}
-          </select>
-      </div>
+        <div class="campo">
+            <label for="artistaSeleccionado">Artista</label>
+            <select id="artistaSeleccionado" bind:value={artistaSeleccionado} required>
+                <option value="" disabled selected>Selecciona un artista</option>
+                {#each artistas as artista}
+                    <option value={artista}>{artista}</option>
+                {/each}
+            </select>
+        </div>
 
-      <div class="campo">
-          <label for="eventoSeleccionado">Evento</label>
-          <select id="eventoSeleccionado" bind:value={eventoSeleccionado} required>
-              <option value="" disabled selected>Selecciona un evento</option>
-              {#each eventos as evento}
-                  <option value={evento}>{evento}</option>
-              {/each}
-          </select>
-      </div>
+        <div class="campo">
+            <label for="eventoSeleccionado">Evento</label>
+            <select id="eventoSeleccionado" bind:value={eventoSeleccionado} required>
+                <option value="" disabled selected>Selecciona un evento</option>
+                {#each eventos as evento}
+                    <option value={evento}>{evento}</option>
+                {/each}
+            </select>
+        </div>
 
-      <div class="campo">
-          <label for="imagenes">Imágenes de la escultura</label>
-          <input type="file" id="imagenes" multiple on:change={handleFileChange} />
-      </div>
+        <div class="campo">
+            <label for="imagenes">Imágenes de la escultura</label>
+            <input type="file" id="imagenes" multiple on:change={handleFileChange} />
+        </div>
 
-      <button type="submit">Registrar Escultura</button>
-  </form>
-</section>
-
+        <button type="submit">Registrar Escultura</button>
+    </form>
+  </section>
+{/if}
 <style>
   section {
       max-width: 600px;

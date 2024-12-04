@@ -1,5 +1,20 @@
 <script>
   import { onMount } from 'svelte';
+
+let userRole;
+let accesoPermitido = false; // Variable para controlar el acceso
+
+onMount(() => {
+  userRole = localStorage.getItem('role');
+
+  // Verifica si el usuario tiene el rol adecuado
+  if (userRole === 'admin') {
+    accesoPermitido = true; // Permite el acceso si es administrador
+  } else {
+    alert('Acceso denegado. Redirigiendo a la página principal.');
+    window.location.href = '/inicio';
+  }
+});
   import axios from 'axios';
 
   let nombre = '';
@@ -44,58 +59,60 @@
     }
   }
 </script>
+{#if accesoPermitido}
 
-<!-- Mostrar el ícono de carga mientras se realiza la solicitud -->
-{#if mostrandoCarga}
-  <div class="loading-icon"></div>
-{/if}
-
-<section>
-  <h1>Registrar Escultor</h1>
-  <form on:submit|preventDefault={enviarFormulario} class="formulario">
-    <div class="campo">
-      <label for="nombre">Nombre</label>
-      <input type="text" id="nombre" bind:value={nombre} required />
-    </div>
-
-    <div class="campo">
-      <label for="apellido">Apellido</label>
-      <input type="text" id="apellido" bind:value={apellido} required />
-    </div>
-
-    <div class="campo">
-      <label for="dni">DNI</label>
-      <input type="text" id="dni" bind:value={dni} required />
-    </div>
-
-    <div class="campo">
-      <label for="biografia">Biografía</label>
-      <textarea id="biografia" bind:value={biografia} rows="4" required></textarea>
-    </div>
-
-    <div class="campo">
-      <label for="telefono">Número de Teléfono</label>
-      <input type="tel" id="telefono" bind:value={telefono} required />
-    </div>
-
-    <div class="campo">
-      <label for="email">Email</label>
-      <input type="email" id="email" bind:value={email} required />
-    </div>
-
-    <div class="campo">
-      <label for="imagenPerfil">Imagen de Perfil</label>
-      <input type="file" id="imagenPerfil" accept="image/*" on:change={handleFileChange} required />
-    </div>
-
-    <button type="submit">Registrar Escultor</button>
-  </form>
-
-  <!-- Mostrar el mensaje de éxito o error -->
-  {#if mensaje}
-    <p class="mensaje">{mensaje}</p>
+  <!-- Mostrar el ícono de carga mientras se realiza la solicitud -->
+  {#if mostrandoCarga}
+    <div class="loading-icon"></div>
   {/if}
-</section>
+
+  <section>
+    <h1>Registrar Escultor</h1>
+    <form on:submit|preventDefault={enviarFormulario} class="formulario">
+      <div class="campo">
+        <label for="nombre">Nombre</label>
+        <input type="text" id="nombre" bind:value={nombre} required />
+      </div>
+
+      <div class="campo">
+        <label for="apellido">Apellido</label>
+        <input type="text" id="apellido" bind:value={apellido} required />
+      </div>
+
+      <div class="campo">
+        <label for="dni">DNI</label>
+        <input type="text" id="dni" bind:value={dni} required />
+      </div>
+
+      <div class="campo">
+        <label for="biografia">Biografía</label>
+        <textarea id="biografia" bind:value={biografia} rows="4" required></textarea>
+      </div>
+
+      <div class="campo">
+        <label for="telefono">Número de Teléfono</label>
+        <input type="tel" id="telefono" bind:value={telefono} required />
+      </div>
+
+      <div class="campo">
+        <label for="email">Email</label>
+        <input type="email" id="email" bind:value={email} required />
+      </div>
+
+      <div class="campo">
+        <label for="imagenPerfil">Imagen de Perfil</label>
+        <input type="file" id="imagenPerfil" accept="image/*" on:change={handleFileChange} required />
+      </div>
+
+      <button type="submit">Registrar Escultor</button>
+    </form>
+
+    <!-- Mostrar el mensaje de éxito o error -->
+    {#if mensaje}
+      <p class="mensaje">{mensaje}</p>
+    {/if}
+  </section>
+{/if}
 
 <style>
   section {
