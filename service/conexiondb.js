@@ -1,5 +1,6 @@
-import { Esculturas, Visitantes, Eventos, Artistas, Imagenes } from './clases.js';
+import { Esculturas, Eventos, Artistas, Imagenes } from './clases.js';
 import mysql from 'mysql2';
+import bcrypt from 'bcrypt';
 // Esto de abajo es para usar el .env para guardar la contraseña de la database
 import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
@@ -142,20 +143,37 @@ export async function login(correo, password) {
       }
       console.log("Connected!");
 
-      // Realizamos la consulta a la base de datos pasando los parámetros
-      const query = 'CALL login(?, ?)'; // Definimos los placeholders
-      con.query(query, [correo, password], (err, results) => { // Pasamos los valores
+      // Consulta para obtener el hash de la contraseña
+      const query = 'CALL getUserByEmail(?)'; // Procedimiento que obtiene datos del usuario por correo
+      con.query(query, [correo], (err, results) => {
         if (err) {
           console.error('Error querying the database:', err);
           reject(err); // Rechazar la promesa en caso de error en la consulta
+        } else if (results.length === 0) {
+          // Si no se encuentra el usuario
+          reject(new Error('Usuario no encontrado'));
         } else {
-          resolve(results[0]); // Resolver la promesa con los resultados
+          // Comparamos la contraseña ingresada con la hasheada
+          const hashedPassword = results[0][0].contraseña;
+          bcrypt.compare(password, hashedPassword, (err, isMatch) => {
+            if (err) {
+              console.error('Error comparing passwords:', err);
+              reject(err); // Rechazar en caso de error en la comparación
+            } else if (!isMatch) {
+              // Contraseña incorrecta
+              reject(new Error('Contraseña incorrecta'));
+            } else {
+              // Contraseña correcta
+              resolve(results[0]); // Resolver con los datos del usuario
+            }
+          });
         }
-        con.end(); // Cerramos la conexión
+        con.end(); // Cerramos la conexión después de terminar
       });
     });
   });
 }
+
 
 export async function EventosConsulta() {
   const con = crearConexion();
@@ -519,24 +537,32 @@ export async function register(nombreapellido, correo, contraseña) {
   let con = crearConexion();
 
   return new Promise((resolve, reject) => {
-    con.connect((err) => {
+    bcrypt.hash(contraseña, 10, (err, hashedPassword) => { // 10 es el número de rondas de salt
       if (err) {
-        console.error('Error connecting: ' + err.stack);
-        reject(err); // Rechazar la promesa en caso de error de conexión
+        console.error('Error hashing password:', err);
+        reject(err); // Rechazar si hay un error al hashear la contraseña
         return;
       }
-      console.log("Connected!");
 
-      // Realizamos la consulta a la base de datos pasando los parámetros
-      const query = 'CALL register(?, ?, ?)'; // Definimos los placeholders
-      con.query(query, [nombreapellido, correo, contraseña], (err, results) => { // Pasamos los valores
+      con.connect((err) => {
         if (err) {
-          console.error('Error querying the database:', err);
-          reject(err); // Rechazar la promesa en caso de error en la consulta
-        } else {
-          resolve('hecho'); // Resolver la promesa con los resultados
+          console.error('Error connecting: ' + err.stack);
+          reject(err); // Rechazar la promesa en caso de error de conexión
+          return;
         }
-        con.end(); // Cerramos la conexión
+        console.log("Connected!");
+
+        // Realizamos la consulta a la base de datos pasando los parámetros
+        const query = 'CALL register(?, ?, ?)'; // Definimos los placeholders
+        con.query(query, [nombreapellido, correo, hashedPassword], (err, results) => { // Usamos la contraseña hasheada
+          if (err) {
+            console.error('Error querying the database:', err);
+            reject(err); // Rechazar la promesa en caso de error en la consulta
+          } else {
+            resolve('hecho'); // Resolver la promesa con los resultados
+          }
+          con.end(); // Cerramos la conexión
+        });
       });
     });
   });
