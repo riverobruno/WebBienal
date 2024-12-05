@@ -1,4 +1,5 @@
 <script>
+    import Tarjetas from "./tarjetas.svelte"
     let videoSource = "VidnozImageToVideo.mp4";
   </script>
   
@@ -105,10 +106,9 @@
       Tu navegador no soporta la reproducción de video.
     </video>
     <div class="overlay">
-      <div class="title">Bienal del Chaco 2024</div>
+      <div class="title">Artistas Destacados</div>
       <div class="subtitle">
-        Del 13 al 21 de julio, Resistencia, Chaco.  
-        Vive el arte, conecta con la naturaleza y la creatividad en una experiencia inolvidable.
+        <Tarjetas/>
       </div>
     </div>
   </div>

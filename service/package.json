@@ -3,7 +3,7 @@
   "name": "service",
   "version": "1.0.0",
   "description": "backend para la facu",
-  "main": "si.js",
+  "main": "backend.js",
   "scripts": {
     "test": "jest",
     "start": "node server.js"

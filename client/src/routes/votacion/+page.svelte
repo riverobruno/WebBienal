@@ -198,7 +198,7 @@
   }
   .button {
       padding: 12px 24px;
-      background-color: #713307; /* Color de fondo verde */
+      background-color: #0066cc; /* Color de fondo verde */
       border: none;
       border-radius: 8px; /* Bordes redondeados */
       color: white;
@@ -209,12 +209,12 @@
   }
 
   .button:hover {
-      background-color: #86512c; /* Color más oscuro al pasar el mouse */
+      background-color: #3e7fc0; /* Color más oscuro al pasar el mouse */
       transform: scale(1.05); /* Escala ligera al pasar el mouse */
   }
 
   .button:active {
-      background-color: #9f6134; /* Color aún más oscuro al hacer clic */
+      background-color: #000000; /* Color aún más oscuro al hacer clic */
       transform: scale(0.98); /* Efecto de reducción al hacer clic */
   }
 
