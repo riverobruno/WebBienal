@@ -8,7 +8,6 @@ import { dirname, join } from 'path';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 dotenv.config({ path: join(__dirname, '../.env') });
-
 // Crear un pool de conexiones reutilizable
 const pool = mysql.createPool({
   host: process.env.DB_HOST,
@@ -470,6 +469,10 @@ cloudinary.config({
   api_secret: process.env.api_secret
 });
 // Función para insertar un artista
+
+
+
+// Función para insertar un artista
 export async function insertarArtista(artista, imagenPerfil) {
   console.log("Insertando artista...");
   console.log(imagenPerfil); // Para verificar que el archivo se recibe correctamente
@@ -481,9 +484,15 @@ export async function insertarArtista(artista, imagenPerfil) {
   }
 
   try {
+    // Asegurarnos de que imagenPerfil.buffer es un Buffer
+    let buffer = imagenPerfil.buffer;
+    if (!(buffer instanceof Buffer)) {
+      buffer = Buffer.from(buffer); // Si es un ArrayBuffer o tipo no esperado, convertirlo a Buffer
+    }
+
     // Convertir el buffer de la imagen en un stream legible
     const bufferStream = new Readable();
-    bufferStream.push(imagenPerfil.buffer);
+    bufferStream.push(buffer);
     bufferStream.push(null); // Indica el final del stream
 
     // Subir la imagen de perfil a Cloudinary usando upload_stream
@@ -531,6 +540,7 @@ export async function insertarArtista(artista, imagenPerfil) {
     throw error;
   }
 }
+
 
 export async function register(nombreapellido, correo, contraseña) {
   let con = crearConexion();
@@ -715,24 +725,30 @@ export async function registrar_imagen(etapa, nombre_escultura, imagen) {
   console.log("Nombre de la escultura:", nombre_escultura);
   console.log("Detalles de la imagen:", imagen);
 
-  // Validación básica
+  // Validación básica de los datos
   if (!etapa || !nombre_escultura || !imagen || !imagen.buffer) {
     throw new Error("Faltan datos obligatorios: etapa, nombre de escultura o imagen.");
   }
 
   try {
+    // Asegurarnos de que imagen.buffer sea un Buffer
+    let buffer = imagen.buffer;
+    if (!(buffer instanceof Buffer)) {
+      buffer = Buffer.from(buffer); // Convertir si no es un Buffer
+    }
+
     // Convertir el buffer de la imagen en un stream legible
     const bufferStream = new Readable();
-    bufferStream.push(imagen.buffer);
-    bufferStream.push(null); // Indica el final del stream
+    bufferStream.push(buffer);
+    bufferStream.push(null); // Indicar el final del stream
 
-    // Subir la imagen a Cloudinary
+    // Subir la imagen a Cloudinary usando upload_stream
     const result = await new Promise((resolve, reject) => {
       const stream = cloudinary.uploader.upload_stream(
         {
-          folder: 'imagenes_obras',
+          folder: 'imagenes_obras', // Carpeta donde se guardará la imagen
           public_id: `imagen_${nombre_escultura}_${etapa}`, // ID único basado en la escultura y etapa
-          resource_type: 'image', // Especifica que es una imagen
+          resource_type: 'image', // Especificar que es una imagen
         },
         (error, result) => {
           if (error) {
@@ -741,10 +757,10 @@ export async function registrar_imagen(etapa, nombre_escultura, imagen) {
           resolve(result);
         }
       );
-      bufferStream.pipe(stream); // Pasar el stream al uploader de Cloudinary
+      bufferStream.pipe(stream); // Pasa el stream al uploader de Cloudinary
     });
 
-    const urlFoto = result.secure_url;
+    const urlFoto = result.secure_url; // URL de la imagen subida
     console.log("URL DE LA IMAGEN:", urlFoto);
 
     // Crear el query para insertar en la base de datos
@@ -753,7 +769,7 @@ export async function registrar_imagen(etapa, nombre_escultura, imagen) {
       VALUES (?, ?, ?);
     `;
 
-    // Ejecutar el query
+    // Ejecutar el query para insertar la imagen
     return new Promise((resolve, reject) => {
       pool.execute(query, [etapa, nombre_escultura, urlFoto], (error, result) => {
         if (error) {
@@ -761,13 +777,13 @@ export async function registrar_imagen(etapa, nombre_escultura, imagen) {
           reject(error);
         } else {
           console.log("Imagen insertada:", result);
-          resolve(result.insertId);
+          resolve(result.insertId); // Devuelve el ID insertado
         }
       });
     });
   } catch (error) {
     console.error("Error al subir la imagen o insertar en la base de datos:", error);
-    throw error;
+    throw error; // Lanza el error para que sea capturado en la función principal
   }
 }
 
