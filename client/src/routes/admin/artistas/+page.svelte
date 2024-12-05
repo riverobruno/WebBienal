@@ -1,4 +1,5 @@
 <script>
+  // @ts-nocheck
   import { onMount } from 'svelte';
   import axios from 'axios';
 
@@ -14,13 +15,13 @@
           order: orden       // Orden (asc o desc)
         }
       });
-
       // Extraemos solo los nombres y el DNI de los artistas
       artistas = res.data.map(artista => ({
         nombre: artista.escultorName, // Asegúrate de que 'escultorName' sea el campo correcto en la respuesta
         dni: artista.dni,             // Asegúrate de que 'DNI' sea el campo correcto en la respuesta
         email:artista.contactoEmail,
         nacionalidad:artista.nacionalidad,
+        url: artista.escultorPantalla
       
       }));
     } catch (error) {
@@ -35,9 +36,8 @@
   });
 
   // Función para redirigir a las páginas de edición o alta de artistas
-  const editarArtista = (id) => {
-      console.log(`Editar artista con ID: ${id}`);
-      window.location.href = `/admin/artistas/mod_artista/${id}`; // Redirige a la página de edición con el ID del artista
+  const editarArtista = (dni) => {
+      window.location.href = `/admin/artistas/${dni}`; // Redirige a la página de edición con el ID del artista
   };
 
   // Función para borrar un artista
@@ -72,12 +72,6 @@
 </script>
 
 <style>
-  body {
-    font-family: 'Arial', sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: #f9f9f9;
-  }
 
   .header {
     text-align: center;
@@ -118,19 +112,6 @@
     box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
   }
 
-  .btn-verde {
-    background-color: #27ae60;
-    color: white;
-    border: none;
-    cursor: pointer;
-    padding: 10px 20px;
-    border-radius: 4px;
-    font-size: 14px;
-    font-weight: bold;
-    text-transform: uppercase;
-    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
-  }
-
   .btn-rojo {
     background-color: #e74c3c;
     color: white;
@@ -146,10 +127,6 @@
 
   .btn-azul:hover {
     background-color: #2980b9;
-  }
-
-  .btn-verde:hover {
-    background-color: #2ecc71;
   }
 
   .btn-rojo:hover {
@@ -231,7 +208,6 @@
 <div class="container">
   <div class="botones-izquierda">
     <button class="btn-azul" on:click={() => redirigir('/admin/artistas/alta_artista')}>Agregar Artista</button>
-    <button class="btn-verde" on:click={confirmar}>Confirmar</button>
     <button class="btn-rojo" on:click={volver}>Volver</button>
   </div>
 
@@ -246,14 +222,14 @@
       </tr>
     </thead>
     <tbody>
-      {#each artistas as { id, nombre, dni, email, nacionalidad }}
+      {#each artistas as { nombre, dni, email, nacionalidad, url }}
         <tr>
           <td>{nombre}</td>
           <td>{dni}</td>
           <td>{email}</td>
           <td>{nacionalidad}</td>
           <td class="acciones">
-            <button class="btn-editar" on:click={() => editarArtista(dni)}>✏️</button>
+            <button class="btn-editar" on:click={() => editarArtista(url)}>✏️</button>
             <button class="btn-eliminar" on:click={() => eliminarArtista(dni)}>❌</button>
           </td>
         </tr>

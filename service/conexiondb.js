@@ -900,6 +900,57 @@ export async function modificar_evento(
   });
 };
 
+export async function modificar_artista(
+  dni_resguardado,
+  nombre,
+  apellido,
+  dni,
+  biografia,
+  email,
+  contraseña,
+  imagenPerfil
+) {
+  console.log(dni_resguardado, nombre,apellido,dni,biografia,email, contraseña,imagenPerfil);
+  let con = crearConexion(); // Asegúrate de que esta función esté bien configurada
+  return new Promise((resolve, reject) => {
+    con.connect((err) => {
+      if (err) {
+        console.error('Error connecting: ' + err.stack);
+        reject(err);
+        return;
+      }
+      console.log("Connected!");
+
+      // Llamada al procedimiento almacenado `modificar_artista`
+      const query = 'CALL modificar_artista(?, ?, ?, ?, ?, ?, ?)';
+      console.log(dni_resguardado,
+        dni,
+        nombre + ' ' + apellido,
+        biografia,
+        email,
+        imagenPerfil,
+        contraseña)
+      con.query(query, [
+        dni_resguardado,
+        dni,
+        nombre + ' ' + apellido,
+        biografia,
+        email,
+        imagenPerfil,
+        contraseña
+      ], (err, results) => {
+        if (err) {
+          reject(err);
+        } else {
+          console.log(results)
+          resolve('Evento modificado exitosamente');
+        }
+        con.end(); // Cerramos la conexión
+      });
+    });
+  });
+};
+
 export async function borrar_artista(DNI) {
   let con = crearConexion(); // Asegúrate de que esta función esté bien configurada
   console.log("Se llama al 2do")

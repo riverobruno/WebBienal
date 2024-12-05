@@ -1,20 +1,27 @@
 <script>
+    // @ts-nocheck
     import { onMount } from 'svelte';
     import axios from 'axios';
+    import { page } from "$app/stores";
   
     let userRole;
     let accesoPermitido = false;
     let mostrandoCarga = false;
     let mensaje = '';
-  
-    let id = ''; // ID del escultor a modificar
-    let nombre = '';
-    let apellido = '';
-    let dni = '';
-    let biografia = '';
-    let email = '';
-    let contraseña = '';
-    let imagenPerfil = null;
+
+    /**
+     * @type {string}
+     */
+    let slug;
+    $: slug = $page.params.slug;
+    let nombre;
+    let apellido;
+    let dni;
+    let biografia;
+    let email;
+    let contraseña;
+    let imageUrl;
+    let resguardo_dni;
   
     onMount(() => {
       userRole = localStorage.getItem('role');
@@ -31,13 +38,18 @@
     async function obtenerDatosEscultor() {
       mostrandoCarga = true;
       try {
-        const res = await axios.get(`http://localhost:3001/api/artista/${id}`);
-        const data = res.data;
-        nombre = data.nombre;
-        apellido = data.apellido;
+        const response = await axios.get(`http://localhost:3001/api/escultores/${slug}`, {
+            params: { nombre: slug }
+        });
+        const data = response.data.escultor;
+        console.log(slug)
+        console.log(data);
+        [nombre, apellido] = data.escultorName.split(" ");
         dni = data.dni;
-        biografia = data.biografia;
-        email = data.email;
+        resguardo_dni = data.dni;
+        biografia = data.content;
+        email = data.contactoEmail;
+        contraseña;
       } catch (error) {
         console.error('Error al obtener los datos del escultor:', error);
         mensaje = 'No se pudo cargar la información del escultor.';
@@ -47,28 +59,29 @@
     }
   
     // Función para manejar el cambio de archivo
-    function handleFileChange(event) {
-      imagenPerfil = event.target.files[0];
+    function handleFile(event) {
+        const file = event.target.files[0]; // Obtiene el archivo seleccionado
+        if (file) {
+            imageUrl = URL.createObjectURL(file); // Crea una URL para previsualizar la imagen
+        }
     }
   
     // Función para enviar el formulario de actualización al backend
     async function enviarFormulario() {
       mostrandoCarga = true;
       try {
-        const formData = new FormData();
-        formData.append('nombre', nombre);
-        formData.append('apellido', apellido);
-        formData.append('dni', dni);
-        formData.append('biografia', biografia);
-        formData.append('email', email);
-        if (contraseña) formData.append('contrasena', contraseña);
-        if (imagenPerfil) formData.append('imagenPerfil', imagenPerfil);
-  
-        const res = await axios.put(`http://localhost:3001/api/artista/${id}`, formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        });
+        const artistaActualizado = {
+        dni_resguardado: resguardo_dni,
+        nombre_actual: nombre,
+        apellido_actual: apellido,
+        dni_nuevo: dni,
+        biografia_nuevo: biografia,
+        email_nuevo: email,
+        contraseña_nueva: contraseña,
+        imagenPerfil_nueva: imageUrl
+      };
+      console.log(artistaActualizado)
+        const res = await axios.post(`http://localhost:3001/api/modificarArtista`, artistaActualizado);
         mensaje = res.data.mensaje || 'Escultor modificado con éxito';
       } catch (error) {
         console.error('Error al modificar el escultor:', error);
@@ -120,7 +133,16 @@
   
         <div class="campo">
           <label for="imagenPerfil">Actualizar Imagen de Perfil</label>
-          <input type="file" id="imagenPerfil" accept="image/*" on:change={handleFileChange} />
+          <!-- Input para seleccionar la imagen -->
+          <input type="file" accept="image/*" on:change={handleFile} />
+
+          <!-- Previsualización de la imagen seleccionada -->
+          {#if imageUrl}
+              <div>
+                  <h2>Previsualización:</h2>
+                  <img src={imageUrl} alt="Imagen seleccionada" style="max-width: 100%; height: auto;" />
+              </div>
+          {/if}
         </div>
   
         <button type="submit">Modificar Escultor</button>

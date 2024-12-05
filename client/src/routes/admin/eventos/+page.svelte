@@ -63,6 +63,11 @@
       window.location.href = ruta+slug; // Redirige a la ruta especificada
   };
 
+  const redirigirAlta = (ruta) => {
+      window.location.href = '/admin/eventos/alta_evento'; // Redirige a la ruta especificada
+  };
+
+
   const confirmar = () => {
       console.log('Acción confirmada');
       // Lógica para confirmar
@@ -74,12 +79,6 @@
 </script>
 
 <style>
-  body {
-      font-family: 'Arial', sans-serif;
-      margin: 0;
-      padding: 0;
-      background-color: #f9f9f9;
-  }
 
   .header {
       text-align: center;
@@ -120,19 +119,6 @@
       box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
   }
 
-  .btn-verde {
-      background-color: #27ae60;
-      color: white;
-      border: none;
-      cursor: pointer;
-      padding: 10px 20px;
-      border-radius: 4px;
-      font-size: 14px;
-      font-weight: bold;
-      text-transform: uppercase;
-      box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
-  }
-
   .btn-rojo {
       background-color: #e74c3c;
       color: white;
@@ -148,10 +134,6 @@
 
   .btn-azul:hover {
       background-color: #2980b9;
-  }
-
-  .btn-verde:hover {
-      background-color: #2ecc71;
   }
 
   .btn-rojo:hover {
@@ -232,8 +214,7 @@
 
 <div class="container">
   <div class="botones-izquierda">
-      <button class="btn-azul" on:click={() => redirigir('/admin/eventos/alta_evento')}>Agregar Evento</button>
-      <button class="btn-verde" on:click={confirmar}>Confirmar</button>
+      <button class="btn-azul" on:click={() => redirigirAlta()}>Agregar Evento</button>
       <button class="btn-rojo" on:click={volver}>Volver</button>
   </div>
 

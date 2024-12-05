@@ -14,7 +14,8 @@ dotenv.config({ path: join(__dirname, '../.env') });
 import { ArtistasConsulta, EsculturasConsulta, EventosConsulta, login, 
   ObrasdeUnEvento, ObrasdeUnArtista, EventosYEsculturasDeObra, insertarEvento, 
   insertarArtista, register, registrar_voto,registrar_escultura, registrar_hechas_por, 
-  registrar_imagen, registrar_compiten, cambiar_Contraseña,modificar_evento,borrar_evento,borrar_artista } from './conexiondb.js';
+  registrar_imagen, registrar_compiten, cambiar_Contraseña,modificar_evento,borrar_evento,borrar_artista,
+  modificar_artista } from './conexiondb.js';
 
 import { ordenarEsculturas, buscarEsculturas, ordenarEventos, 
   buscarEventos, ordenarArtistas, buscarArtistas, eventoProximo } from './filtrosObjetos.js';
@@ -777,11 +778,6 @@ app.post('/api/artistaNuevo', upload.single('imagenPerfil'), async (req, res) =>
   }
 });
 
-
-
-
-
-
 // Endpoint para registrar una escultura
 app.post('/api/esculturaNueva', async (req, res) => {
   console.log("Llama a crear Escultura")
@@ -864,31 +860,6 @@ app.post('/api/compitenNuevo', async (req, res) => {
   }
 });
 
-app.post('/api/validate-captcha', async (req, res) => {
-  const { recaptchaResponse } = req.body;
-
-  try {
-    const response = await axios.post(`https://www.google.com/recaptcha/api/siteverify`, null, {
-      params: {
-        secret: process.env.VITE_RECAPTCHA_SECRET_KEY,
-        response: recaptchaResponse
-      }
-    });
-
-    if (response.data.success) {
-      res.json({ success: true });
-    } else {
-      res.json({ success: false });
-    }
-  } catch (error) {
-    res.status(500).json({ success: false, message: 'Error en la verificación' });
-  }
-});
-
-app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`);
-});
-
 
 app.post('/api/borrarEvento', async (req, res) => {
   const { nombre_evento, lugar_evento } = req.body;
@@ -949,6 +920,38 @@ app.post('/api/modificarEvento', async (req, res) => {
   }
 });
 
+app.post('/api/modificarArtista', async (req, res) => {
+  const {
+    dni_resguardado,
+    nombre,
+    apellido,
+    dni,
+    biografia,
+    email,
+    contraseña,
+    imagenPerfil
+  } = req.body;
+  console.log(req.body);
+  try {
+    // Llamamos a la función para modificar el evento
+    const resultado = await modificar_artista(
+      req.body.dni_resguardado,
+      req.body.nombre_actual,
+      req.body.apellido_actual,
+      req.body.dni_nuevo,
+      req.body.biografia_nuevo,
+      req.body.email_nuevo,
+      req.body.contraseña_nueva,
+      req.body.imagenPerfil_nueva
+    );
+    cache.del(['artistas']);
+    res.status(200).json({ mensaje: 'Artista modificado con éxito', resultado });
+  } catch (error) {
+    console.error('Error al modificar el artista:', error);
+    res.status(500).json({ error: 'Error al modificar el artista' });
+  }
+});
+
 
 app.post('/api/borrarArtista', async (req, res) => {
   const { dni } = req.body;
@@ -965,7 +968,6 @@ app.post('/api/borrarArtista', async (req, res) => {
     const resultado = await borrar_artista(dni);
     // Si deseas limpiar algún cache relacionado con artistas, puedes hacerlo aquí
     cache.del(['artistas']); 
-
     res.status(200).json({ mensaje: 'Artista borrado con éxito', resultado });
   } catch (error) {
     console.error('Error al borrar el artista:', error);
@@ -973,3 +975,6 @@ app.post('/api/borrarArtista', async (req, res) => {
   }
 });
 
+app.listen(port, () => {
+  console.log(`Example app listening on port ${port}`);
+});
