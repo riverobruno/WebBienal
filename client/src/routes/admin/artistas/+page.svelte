@@ -1,195 +1,224 @@
 <script>
-  import { onMount } from 'svelte';
+  // Datos de ejemplo para los artistas
+  let artistas = [
+    { id: 1, nombre: "Juan", apellido: "Pérez", email: "juan.perez@example.com", nacionalidad: "Argentina" },
+    { id: 2, nombre: "Maria", apellido: "Gómez", email: "maria.gomez@example.com", nacionalidad: "México" },
+    { id: 3, nombre: "Carlos", apellido: "Martínez", email: "carlos.martinez@example.com", nacionalidad: "España" },
+  ];
 
-  let userRole;
-  let accesoPermitido = false; // Variable para controlar el acceso
+  const editarArtista = (id,ruta) => {
+    console.log(`Editar artista con ID: ${id}`);
+    window.location.href = ruta; // Redirige a la ruta especificada
+    // Lógica para editar
+  };
 
-  onMount(() => {
-    userRole = localStorage.getItem('role');
-
-    // Verifica si el usuario tiene el rol adecuado
-    if (userRole === 'admin') {
-      accesoPermitido = true; // Permite el acceso si es administrador
-    } else {
-      alert('Acceso denegado. Redirigiendo a la página principal.');
-      window.location.href = '/inicio';
+  function redirigir(ruta) {
+      window.location.href = ruta; // Redirige a la ruta especificada
     }
-  });
 
-  import axios from 'axios';
+  const eliminarArtista = (id) => {
+    console.log(`Eliminar artista con ID: ${id}`);
+    // Lógica para eliminar
+  };
 
-  let nombre = '';
-  let apellido = '';
-  let dni = '';
-  let biografia = '';
-  let email = '';
-  let contraseña = '';
-  let imagenPerfil = null;
-  let mensaje = '';
-  let mostrandoCarga = false;
 
-  // Función para manejar el cambio de archivo
-  function handleFileChange(event) {
-    imagenPerfil = event.target.files[0];
-  }
+  const confirmar = () => {
+    console.log('Acción confirmada');
+    // Lógica para confirmar
+  };
 
-  // Función para enviar el formulario al backend
-  async function enviarFormulario() {
-    mostrandoCarga = true;
-    try {
-      const formData = new FormData();
-      formData.append('nombre', nombre);
-      formData.append('apellido', apellido);
-      formData.append('dni', dni);
-      formData.append('biografia', biografia);
-      formData.append('email', email);
-      formData.append('contrasena', contraseña);
-      formData.append('imagenPerfil', imagenPerfil);
-
-      const res = await axios.post('http://localhost:3001/api/artistaNuevo', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-      mensaje = res.data.mensaje || 'Escultor registrado con éxito';
-    } catch (error) {
-      console.error(error);
-      mensaje = 'Error al registrar el escultor. Por favor, intenta de nuevo.';
-    } finally {
-      mostrandoCarga = false;
-    }
-  }
+  const volver = () => {
+    window.location.href = '/admin';
+  };
 </script>
 
-{#if accesoPermitido}
-
-  <!-- Mostrar el ícono de carga mientras se realiza la solicitud -->
-  {#if mostrandoCarga}
-    <div class="loading-icon"></div>
-  {/if}
-
-  <section>
-    <h1>Registrar Escultor</h1>
-    <form on:submit|preventDefault={enviarFormulario} class="formulario">
-      <div class="campo">
-        <label for="nombre">Nombre</label>
-        <input type="text" id="nombre" bind:value={nombre} required />
-      </div>
-
-      <div class="campo">
-        <label for="apellido">Apellido</label>
-        <input type="text" id="apellido" bind:value={apellido} required />
-      </div>
-
-      <div class="campo">
-        <label for="dni">DNI</label>
-        <input type="text" id="dni" bind:value={dni} required />
-      </div>
-
-      <div class="campo">
-        <label for="biografia">Biografía</label>
-        <textarea id="biografia" bind:value={biografia} rows="4" required></textarea>
-      </div>
-
-      <div class="campo">
-        <label for="email">Correo Electrónico</label>
-        <input type="email" id="email" bind:value={email} required />
-      </div>
-
-      <div class="campo">
-        <label for="contraseña">Contraseña</label>
-        <input type="password" id="contraseña" bind:value={contraseña} required />
-      </div>
-
-      <div class="campo">
-        <label for="imagenPerfil">Imagen de Perfil</label>
-        <input type="file" id="imagenPerfil" accept="image/*" on:change={handleFileChange} required />
-      </div>
-
-      <button type="submit">Registrar Escultor</button>
-    </form>
-
-    <!-- Mostrar el mensaje de éxito o error -->
-    {#if mensaje}
-      <p class="mensaje">{mensaje}</p>
-    {/if}
-  </section>
-{/if}
-
 <style>
-  section {
-    max-width: 600px;
-    margin: 0 auto;
-    padding: 20px;
+  body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
     background-color: #f9f9f9;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+
+  .header {
+    text-align: center;
+    margin: 20px auto;
   }
 
   h1 {
-    text-align: center;
-    margin-bottom: 20px;
-  }
-
-  .formulario {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-  }
-
-  .campo {
-    display: flex;
-    flex-direction: column;
-  }
-
-  label {
+    margin: 0;
+    font-size: 24px;
+    color: #333;
     font-weight: bold;
-    margin-bottom: 5px;
   }
 
-  input, textarea, button {
-    padding: 10px;
-    font-size: 16px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+  .container {
+    display: flex;
+    align-items: flex-start;
   }
 
-  button {
-    background-color: #007BFF;
+  .botones-izquierda {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-left: 20px;
+    margin-top: 20px;
+    gap: 10px;
+  }
+
+  .btn-azul {
+    background-color: #3498db;
     color: white;
     border: none;
     cursor: pointer;
-    transition: background-color 0.3s;
+    padding: 10px 20px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: bold;
+    text-transform: uppercase;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
   }
 
-  button:hover {
-    background-color: #0056b3;
+  .btn-verde {
+    background-color: #27ae60;
+    color: white;
+    border: none;
+    cursor: pointer;
+    padding: 10px 20px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: bold;
+    text-transform: uppercase;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
   }
 
-  .mensaje {
-    text-align: center;
-    font-size: 16px;
-    color: green;
+  .btn-rojo {
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    cursor: pointer;
+    padding: 10px 20px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: bold;
+    text-transform: uppercase;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
   }
 
-  .loading-icon {
+  .btn-azul:hover {
+    background-color: #2980b9;
+  }
+
+  .btn-verde:hover {
+    background-color: #2ecc71;
+  }
+
+  .btn-rojo:hover {
+    background-color: #c0392b;
+  }
+
+  table {
+    width: 70%;
+    margin: 0 auto;
+    border-collapse: collapse;
+    background: white;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  th, td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+  }
+
+  th {
+    background-color: #4CAF50;
+    color: white;
+    font-weight: bold;
+    text-transform: uppercase;
+  }
+
+  td {
+    color: #333;
+  }
+
+  tr:hover {
+    background-color: #f1f1f1;
+  }
+
+  .acciones {
     display: flex;
     justify-content: center;
-    align-items: center;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 50px;
-    height: 50px;
-    border: 6px solid #f3f3f3;
-    border-top: 6px solid #3498db;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
+    gap: 10px;
   }
 
-  @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+  .btn-editar {
+    background-color: #fbc531;
+    border: none;
+    cursor: pointer;
+    padding: 5px 12px;
+    border-radius: 4px;
+    font-weight: bold;
+    color: white;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
+  }
+
+  .btn-eliminar {
+    background-color: #e84118;
+    border: none;
+    cursor: pointer;
+    padding: 5px 12px;
+    border-radius: 4px;
+    font-weight: bold;
+    color: white;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
+  }
+
+  .btn-editar:hover {
+    background-color: #f5c327;
+  }
+
+  .btn-eliminar:hover {
+    background-color: #d63031;
   }
 </style>
+
+<div class="header">
+  <h1>Lista de Artistas</h1>
+</div>
+
+<div class="container">
+  <div class="botones-izquierda">
+    <button class="btn-azul" on:click={() => redirigir('/admin/artistas/alta_artista')}>Agregar Artista</button>
+    <button class="btn-verde" on:click={confirmar}>Confirmar</button>
+    <button class="btn-rojo" on:click={volver}>Volver</button>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Nombre</th>
+        <th>Apellido</th>
+        <th>Email</th>
+        <th>Nacionalidad</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {#each artistas as { id, nombre, apellido, email, nacionalidad }}
+        <tr>
+          <td>{nombre}</td>
+          <td>{apellido}</td>
+          <td>{email}</td>
+          <td>{nacionalidad}</td>
+          <td class="acciones">
+            <button class="btn-editar" on:click={() => redirigir('/admin/artistas/mod_artista')}>✏️</button>
+            <button class="btn-eliminar" on:click={() => eliminarArtista(id)}>❌</button>
+          </td>
+        </tr>
+      {/each}
+    </tbody>
+  </table>
+</div>
