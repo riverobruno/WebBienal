@@ -210,6 +210,7 @@
     border-radius: 8px;
     color: white;
     font-size: 1rem;
+    font-weight: bold;
     cursor: pointer;
     transition: background 0.3s ease;
   }
