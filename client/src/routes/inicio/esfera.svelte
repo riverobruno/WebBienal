@@ -42,7 +42,7 @@
       justify-content: center;
       align-items: center;
       background: linear-gradient(180deg, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0.3) 60%, rgba(0, 0, 0, 0.8) 100%);
-      color: #fff;
+      color: #000000;
       text-align: center;
       padding: 1.5rem;
       font-family: 'Montserrat', sans-serif;
