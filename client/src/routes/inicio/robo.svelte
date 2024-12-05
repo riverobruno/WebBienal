@@ -132,7 +132,7 @@
       <div class="section-title">Obras Destacadas</div>
       <div class="card-grid">
         {#each cards as evento}
-          <a href="http://localhost:3333/obras/{evento.obraPantalla}">
+          <a href="/obras/{evento.obraPantalla}">
             <div class="hover-card">
               <HoverCard imageSrc={evento.obraImage[0]} title={evento.obraName} />
             </div>
