@@ -68,7 +68,7 @@
 
 <div class="video-container">
   <video autoplay muted loop playsinline>
-      <source src="1733168603669-5154d4f9-d6ed-d061-b328-2554ea16a594.mp4" type="video/mp4" />
+      <source src="video_inicio.mp4" type="video/mp4" />
       Tu navegador no soporta la reproducción de video.
   </video>
   <div class="overlay">
