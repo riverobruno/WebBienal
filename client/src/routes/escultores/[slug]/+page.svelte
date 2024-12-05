@@ -24,6 +24,7 @@
             obras = data.obras;
             
             nombrepais = whereAlpha2(escultor.nacionalidad); 
+            nombrepais=nombrepais.country;
         } catch (error) {
             console.log("Error al obtener escultor:", error);
         }
