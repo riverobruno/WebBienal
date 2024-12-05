@@ -14,7 +14,7 @@ dotenv.config({ path: join(__dirname, '../.env') });
 import { ArtistasConsulta, EsculturasConsulta, EventosConsulta, login, 
   ObrasdeUnEvento, ObrasdeUnArtista, EventosYEsculturasDeObra, insertarEvento, 
   insertarArtista, register, registrar_voto,registrar_escultura, registrar_hechas_por, 
-  registrar_imagen, registrar_compiten, cambiar_Contraseña } from './conexiondb.js';
+  registrar_imagen, registrar_compiten, cambiar_Contraseña,modificar_evento,borrar_evento } from './conexiondb.js';
 
 import { ordenarEsculturas, buscarEsculturas, ordenarEventos, 
   buscarEventos, ordenarArtistas, buscarArtistas, eventoProximo } from './filtrosObjetos.js';
@@ -865,4 +865,64 @@ app.post('/api/compitenNuevo', async (req, res) => {
 });
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
+});
+
+
+app.post('/api/borrarEvento', async (req, res) => {
+  const { nombre_evento, lugar_evento } = req.body;
+
+  // Verificación de campos obligatorios
+  if (!nombre_evento || !lugar_evento) {
+    return res.status(400).json({ error: 'El nombre y lugar del evento son obligatorios' });
+  }
+
+  try {
+    // Llamamos a la función para borrar el evento
+    const resultado = await borrar_evento(nombre_evento, lugar_evento);
+    cache.del(['eventos']);
+    res.status(200).json({ mensaje: 'Evento borrado con éxito', resultado });
+  } catch (error) {
+    console.error('Error al borrar el evento:', error);
+    res.status(500).json({ error: 'Error al borrar el evento' });
+  }
+});
+
+
+app.post('/api/modificarEvento', async (req, res) => {
+  const {
+    nombre_evento_actual,
+    lugar_evento_actual,
+    nombre_evento_nuevo,
+    lugar_evento_nuevo,
+    fecha_inicio,
+    fecha_fin,
+    tematica,
+    hora_inicio,
+    hora_fin
+  } = req.body;
+
+  // Verificación de campos obligatorios
+  if (!nombre_evento_actual || !lugar_evento_actual || !nombre_evento_nuevo || !lugar_evento_nuevo) {
+    return res.status(400).json({ error: 'Los campos actuales y nuevos de nombre y lugar del evento son obligatorios' });
+  }
+
+  try {
+    // Llamamos a la función para modificar el evento
+    const resultado = await modificar_evento(
+      nombre_evento_actual,
+      lugar_evento_actual,
+      nombre_evento_nuevo,
+      lugar_evento_nuevo,
+      fecha_inicio,
+      fecha_fin,
+      tematica,
+      hora_inicio,
+      hora_fin
+    );
+    cache.del(['eventos']);
+    res.status(200).json({ mensaje: 'Evento modificado con éxito', resultado });
+  } catch (error) {
+    console.error('Error al modificar el evento:', error);
+    res.status(500).json({ error: 'Error al modificar el evento' });
+  }
 });
