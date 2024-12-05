@@ -4,7 +4,7 @@
     import axios from "axios";
     import { page } from "$app/stores";
     import "flag-icons/css/flag-icons.min.css";
-
+    import { whereAlpha2 } from 'iso-3166-1';
     let slug;
     $: slug = $page.params.slug;
     let escultor = {}; // Objeto vacío para los datos del escultor
@@ -12,7 +12,7 @@
     let obras = []; // Cambié a un array para manejar varias obras
     let mostrandoCarga = true;
     let animate = false; // Control de animación
-
+    let nombrepais;
     async function fetchEscultor(slug) {
         mostrandoCarga = true;
         try {
@@ -21,7 +21,9 @@
             });
             data = response.data;
             escultor = data.escultor;
-            obras = data.obras; // Asigno las obras correctamente
+            obras = data.obras;
+            
+            nombrepais = whereAlpha2(escultor.nacionalidad); 
         } catch (error) {
             console.log("Error al obtener escultor:", error);
         }
@@ -53,6 +55,7 @@
 
       <section class="mt-4">
           <h2 class="text-xl font-semibold">Biografía</h2>
+          <p>Nacionalidad: {nombrepais} </p>
           <p>{escultor.content}</p>
       </section>
 

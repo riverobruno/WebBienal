@@ -1,7 +1,7 @@
 <script>
   import { onMount } from "svelte";
   import axios from "axios";
-
+  import "flag-icons/css/flag-icons.min.css";
   let searchQuery = ""; // Valor de la búsqueda
   let criterio = "promedio"; // Criterio de ordenamiento
   let orden = "DESC"; // Ordenamiento ascendente o descendente
