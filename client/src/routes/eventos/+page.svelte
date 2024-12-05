@@ -77,6 +77,8 @@
     }
 </script>
 
+<div class="main-container" style="background-image: url('fondobienal2024_2.jpg');">
+
 <!-- Mostrar el ícono de carga solo cuando mostrandoCarga es true -->   
 {#if mostrandoCarga}
     <div class="loading-icon"></div>

@@ -64,10 +64,11 @@
   export let mostrandoCarga = false;
 </script>
 
-<!-- Mostrar el ícono de carga solo cuando mostrandoCarga es true -->
-{#if mostrandoCarga}
-    <div class="loading-icon"></div>
-{/if}
+<div style="background-image: url('dorado.jpg');">
+  <!-- Mostrar el ícono de carga solo cuando mostrandoCarga es true -->
+  {#if mostrandoCarga}
+      <div class="loading-icon"></div>
+  {/if}
 
 <div class="search-container">
   <div>
@@ -85,6 +86,11 @@
       <option value="nombre">Nombre</option>
     </select>
 
+    <!-- Lista desplegable para el orden ascendente/descendente -->
+    <select class="search-select" bind:value="{orden}">
+      <option value="DESC">Descendente</option>
+      <option value="ASC">Ascendente</option>
+    </select>
     <!-- Lista desplegable para el orden ascendente/descendente -->
     <select class="search-select" bind:value="{orden}">
       <option value="DESC">Descendente</option>
@@ -133,15 +139,15 @@
   {/each}
 </div>
 
-<!-- Controles de paginación -->
-<div class="pagination">
-  {#each Array(totalPages) as _, index}
-    <button class="page-button" on:click="{() => changePage(index + 1)}">
-      {index + 1}
-    </button>
-  {/each}
+  <!-- Controles de paginación -->
+  <div class="pagination">
+    {#each Array(totalPages) as _, index}
+      <button class="page-button" on:click="{() => changePage(index + 1)}">
+        {index + 1}
+      </button>
+    {/each}
+  </div>
 </div>
-
 <style>
     .stars {
         margin-top: 8px; /* Espaciado superior */
