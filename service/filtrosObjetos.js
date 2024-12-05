@@ -227,12 +227,11 @@ export function eventoProximo(listaEventos) {
             fechaHoraEventoA.setUTCHours(horaA, minutosA, segundosA || 0);
 
             // Crear el objeto Date desde fecha_inicio
-            const fechaHoraEventoB = new Date(a.fecha_inicio);
+            const fechaHoraEventoB = new Date(b.fecha_inicio);
             // Extraer hora, minutos y segundos de hora_inicio
-            const [horaB, minutosB, segundosB] = a.hora_inicio.split(":").map(Number);
+            const [horaB, minutosB, segundosB] = b.hora_inicio.split(":").map(Number);
             // Ajustar la hora, minutos y segundos en el objeto Date
             fechaHoraEventoA.setUTCHours(horaB, minutosB, segundosB || 0);
-
             // Ordenar los eventos futuros por fecha y hora
             const fechaHoraA = new Date(fechaHoraEventoA);
             const fechaHoraB = new Date(fechaHoraEventoB);
