@@ -1,22 +1,35 @@
 <script>
-  import HoverCard from './shape.svelte'; // Asegúrate de que la ruta sea correcta
+    import { onMount } from 'svelte';
+    import axios from 'axios';
+    import HoverCard from './shape.svelte';
+    let videoSource = "B24-web-slide-institucional-nuevo-c.mp4";
 
-  let videoSource = "B24-web-slide-institucional-nuevo-c.mp4";
+    /**
+     * @type {any[]}
+     */
+    let cards = [];
 
-  const eventos = [
-    { imageSrc: 'Fondo-bienal.jpg', title: 'XIII Bienal Internacional de Escultura' },
-    { imageSrc: 'dorado.jpg', title: 'IX Encuentro de Escultores Invitados' },
-    { imageSrc: 'EoU.jpg', title: 'IX Concurso de Escultura para Estudiantes de Artes' },
-    { imageSrc: 'fondobienal2018v3.jpg', title: 'IV Congreso Internacional de Artes' },
-    { imageSrc: 'fondobienal2024_2.jpg', title: 'V Festival Filarmónico' },
-    { imageSrc: 'psicodelico.jpg', title: 'Artesanía' },
-    { imageSrc: 'pablopicasso.png', title: 'Artes Escénicas' },
-    { imageSrc: 'Fondo-bienal.jpg', title: 'Muestras Individuales y Colectivas' },
-    { imageSrc: 'fondobienal2024_2.jpg', title: 'V Festival Filarmónico' },
-    { imageSrc: 'psicodelico.jpg', title: 'Artesanía' },
-    { imageSrc: 'pablopicasso.png', title: 'Artes Escénicas' },
-    { imageSrc: 'Fondo-bienal.jpg', title: 'Muestras Individuales y Colectivas' }
-  ];
+    async function fetchObras() {
+        try {
+            const res = await axios.get(`http://localhost:3001/api/esculturas`, {
+                params: {
+                    search: "",    
+                    sortBy:  'promedio',  
+                    order: 'DESC'      
+                }
+            });
+            cards = res.data.slice(0,10);
+            console.log(cards)
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    // Ejecutar la consulta inicial cuando se monta la página
+    onMount(() => {
+        fetchObras(); // Sin query al principio
+    });
+
 </script>
 
 <style>
@@ -118,10 +131,12 @@
     <div class="card-section">
       <div class="section-title">Obras Destacadas</div>
       <div class="card-grid">
-        {#each eventos as evento}
-          <div class="hover-card">
-            <HoverCard imageSrc={evento.imageSrc} title={evento.title} />
-          </div>
+        {#each cards as evento}
+          <a href="http://localhost:3333/obras/{evento.obraPantalla}">
+            <div class="hover-card">
+              <HoverCard imageSrc={evento.obraImage[0]} title={evento.obraName} />
+            </div>
+          </a>
         {/each}
       </div>
     </div>

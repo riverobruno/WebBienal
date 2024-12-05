@@ -100,6 +100,8 @@
 
 <div class="contenedor">
     {#each cards as tarjeta}
+    <!-- Tarjeta individual -->
+     <a href="http://localhost:3333/escultores/{tarjeta.escultorPantalla}">
         <div class="tarjeta">
             <div class="imagen-container">
                 <img src={tarjeta.escultorFoto} alt="Foto de {tarjeta.escultorName}" class="imagen" />
@@ -110,6 +112,7 @@
                 <div class="correo">{tarjeta.contactoEmail}</div>
             </div>
         </div>
+      </a>
     {/each}
 </div>
 

@@ -94,14 +94,14 @@
   }
 
   function generarEnlacesCompartir() {
-    const urlPagina = `http://localhost:3001/api/obras/${obra.slug}`; // Obtiene la URL actual de la página
+    const urlPagina = `http://localhost:3001/api/obras/${slug}`; // Obtiene la URL actual de la página
     const mensaje = "¡Mira esta obra!"; // Mensaje predeterminado para compartir
     return {
       facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
         urlPagina
       )}&quote=${encodeURIComponent(mensaje)}`,
-      twitter: `https://twitter.com/intent/tweet?url=${encodeURIComponent(urlPagina)}&text=¡Echa_un_vistazo_a_esta_obra!`,
-      whatsapp: `https://wa.me/?text=${encodeURIComponent("¡Mira esta obra! " + urlPagina)}`,
+      twitter: `https://twitter.com/intent/tweet?url=${encodeURIComponent(urlPagina)}&text=${mensaje}`,
+      whatsapp: `https://wa.me/?text=${encodeURIComponent(mensaje +'\n'+ urlPagina)}`,
       instagram: `https://www.instagram.com`, // Sin soporte directo
     };
   }
@@ -164,71 +164,61 @@
         <img src={qrCodeData} alt="QR" />
         <!-- Muestra el antecedente de la obra -->
       </section>
-    {/if}
-    <!-- Botones para compartir en redes sociales -->
-    <section class="share-icons">
-      <!-- Facebook -->
+    {:else}
+      <!-- Botones para compartir en redes sociales -->
+      <section class="share-icons">
+        <!-- Facebook -->
 
-      <a
-        href={generarEnlacesCompartir().facebook}
-        target="_blank"
-        aria-label="Compartir en Facebook"
-        rel="noopener noreferrer"
-        class="icon-button facebook"
-      >
-        <i class="fab fa-facebook-f"></i>
-      </a>
-
-      <!-- Twitter -->
-      <a
-        href={generarEnlacesCompartir().twitter}
-        target="_blank"
-        aria-label="Compartir en Twitter"
-        rel="noopener noreferrer"
-        class="icon-button twitter"
-      >
-        <i class="fab fa-twitter"></i>
-      </a>
-
-      <!-- WhatsApp -->
-      <a
-        href={generarEnlacesCompartir().whatsapp}
-        target="_blank"
-        aria-label="Compartir en WhatsApp"
-        rel="noopener noreferrer"
-        class="icon-button whatsapp"
-      >
-        <i class="fab fa-whatsapp"></i>
-      </a>
-
-      <!-- Instagram -->
-      <a
-        href={generarEnlacesCompartir().instagram}
-        target="_blank"
-        aria-label="Abrir Instagram"
-        rel="noopener noreferrer"
-        class="icon-button instagram"
-      >
-        <i class="fab fa-instagram"></i>
-      </a>
-
-      <!-- Copiar enlace -->
-      <!-- Contenedor del botón con posición relativa -->
-      <div class="relative">
-        <!-- Botón de copiar -->
-        <button
-          class="icon-button copy"
-          aria-label="Copiar enlace"
-          on:click={() => copiarAlPortapapeles(window.location.href)}
+        <a
+          href={generarEnlacesCompartir().facebook}
+          target="_blank"
+          aria-label="Compartir en Facebook"
+          rel="noopener noreferrer"
+          class="icon-button facebook"
         >
-          <i class="fas fa-copy"></i>
-        </button>
-        {#if mensajeCopiado}
-          <!-- Mensaje copiado -->
-          <span class="mensaje-copiado">Copiado!</span>
-        {/if}
-      </div>
-    </section>
+          <i class="fab fa-facebook-f"></i>
+        </a>
+
+        <!-- Twitter -->
+        <a
+          href={generarEnlacesCompartir().twitter}
+          target="_blank"
+          aria-label="Compartir en Twitter"
+          rel="noopener noreferrer"
+          class="icon-button twitter"
+        >
+          <i class="fab fa-twitter"></i>
+        </a>
+
+        <!-- WhatsApp -->
+        <a
+          href={generarEnlacesCompartir().whatsapp}
+          target="_blank"
+          aria-label="Compartir en WhatsApp"
+          rel="noopener noreferrer"
+          class="icon-button whatsapp"
+        >
+          <i class="fab fa-whatsapp"></i>
+        </a>
+
+        <!-- Copiar enlace -->
+        <!-- Contenedor del botón con posición relativa -->
+        <div class="relative">
+          <!-- Botón de copiar -->
+          <button
+            class="icon-button copy"
+            aria-label="Copiar enlace"
+            on:click={() => copiarAlPortapapeles(window.location.href)}
+          >
+            <i class="fas fa-copy"></i>
+          </button>
+          {#if mensajeCopiado}
+            <!-- Mensaje copiado -->
+            <span class="mensaje-copiado">Copiado!</span>
+          {/if}
+        </div>
+      </section>
+    {/if}
   </article>
 
   <div class="contenedor">
@@ -386,10 +376,6 @@
 
   .twitter {
     color: #1da1f2;
-  }
-
-  .instagram {
-    color: #c13584;
   }
 
   .copy {
