@@ -42,16 +42,27 @@
     alert('Hubo un error al intentar registrar el usuario.');
   }
 };
-
+const cancelar = () => {
+  if (confirm("¿Estás seguro de que deseas cancelar el registro?")) {
+    window.location.href = '/login';
+  }
+};
 </script>
 
 <section class="form-container">
-  <h2>Registro</h2>
   <form on:submit|preventDefault={registrarUsuario} class="form">
-    <input type="text" placeholder="Nombre y Apellido" bind:value={nombreapellido} class="input" />
-    <input type="email" placeholder="Correo electrónico" bind:value={correo} class="input" />
-    <input type="password" placeholder="Contraseña" bind:value={contraseña} class="input" />
-    <button type="submit" class="button">Registrarse</button>
+    <div class="logo text-center">
+      <h2>Registro</h2>
+    </div>  
+    <input type="text" placeholder="Nombre y Apellido" class="input" />
+    <input type="email" placeholder="Correo electrónico" class="input" />
+    <input type="password" placeholder="Contraseña" class="input" />
+    <div class="button-group">
+      <button type="submit" class="button">Registrarse</button>
+      <button type="button" class="cancel-button" on:click={cancelar}>
+        Cancelar
+      </button>
+    </div>
   </form>
 </section>
 
@@ -71,15 +82,21 @@
     margin-bottom: 1.5rem;
     font-size: 2rem;
     color: var(--primary-color, #333);
+    font-weight: normal; /* Establece el peso de la fuente a normal */
   }
 
+  .logo h2 {
+    margin-bottom: 2rem;
+    font-size: 1.5rem;
+    color: var(--text-color);
+  }
   .form {
     display: flex;
     flex-direction: column;
     gap: 1rem;
     width: 100%;
     max-width: 400px;
-    background: rgba(255, 255, 255, 0.8); /* Semitransparencia */
+    background: white;
     padding: 2rem;
     border-radius: 12px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -88,7 +105,7 @@
   .input {
     padding: 0.75rem;
     border-radius: 8px;
-    border: 1px solid #444;
+    border: 1px solid #ccc;
     font-size: 1rem;
     outline: none;
     transition: border-color 0.3s, box-shadow 0.3s;
@@ -99,6 +116,13 @@
     box-shadow: 0 0 6px rgba(0, 102, 204, 0.3);
   }
 
+  .button-group {
+    display: flex;
+    gap: 1rem;
+    justify-content: space-between;
+  }
+
+  /* Botón de registrarse */
   .button {
     padding: 0.75rem;
     border: none;
@@ -106,23 +130,46 @@
     font-size: 1rem;
     font-weight: bold;
     color: white;
-    background: linear-gradient(to right, #0066cc, #00bcd4);
+    background: linear-gradient(to right, #0066cc, #00bcd4); /* Gradiente azul */
     cursor: pointer;
     transition: background 0.3s ease;
   }
 
   .button:hover {
-    background: linear-gradient(to right, var(--button-hover-start), var(--button-hover-end));
+    background: linear-gradient(to right, var(--button-hover-start, #005bb5), var(--button-hover-end, #0097a7));
+  }
+
+  /* Botón cancelar: gradiente rojo con estilo independiente */
+  .cancel-button {
+    padding: 0.75rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: bold;
+    color: white;
+    background: linear-gradient(to right, #5f0404, #fc0101) !important; /* Gradiente rojo */
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+
+  .cancel-button:hover {
+    background: linear-gradient(to right, #9b1515, #fc0101) !important; /* Gradiente rojo oscuro */
+  }
+
+  .button, .cancel-button {
+    flex: 1; /* Hace que ambos botones crezcan uniformemente */
+    text-align: center;
   }
 
   /* Modo oscuro */
   @media (prefers-color-scheme: dark) {
     .form-container {
-      background: linear-gradient(to bottom, #444, #444);
+      background: linear-gradient(to bottom, #333, #222);
     }
 
     h2 {
       color: #fff;
+      font-style: normal;
     }
 
     .form {
