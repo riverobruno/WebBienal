@@ -1,47 +1,41 @@
 <script>
-  import { onMount } from "svelte";
-  import axios from "axios";
-  import "flag-icons/css/flag-icons.min.css";
-    /**
-     * @type {any[]}
-     */
-  let cards = []; // Resultado de las esculturas
+    import { onMount } from "svelte";
+    import axios from "axios";
+    import "flag-icons/css/flag-icons.min.css";
   
-  // Función para realizar la búsqueda
-  async function fetchEscultores() {
-    try {
-      const res = await axios.get(`http://localhost:3001/api/escultores`, {
-        params: {
-          search: "",
-          sortBy: "promedio",
-          order: "DESC"
-        }
-      });
-      cards = res.data.slice(0,10);
-      console.log(cards)
-    } catch (error) {
-      console.log(error);
+    let cards = []; // Resultado de las esculturas
+  
+    // Función para realizar la búsqueda
+    async function fetchEscultores() {
+      try {
+        const res = await axios.get(`http://localhost:3001/api/escultores`, {
+          params: {
+            search: "",
+            sortBy: "promedio",
+            order: "DESC"
+          }
+        });
+        cards = res.data.slice(0, 10);
+      } catch (error) {
+        console.log(error);
+      }
     }
-  }
-
-  // Ejecutar la consulta inicial cuando se monta la página
-  onMount(() => {
-    fetchEscultores(); // Sin query al principio
-  });
-</script>
-
-<style>
+  
+    onMount(() => {
+      fetchEscultores();
+    });
+  </script>
+  
+  <style>
     .contenedor {
         display: grid;
-        grid-template-columns: repeat(5, 1fr); /* 5 tarjetas por fila */
-        gap: 30px; /* Incrementa el espacio entre tarjetas */
+        grid-template-columns: repeat(5, 1fr); /* 5 tarjetas por fila en pantallas grandes */
+        gap: 30px;
         justify-content: center;
         padding: 16px;
     }
-
+  
     .tarjeta {
-        width: 180px;
-        height: 300px;
         background-color: #fff;
         border: 1px solid #ddd;
         border-radius: 8px;
@@ -49,70 +43,93 @@
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         display: flex;
         flex-direction: column;
-        position: relative;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
-
+  
+    .tarjeta:hover {
+        transform: scale(1.05);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+  
     .imagen {
         width: 100%;
-        height: 150px;
+        height: 200px;
         object-fit: cover;
     }
-
-    .bandera {
-        position: absolute;
-        top: 10px;
-        left: 10px;
-        width: 30px;
-        height: 20px;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-    }
-
+  
     .contenido {
-        padding: 8px;
+        padding: 12px;
         display: flex;
         flex-direction: column;
-        flex-grow: 1;
-    }
-
-    .nombre {
-        font-size: 16px;
-        font-weight: bold;
-        margin-bottom: 4px;
-    }
-
-    .correo {
-        font-size: 14px;
-        color: #666;
-        margin-bottom: 0px;
-    }
-    
-    .fi {
-        position: absolute;
-        top: 5px; /* Ajusta según el espacio que quieras desde la parte superior */
-        left: 5px; /* Ajusta según el espacio que quieras desde la parte izquierda */
-        display: flex;
         align-items: center;
-        justify-content: center;
-        font-size: 20px;  /* Ajusta el tamaño del ícono */
+        text-align: center;
     }
-</style>
-
-<div class="contenedor">
+  
+    .nombre {
+        font-size: 1rem;
+        font-weight: bold;
+        margin-bottom: 8px;
+    }
+  
+    .correo {
+        font-size: 0.9rem;
+        color: #666;
+    }
+  
+    /* Media Queries */
+    @media (max-width: 1024px) {
+        .contenedor {
+            grid-template-columns: repeat(3, 1fr); /* 3 tarjetas por fila */
+            gap: 20px;
+        }
+  
+        .tarjeta .imagen {
+            height: 180px;
+        }
+    }
+  
+    @media (max-width: 768px) {
+        .contenedor {
+            grid-template-columns: repeat(2, 1fr); /* 2 tarjetas por fila */
+            gap: 15px;
+        }
+  
+        .tarjeta {
+            width: 100%;
+        }
+  
+        .tarjeta .imagen {
+            height: 160px;
+        }
+    }
+  
+    @media (max-width: 480px) {
+        .contenedor {
+            grid-template-columns: 1fr; /* Una tarjeta por fila */
+            gap: 10px;
+        }
+  
+        .tarjeta {
+            width: 100%; /* Ocupa todo el ancho del contenedor */
+        }
+  
+        .tarjeta .imagen {
+            height: 150px;
+        }
+    }
+  </style>
+  
+  <div class="contenedor">
     {#each cards as tarjeta}
-    <!-- Tarjeta individual -->
-     <a href="/escultores/{tarjeta.escultorPantalla}">
+      <a href="/escultores/{tarjeta.escultorPantalla}">
         <div class="tarjeta">
-            <div class="imagen-container">
-                <img src={tarjeta.escultorFoto} alt="Foto de {tarjeta.escultorName}" class="imagen" />
-                <span class={`fi fi-${tarjeta.nacionalidad}`}></span>
-            </div>
-            <div class="contenido">
-                <div class="nombre">{tarjeta.escultorName}</div>
-                <div class="correo">{tarjeta.contactoEmail}</div>
-            </div>
+          <img src={tarjeta.escultorFoto} alt="Foto de {tarjeta.escultorName}" class="imagen" />
+          <div class="contenido">
+            <div class="nombre">{tarjeta.escultorName}</div>
+            <div class="correo">{tarjeta.contactoEmail}</div>
+          </div>
         </div>
       </a>
     {/each}
-</div>
-
+  </div>
+  

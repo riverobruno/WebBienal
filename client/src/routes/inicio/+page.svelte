@@ -47,10 +47,20 @@
       }
     };
 
+    const touchHandler = (event) => {
+      const touch = event.changedTouches[0];
+      mouseHandler({
+        clientX: touch.clientX,
+        clientY: touch.clientY,
+      });
+    };
+
     window.addEventListener('mousemove', mouseHandler);
+    window.addEventListener('touchmove', touchHandler);
 
     return () => {
       window.removeEventListener('mousemove', mouseHandler);
+      window.removeEventListener('touchmove', touchHandler);
     };
   });
 </script>
@@ -75,6 +85,24 @@
     justify-content: center;
     scroll-snap-align: start; /* Alinear las secciones al inicio */
     overflow: hidden;
+    background: #f0f0f0;
+  }
+
+  /* Media Queries para diseño responsive */
+  @media (max-width: 768px) {
+    .full-page {
+      flex-direction: column;
+      justify-content: flex-start;
+      padding: 20px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .full-page {
+      height: auto; /* Permitir que el contenido se ajuste */
+      width: 100vw;
+      padding: 10px;
+    }
   }
 </style>
 
