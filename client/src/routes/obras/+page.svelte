@@ -283,7 +283,7 @@
 
 
   .search-input{
-    width: 100%; /* Ocupa todo el ancho del contenedor */
+    width: 300px; /* Ocupa todo el ancho del contenedor */
     font-size: 14px; /* Reduce el tamaño de fuente */
     flex-wrap: nowrap; /* Evita que los elementos se apilen */
     padding: 8px; /* Reduce el padding */

@@ -66,32 +66,35 @@
 </script>
 
 <div class="search-container">
-    <input
-        type="text"
-        class="search-input"
-        bind:value="{searchQuery}"
-        placeholder="Buscar evento..."
-    />
+    <div>
+        <input
+            type="text"
+            class="search-input"
+            bind:value="{searchQuery}"
+            placeholder="Buscar obra..."
+        />
+    </div>
+    <div>
+        <!-- Lista desplegable para el criterio de orden -->
+        <select class="search-select" bind:value="{criterio}">
+            <option value="promedio">Mejores eventos</option>
+            <option value="nombre">Nombre</option>
+            <option value="fecha_inicio">Fecha de inicio</option>
+        </select>
 
-    <!-- Lista desplegable para el criterio de orden -->
-    <select class="search-select" bind:value="{criterio}">
-        <option value="promedio">Mejores eventos</option>
-        <option value="nombre">Nombre</option>
-        <option value="fecha_inicio">Fecha de inicio</option>
-    </select>
+        <!-- Mostrar el ícono de carga solo cuando mostrandoCarga es true -->   
+        {#if mostrandoCarga}
+            <div class="loading-icon"></div>
+        {/if}
 
-    <!-- Mostrar el ícono de carga solo cuando mostrandoCarga es true -->   
-    {#if mostrandoCarga}
-        <div class="loading-icon"></div>
-    {/if}
+        <!-- Lista desplegable para el orden ascendente/descendente -->
+        <select class="search-select" bind:value="{orden}">
+            <option value="DESC">Descendente</option>
+            <option value="ASC">Ascendente</option>
+        </select>
 
-    <!-- Lista desplegable para el orden ascendente/descendente -->
-    <select class="search-select" bind:value="{orden}">
-        <option value="DESC">Descendente</option>
-        <option value="ASC">Ascendente</option>
-    </select>
-
-    <button class="search-button" on:click="{() => fetchEventos(searchQuery, criterio, orden)}">Buscar</button>
+        <button class="search-button" on:click="{() => fetchEventos(searchQuery, criterio, orden)}">Buscar</button>
+    </div>
 </div>
 
 
@@ -202,9 +205,12 @@
 
     .search-container {
         display: flex;
+        flex-wrap: wrap; /* Permite que los elementos se ajusten a varias líneas */
+        gap: 10px; /* Espaciado entre los elementos */
         justify-content: center; /* Centra horizontalmente */
         align-items: center; /* Centra verticalmente */
-        margin-top: 20px; /* Espaciado superior */
+        margin-top: 20px;
+        width: 100%; /* Ancho completo */
     }
 
     .search-input {
@@ -220,41 +226,99 @@
     .search-input:focus {
         border-color: #000000; /* Cambia el color del borde al hacer foco */
         outline: none; /* Elimina el contorno por defecto */
+        }
+
+    /* Botones de búsqueda */
+    .search-button, .search-select {
+        padding: 10px;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.3s, border-color 0.3s;
     }
 
-    .search-button {
-        padding: 10px 15px; /* Espaciado interno */
-        background-color: #000000; /* Color de fondo del botón */
-        color: white; /* Color del texto */
-        border: none; /* Sin borde */
-        border-radius: 5px; /* Esquinas redondeadas */
-        cursor: pointer; /* Cambia el cursor al pasar el mouse */
-        font-size: 16px; /* Tamaño de la fuente */
-        transition: background-color 0.3s; /* Transición para el color de fondo */
+.search-button {
+  background-color: #000000;
+  color: white;
+  border: none;
+}
+
+.search-button:hover {
+  background-color: #525252;
+}
+
+.search-select {
+  background-color: #f4f4f4;
+  border: 2px solid #ccc;
+}
+
+.search-select:hover,
+.search-select:focus {
+  border-color: #86512c;
+}
+    
+/* Botones y selects en pantallas pequeñas */
+@media (max-width: 768px) {
+  .search-container {
+    display: flex;
+    justify-content: center; /* Centra los elementos horizontalmente */
+    align-items: center; /* Centra los elementos verticalmente */
+    gap: 10px; /* Espaciado uniforme entre elementos */
+    flex-wrap: wrap; /* Permite que los elementos se ajusten si no hay espacio suficiente */
+    margin-top: 20px; /* Espaciado superior opcional */
+    padding: 10px; /* Añade espacio interior opcional */
+    }   
+
+    .search-container > div {
+        display: flex;
+        justify-content: center; /* Centra los elementos dentro de cada div */
+        align-items: center; /* Alinea los elementos verticalmente */
+        flex-wrap: wrap; /* Permite ajustar el contenido interno si es necesario */
+        gap: 10px; /* Espaciado interno entre elementos */  
+    }   
+
+    .search-input{
+        width: 300px; /* Ocupa todo el ancho del contenedor */
+        font-size: 14px; /* Reduce el tamaño de fuente */
+        flex-wrap: nowrap; /* Evita que los elementos se apilen */
+        padding: 8px; /* Reduce el padding */
+
     }
 
-    .search-button:hover {
+   .search-select, .search-button {
+    flex: 1 0 auto; /* Los elementos mantienen su tamaño ajustado al contenido */
+    max-width: 150px; /* Limita el ancho máximo */
+    font-size: 14px; /* Reduce el tamaño de fuente */
+    padding: 8px; /* Reduce el padding */
+  } 
+}
+    .-button:hover {
         background-color: #525252; /* Color de fondo al pasar el mouse */
     }
 
-    .search-select {
-        padding: 10px 15px; /* Espaciado interno */
-        background-color: #f4f4f4; /* Color de fondo */
-        border: 2px solid #ccc; /* Color del borde */
-        border-radius: 5px; /* Esquinas redondeadas */
-        margin-right: 10px; /* Espaciado entre los selectores */
-        font-size: 16px; /* Tamaño de la fuente */
-        transition: border-color 0.3s; /* Transición para el color del borde */
-        cursor: pointer; /* Cambia el cursor al pasar el mouse */
+    .stars {
+        margin-top: 8px; /* Espaciado superior */
     }
 
-    .search-select:hover {
-        border-color: #000000; /* Cambia el color del borde al pasar el mouse */
+    .star {
+        font-size: 20px; /* Tamaño de las estrellas */
+        color: lightgray; /* Color por defecto de las estrellas */
+        margin-right: 2px; /* Espaciado entre las estrellas */
+        transition: color 0.3s; /* Transición para el color */
     }
 
-    .search-select:focus {
-        outline: none; /* Elimina el contorno por defecto */
-        border-color: #ffffff; /* Cambia el color del borde al hacer foco */
+    .star.filled {
+        color: gold; /* Color de las estrellas llenas */
+    }
+
+    .star.half-filled {
+        background: linear-gradient(90deg, gold 50%, lightgray 50%); /* Gradiente para media estrella */
+        background-clip: text;
+        -webkit-background-clip: text; /* Clip para texto en navegadores WebKit */
+        color: transparent; /* Oculta el color base */
+        display: inline-block; /* Necesario para el fondo */
+        width: 20px; /* Ancho para media estrella */
+        text-align: center; /* Centra el texto */
     }
 
     .pagination {
