@@ -20,6 +20,7 @@
   let nombre = '';
   let fechaCreacion = '';
   let tecnica = '';
+    let etapa = ''
   let antecedentes = '';
   let artistasSeleccionados = [];
   let eventosSeleccionados = [];

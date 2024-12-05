@@ -1,28 +1,29 @@
 <script>
   import { onMount } from 'svelte';
 
-let userRole;
-let accesoPermitido = false; // Variable para controlar el acceso
+  let userRole;
+  let accesoPermitido = false; // Variable para controlar el acceso
 
-onMount(() => {
-  userRole = localStorage.getItem('role');
+  onMount(() => {
+    userRole = localStorage.getItem('role');
 
-  // Verifica si el usuario tiene el rol adecuado
-  if (userRole === 'admin') {
-    accesoPermitido = true; // Permite el acceso si es administrador
-  } else {
-    alert('Acceso denegado. Redirigiendo a la página principal.');
-    window.location.href = '/inicio';
-  }
-});
+    // Verifica si el usuario tiene el rol adecuado
+    if (userRole === 'admin') {
+      accesoPermitido = true; // Permite el acceso si es administrador
+    } else {
+      alert('Acceso denegado. Redirigiendo a la página principal.');
+      window.location.href = '/inicio';
+    }
+  });
+
   import axios from 'axios';
 
   let nombre = '';
   let apellido = '';
   let dni = '';
   let biografia = '';
-  let telefono = '';
   let email = '';
+  let contraseña = '';
   let imagenPerfil = null;
   let mensaje = '';
   let mostrandoCarga = false;
@@ -41,8 +42,8 @@ onMount(() => {
       formData.append('apellido', apellido);
       formData.append('dni', dni);
       formData.append('biografia', biografia);
-      formData.append('telefono', telefono);
       formData.append('email', email);
+      formData.append('contraseña', contraseña);
       formData.append('imagenPerfil', imagenPerfil);
 
       const res = await axios.post('http://localhost:3001/api/artistaNuevo', formData, {
@@ -59,6 +60,7 @@ onMount(() => {
     }
   }
 </script>
+
 {#if accesoPermitido}
 
   <!-- Mostrar el ícono de carga mientras se realiza la solicitud -->
@@ -90,13 +92,13 @@ onMount(() => {
       </div>
 
       <div class="campo">
-        <label for="telefono">Número de Teléfono</label>
-        <input type="tel" id="telefono" bind:value={telefono} required />
+        <label for="email">Correo Electrónico</label>
+        <input type="email" id="email" bind:value={email} required />
       </div>
 
       <div class="campo">
-        <label for="email">Email</label>
-        <input type="email" id="email" bind:value={email} required />
+        <label for="contraseña">Contraseña</label>
+        <input type="password" id="contraseña" bind:value={contraseña} required />
       </div>
 
       <div class="campo">
