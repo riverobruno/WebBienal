@@ -18,7 +18,7 @@ import { ArtistasConsulta, EsculturasConsulta, EventosConsulta, login,
 
 import { ordenarEsculturas, buscarEsculturas, ordenarEventos, 
   buscarEventos, ordenarArtistas, buscarArtistas, eventoProximo } from './filtrosObjetos.js';
-
+import bcrypt from 'bcrypt';
 // Clave secreta para firmar el token (debería ser almacenada de forma segura, como en variables de entorno)
 const JWT_SECRET = process.env.JWT_SECRET; // Cambir por algo más seguro
 const app = express();
@@ -644,6 +644,35 @@ app.post('/api/cambiarContrasena', (req, res) => {
     });
 });
 
+app.post('/api/cambiarContrasena', (req, res) => {
+  const { email, contraseña_actual, contraseña_nueva1  } = req.body;
+  console.log(email, contraseña_actual, contraseña_nueva1);
+  if (!email || !contraseña_actual || !contraseña_nueva1) {
+    return res.status(400).json({ message: 'Por favor ingrese todos los campos'});
+  }
+
+  cambiar_Contraseña(email, contraseña_actual, contraseña_nueva1)
+    .then(conexion => {
+      if (conexion == 'hecho') {
+        return res.status(200).json({ success: true, message: 'Contraseña cambiada correctamente'});
+      } else {
+        return res.status(401).json({ success: false, message: 'Error en el cambio de contraseña' });
+      }
+
+    })
+    .catch(error => {
+      console.error('Error en la conexión:', error);
+      if (error.code == 'ER_DUP_ENTRY') {
+        return res.status(409).json({ success: false, message: 'El correo ya está en uso. Por favor use uno diferente' });
+      }
+      if (error.message === 'Contraseña incorrecta') {
+        return res.status(500).json({ success: false, message: 'Contraseña incorrecta' });
+      } else {
+        return res.status(500).json({ success: false, message: 'Error en el servidor' });
+      }
+    });
+});
+
 app.post('/api/votacion', (req, res) => {
   const { rating, nombre, email } = req.body;
 
@@ -677,6 +706,7 @@ app.post('/api/eventoNuevo', async (req, res) => {
 
   try {
     const resultado = await insertarEvento({ nombre, lugar, tematica, fecha_inicio, fecha_fin, hora_inicio, hora_fin });
+    cache.del(['eventos']);
     res.json({ mensaje: 'Evento creado con éxito', resultado });
   } catch (error) {
     console.error(error);
@@ -687,22 +717,28 @@ app.post('/api/eventoNuevo', async (req, res) => {
 // Endpoint para registrar un nuevo artista
 app.post('/api/artistaNuevo', upload.single('imagenPerfil'), async (req, res) => {
   console.log(req.body)
-  const { dni, nombre, apellido, biografia, telefono, email } = req.body;
+  const { dni, nombre, apellido, biografia, email,contrasena } = req.body;
   const imagenPerfil = req.file; // La imagen viene en 'imagenPerfil' debido a 'upload.single('imagenPerfil')'
   // Verifica si la imagen fue cargada
+  
+
   if (!imagenPerfil) {
     return res.status(400).json({ error: 'La imagen de perfil es requerida' });
   }
   // Llamar a la función insertarArtista para subir la imagen y registrar al artista
   try {
+    console.log(contrasena)
+    const hashedPassword = await bcrypt.hash(contrasena, 10);
+    
     const artista = {
       DNI: dni,           // Asignar los valores con los nombres que espera tu función
       NyA: `${nombre} ${apellido}`,
       res_biografia: biografia,
-      contacto: telefono,
-      contrasena: email,  // Suponiendo que la contraseña es el email en este caso (deberías verificarlo)
+      contacto: email,
+      contrasena: hashedPassword,  
     };
     const artistaId = await insertarArtista(artista, imagenPerfil);
+    cache.del(['artistas']);
     res.status(200).json({ mensaje: 'Artista registrado con éxito', artistaId });
   } catch (error) {
     console.error('Error al registrar artista:', error);
@@ -727,8 +763,9 @@ app.post('/api/esculturaNueva', async (req, res) => {
 
   try {
     const resultado = await registrar_escultura(nombre, f_creacion, antecedentes, tecnica);
-    console.log(resultado)
     cache.del(['esculturas']);
+    
+    
     res.status(200).json({ mensaje: 'Escultura registrada con éxito', resultado });
   } catch (error) {
     console.error('Error al registrar escultura:', error);
