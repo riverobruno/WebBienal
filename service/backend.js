@@ -860,6 +860,29 @@ app.post('/api/compitenNuevo', async (req, res) => {
   }
 });
 
+app.post('/api/validate-captcha', async (req, res) => {
+  const { recaptchaResponse } = req.body;
+
+  try {
+    const response = await axios.post(`https://www.google.com/recaptcha/api/siteverify`, null, {
+      params: {
+        secret: process.env.VITE_RECAPTCHA_SECRET_KEY,
+        response: recaptchaResponse
+      }
+    });
+
+    if (response.data.success) {
+      res.json({ success: true });
+    } else {
+      res.json({ success: false });
+    }
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Error en la verificación' });
+  }
+});
+
+
+
 
 app.post('/api/borrarEvento', async (req, res) => {
   const { nombre_evento, lugar_evento } = req.body;
@@ -974,6 +997,35 @@ app.post('/api/borrarArtista', async (req, res) => {
     res.status(500).json({ error: 'Error al borrar el artista' });
   }
 });
+
+
+app.post('/api/borrarEscultura', async (req, res) => {
+  const { nombreEscultura } = req.body;
+  console.log("Se llama al 1er para borrar escultura");
+  console.log(nombreEscultura);
+
+  // Verificación de campos obligatorios
+  if (!nombreEscultura) {
+    return res.status(400).json({ error: 'El nombre de la escultura es obligatorio' });
+  }
+
+  try {
+    // Llamamos a la función para borrar la escultura
+    const resultado = await borrar_escultura(nombreEscultura);
+
+    // Si deseas limpiar algún cache relacionado con esculturas, puedes hacerlo aquí
+    cache.del(['esculturas']);
+
+    res.status(200).json({ mensaje: 'Escultura borrada con éxito', resultado });
+  } catch (error) {
+    console.error('Error al borrar la escultura:', error);
+    res.status(500).json({ error: 'Error al borrar la escultura' });
+  }
+});
+
+
+
+
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
