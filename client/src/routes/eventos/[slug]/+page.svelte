@@ -85,76 +85,65 @@
       <p class="mt-4">{evento.content}</p>
     </section>
     <!-- Botones para compartir en redes sociales -->
-    <section class="share-icons">
-      <!-- Facebook -->
+      <section class="share-icons">
+        <!-- Facebook -->
 
-      <a
-        href={generarEnlacesCompartir().facebook}
-        target="_blank"
-        aria-label="Compartir en Facebook"
-        rel="noopener noreferrer"
-        class="icon-button facebook"
-      >
-        <i class="fab fa-facebook-f"></i>
-      </a>
-
-      <!-- Twitter -->
-      <a
-        href={generarEnlacesCompartir().twitter}
-        target="_blank"
-        aria-label="Compartir en Twitter"
-        rel="noopener noreferrer"
-        class="icon-button twitter"
-      >
-        <i class="fab fa-twitter"></i>
-      </a>
-
-      <!-- WhatsApp -->
-      <a
-        href={generarEnlacesCompartir().whatsapp}
-        target="_blank"
-        aria-label="Compartir en WhatsApp"
-        rel="noopener noreferrer"
-        class="icon-button whatsapp"
-      >
-        <i class="fab fa-whatsapp"></i>
-      </a>
-
-      <!-- Instagram -->
-      <a
-        href={generarEnlacesCompartir().instagram}
-        target="_blank"
-        aria-label="Abrir Instagram"
-        rel="noopener noreferrer"
-        class="icon-button instagram"
-      >
-        <i class="fab fa-instagram"></i>
-      </a>
-
-      <!-- Copiar enlace -->
-      <!-- Contenedor del botón con posición relativa -->
-      <div class="relative">
-        <!-- Botón de copiar -->
-        <button
-          class="icon-button copy"
-          aria-label="Copiar enlace"
-          on:click={() => copiarAlPortapapeles(window.location.href)}
+        <a
+          href={generarEnlacesCompartir().facebook}
+          target="_blank"
+          aria-label="Compartir en Facebook"
+          rel="noopener noreferrer"
+          class="icon-button facebook"
         >
-          <i class="fas fa-copy"></i>
-        </button>
-        {#if mensajeCopiado}
-          <!-- Mensaje copiado -->
-          <span class="mensaje-copiado">Copiado!</span>
-        {/if}
-      </div>
-    </section>
+          <i class="fab fa-facebook-f"></i>
+        </a>
+
+        <!-- Twitter -->
+        <a
+          href={generarEnlacesCompartir().twitter}
+          target="_blank"
+          aria-label="Compartir en Twitter"
+          rel="noopener noreferrer"
+          class="icon-button twitter"
+        >
+          <i class="fab fa-twitter"></i>
+        </a>
+
+        <!-- WhatsApp -->
+        <a
+          href={generarEnlacesCompartir().whatsapp}
+          target="_blank"
+          aria-label="Compartir en WhatsApp"
+          rel="noopener noreferrer"
+          class="icon-button whatsapp"
+        >
+          <i class="fab fa-whatsapp"></i>
+        </a>
+
+        <!-- Copiar enlace -->
+        <!-- Contenedor del botón con posición relativa -->
+        <div class="relative">
+          <!-- Botón de copiar -->
+          <button
+            class="icon-button copy"
+            aria-label="Copiar enlace"
+            on:click={() => copiarAlPortapapeles(window.location.href)}
+          >
+            <i class="fas fa-copy"></i>
+          </button>
+          {#if mensajeCopiado}
+            <!-- Mensaje copiado -->
+            <span class="mensaje-copiado">Copiado!</span>
+          {/if}
+        </div>
+      </section>
   </article>
 {/if}
 
 <!-- Mostrar el ícono de carga solo cuando mostrandoCarga es true -->
 {#if mostrandoCarga}
   <div class="loading-icon"></div>
-{/if}
+{:else}
 <section class="obras-section p-4">
   <!-- Contenedor de las cards -->
   <h2 class="text-2xl font-semibold text-center mb-6">Obras del evento</h2>
@@ -197,7 +186,7 @@
                       <!-- Imagen grande con nombre para el primer escultor -->
                       <img
                         src={card.obraEscultor.escultoresFotos[index]}
-                        class="w-32 h-32 rounded-full"
+                        class="w-32 h-32 rounded-full object-cover"
                         alt="Avatar"
                       />
                       <h2>{nombre}</h2>
@@ -205,7 +194,7 @@
                       <!-- Imágenes pequeñas sin nombre para el resto -->
                       <img
                         src={card.obraEscultor.escultoresFotos[index]}
-                        class="w-16 h-16 rounded-full"
+                        class="w-16 h-16 rounded-full object-cover"
                         alt="Avatar"
                       />
                     {/if}
@@ -238,6 +227,7 @@
     {/each}
   </div>
 </section>
+{/if}
 
 <style>
   .mensaje-copiado {
@@ -289,10 +279,6 @@
 
   .twitter {
     color: #1da1f2;
-  }
-
-  .instagram {
-    color: #c13584;
   }
 
   .copy {

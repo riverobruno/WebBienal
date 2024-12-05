@@ -12,6 +12,7 @@
     let animate = false; // Control de animación
     let mostrandoCarga = true;
     let email;
+    let recaptchaResponse = "";
 
     $: slug = $page.url.searchParams.get('slug');
     $: [name, code] = slug ? slug.replace(/\/$/, '').split('-') : [null, null];
