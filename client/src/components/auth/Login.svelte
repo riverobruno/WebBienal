@@ -94,12 +94,6 @@
                 bind:value={contraseña}
                 class="input"
               />
-              <div class="logo text-center">
-                <p>
-                  ¿Ha olvidado su contraseña?
-                  <a href="/cambiarContraseña"><b><u>Cámbiela aquí</u></b></a>. <br />
-                </p>
-              </div>
             </div>
             <button type="submit" class="button">Iniciar sesión</button>
           </form>
