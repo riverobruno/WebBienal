@@ -899,3 +899,31 @@ export async function modificar_evento(
     });
   });
 };
+
+export async function borrar_artista(DNI) {
+  let con = crearConexion(); // Asegúrate de que esta función esté bien configurada
+  console.log("Se llama al 2do")
+
+  return new Promise((resolve, reject) => {
+    con.connect((err) => {
+      if (err) {
+        console.error('Error connecting: ' + err.stack);
+        reject(err);
+        return;
+      }
+      console.log("Connected!");
+
+      // Llamada al procedimiento almacenado `borrar_artista`
+      const query = 'CALL borrar_artista(?)';
+      con.query(query, [DNI], (err, results) => {
+        if (err) {
+          console.error('Error executing the procedure:', err);
+          reject(err);
+        } else {
+          resolve('Artista borrado exitosamente');
+        }
+        con.end(); // Cerramos la conexión
+      });
+    });
+  });
+};
