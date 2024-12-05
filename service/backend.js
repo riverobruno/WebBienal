@@ -359,7 +359,6 @@ const obtenerEventoProximo = async () => {
       cache.set('eventos', eventosCache, ttl);
     }
     const eventProximo = eventoProximo(eventosCache);
-    console.log(eventProximo);
 
     const card = [];
 

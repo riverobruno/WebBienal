@@ -207,7 +207,6 @@ export function buscarArtistas(listaArtistas, busqueda) {
 
 export function eventoProximo(listaEventos) {
     const ahora = new Date();
-    console.log(ahora)
     return listaEventos
         .filter(evento => {
             // Crear el objeto Date desde fecha_inicio

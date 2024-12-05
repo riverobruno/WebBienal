@@ -75,13 +75,13 @@
       type="text"
       class="search-input"
       bind:value="{searchQuery}"
-      placeholder="Buscar artista..."
+      placeholder="Buscar escultor..."
     />
   </div>
   <div>
     <!-- Lista desplegable para el criterio de orden -->
     <select class="search-select" bind:value="{criterio}">
-      <option value="promedio">Mejores artistas</option>
+      <option value="promedio">Mejores escultores</option>
       <option value="nombre">Nombre</option>
     </select>
 
