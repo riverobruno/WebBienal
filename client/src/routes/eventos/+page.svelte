@@ -103,56 +103,29 @@
         </section>
     </article>
     <div class="search-container">
-        <input
-            type="text"
-            class="search-input"
-            bind:value="{searchQuery}"
-            placeholder="Buscar evento..."
-        />
-        <!-- Lista desplegable para el criterio de orden -->
-        <select class="search-select" bind:value="{criterio}">
-            <option value="promedio">Mejores eventos</option>
-            <option value="nombre">Nombre</option>
-            <option value="fecha_inicio">Fecha de inicio</option>
-        </select>
-<div class="search-container">
-    <div>
-        <input
-            type="text"
-            class="search-input"
-            bind:value="{searchQuery}"
-            placeholder="Buscar obra..."
-        />
+        <div>
+            <input
+                type="text"
+                class="search-input"
+                bind:value="{searchQuery}"
+                placeholder="Buscar evento..."
+            />
+        </div>
+        <div>
+            <!-- Lista desplegable para el criterio de orden -->
+            <select class="search-select" bind:value="{criterio}">
+                <option value="promedio">Mejores eventos</option>
+                <option value="nombre">Nombre</option>
+                <option value="fecha_inicio">Fecha de inicio</option>
+            </select>
+            <!-- Lista desplegable para el orden ascendente/descendente -->
+            <select class="search-select" bind:value="{orden}">
+                <option value="DESC">Descendente</option>
+                <option value="ASC">Ascendente</option>
+            </select>
+            <button class="search-button" on:click="{() => fetchEventos(searchQuery, criterio, orden)}">Buscar</button>
+        </div>
     </div>
-    <div>
-        <!-- Lista desplegable para el criterio de orden -->
-        <select class="search-select" bind:value="{criterio}">
-            <option value="promedio">Mejores eventos</option>
-            <option value="nombre">Nombre</option>
-            <option value="fecha_inicio">Fecha de inicio</option>
-        </select>
-
-        <!-- Mostrar el ícono de carga solo cuando mostrandoCarga es true -->   
-        {#if mostrandoCarga}
-            <div class="loading-icon"></div>
-        {/if}
-
-        <!-- Lista desplegable para el orden ascendente/descendente -->
-        <select class="search-select" bind:value="{orden}">
-            <option value="DESC">Descendente</option>
-            <option value="ASC">Ascendente</option>
-        </select>
-        <!-- Lista desplegable para el orden ascendente/descendente -->
-        <select class="search-select" bind:value="{orden}">
-            <option value="DESC">Descendente</option>
-            <option value="ASC">Ascendente</option>
-        </select>
-
-        <button class="search-button" on:click="{() => fetchEventos(searchQuery, criterio, orden)}">Buscar</button>
-    </div>
-</div>
-
-
     <!-- Contenedor de las cards -->
     <div class="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 p-4 auto-rows-auto {animate ? 'animate' : ''}">
         {#each displayedCards as card}
