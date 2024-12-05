@@ -210,7 +210,7 @@
             <td>{lugar}</td>
             <td>{tematica}</td>
             <td class="acciones">
-              <button class="btn-editar" on:click={() => editarEvento(id)}>✏️</button>
+                <button class="btn-editar" on:click={() => redirigir('/admin/eventos/mod_eventos')}>✏️</button>
               <button class="btn-eliminar" on:click={() => eliminarEvento(id)}>❌</button>
             </td>
           </tr>

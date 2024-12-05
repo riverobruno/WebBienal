@@ -6,19 +6,21 @@
     { id: 3, nombre: "Carlos", apellido: "Martínez", email: "carlos.martinez@example.com", nacionalidad: "España" },
   ];
 
-  const editarArtista = (id) => {
+  const editarArtista = (id,ruta) => {
     console.log(`Editar artista con ID: ${id}`);
+    window.location.href = ruta; // Redirige a la ruta especificada
     // Lógica para editar
   };
+
+  function redirigir(ruta) {
+      window.location.href = ruta; // Redirige a la ruta especificada
+    }
 
   const eliminarArtista = (id) => {
     console.log(`Eliminar artista con ID: ${id}`);
     // Lógica para eliminar
   };
 
-  function redirigir(ruta) {
-    window.location.href = ruta; // Redirige a la ruta especificada
-  }
 
   const confirmar = () => {
     console.log('Acción confirmada');
@@ -212,7 +214,7 @@
           <td>{email}</td>
           <td>{nacionalidad}</td>
           <td class="acciones">
-            <button class="btn-editar" on:click={() => editarArtista(id)}>✏️</button>
+            <button class="btn-editar" on:click={() => redirigir('/admin/artistas/mod_artista')}>✏️</button>
             <button class="btn-eliminar" on:click={() => eliminarArtista(id)}>❌</button>
           </td>
         </tr>

@@ -208,8 +208,8 @@
             <td>{nombre}</td>
             <td>{fechaCreacion}</td>
             <td class="acciones">
-              <button class="btn-editar" on:click={() => editarEscultura(id)}>✏️</button>
-              <button class="btn-eliminar" on:click={() => eliminarEscultura(id)}>❌</button>
+                <button class="btn-editar" on:click={() => redirigir('/admin/esculturas/mod_esculturas')}>✏️</button>
+                <button class="btn-eliminar" on:click={() => eliminarEscultura(id)}>❌</button>
             </td>
           </tr>
         {/each}
