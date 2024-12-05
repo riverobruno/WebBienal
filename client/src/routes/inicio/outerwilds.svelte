@@ -24,6 +24,8 @@
         height: auto;
         filter: brightness(0.8) contrast(1.2) saturate(1.1);
         transition: filter 0.5s ease;
+        transform: translateZ(0); /* Activa la aceleración por hardware */
+
     }
 
     .video-container:hover video {
@@ -109,8 +111,7 @@
     <div class="overlay">
         <div class="title">Explora el Cosmos</div>
         <div class="subtitle">
-            Del 13 al 21 de julio, Resistencia, Chaco.  
-            Sumérgete en un universo de creatividad y estrellas en un viaje inolvidable.
+            Es un orgullo para nosotros, los chaqueños, haber construido un acontecimiento internacional de reconocimiento pleno en la escena escultórica mundial. Grandes escultores del mundo en escena y en acción, trabajando a cielo abierto y en público, esculpiendo piezas que tienen por destino las veredas de Resistencia. Y así se cierra el círculo virtuoso: la obra de arte que pasa a formar parte del paisaje cotidiano haciendo del arte un bien de todos.
         </div>
     </div>
 </div>

@@ -78,6 +78,19 @@ function irAPerfil() {
   onMount(() => { document.addEventListener("click", clickAfuera); return () => document.removeEventListener("click", clickAfuera); });
   
   
+  function IrCambioContrasena() {
+    const token = localStorage.getItem('token');
+    if (token) {
+      // Decodificar el token (asegurándote de tener una función de decodificación como decodificarToken)
+      const decoded = decodificarToken(token);
+      const nombre = decoded.nombre.replace(/ /g, ''); // Eliminar los espacios del nombre
+      // Redirigir al perfil del escultor
+      window.location.href = `/cambiarContrasena`;
+    } else {
+      console.error('Token no encontrado en localStorage');
+    }
+  }
+  
 </script>
 
 <!-- Main navigation container -->
@@ -154,7 +167,7 @@ function irAPerfil() {
         </button>
         {/if}
         {#if !isAdmin}
-          <button on:click={irAPerfil} class="block px-4 py-2 text-sm text-neutral-600 dark:text-white hover:bg-pink-500 hover:text-white cursor-pointer">
+          <button on:click={IrCambioContrasena} class="block px-4 py-2 text-sm text-neutral-600 dark:text-white hover:bg-pink-500 hover:text-white cursor-pointer">
           Cambiar contraseña
         </button>
         {/if}

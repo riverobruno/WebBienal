@@ -594,6 +594,55 @@ export async function registrar_voto(rating, nombre, email) {
   });
 }
 
+export async function cambiar_Contraseña(correo, contraseña_actual, contraseña_nueva) {
+
+  const con = crearConexion();
+
+  return new Promise((resolve, reject) => {
+    con.connect((err) => {
+      if (err) {
+        console.error('Error connecting: ' + err.stack);
+        reject(err);
+        return;
+      }
+      console.log("Connected!");
+
+      // Consulta para obtener el hash de la contraseña
+      con.query('CALL getUserByEmail(?)', [correo], (err, results) => {
+        if (err) {
+          console.error('Error querying the database:', err);
+          reject(err); // Rechazar la promesa en caso de error en la consulta
+        } else if (results.length === 0) {
+          // Si no se encuentra el usuario
+          reject(new Error('Usuario no encontrado'));
+        } else {
+          // Comparamos la contraseña ingresada con la hasheada
+          const hashedPassword = results[0][0].contraseña;
+          bcrypt.compare(contraseña_actual, hashedPassword, (err, isMatch) => {
+            if (err) {
+              console.error('Error comparing passwords:', err);
+              reject(err); // Rechazar en caso de error en la comparación
+            } else if (!isMatch) {
+              // Contraseña incorrecta
+              reject(new Error('Contraseña incorrecta'));
+            } else {
+              // Contraseña correcta
+              con.query('cambiar_contraseña(?,?)', [correo, contraseña_nueva], async (err, results) => { // Pasamos los valores
+                if (err) {
+                  console.error('Error querying the database:', err);
+                  reject(err); // Rechazar la promesa en caso de error en la consulta
+                } else {
+                  resolve('hecho'); // Resolver la promesa con los resultados
+                }
+                con.end(); // Cerramos la conexión
+              });
+            }
+          });
+        }
+      });
+    });
+  });
+}
 //Registrar escultura
 export async function registrar_escultura(nombre, f_creacion, antecedentes, tecnica) {
   let con = crearConexion();

@@ -20,12 +20,14 @@
   .video-container video {
       width: 100%;
       height: auto;
-      filter: brightness(0.9) saturate(1.2) contrast(1.1) sepia(0.1);
+      filter: brightness(0.7) saturate(1.1) contrast(1) sepia(0.05);
       transition: filter 0.5s ease;
+      transform: translateZ(0); /* Activa la aceleración por hardware */
+
   }
 
   .video-container:hover video {
-      filter: brightness(1.1) saturate(1.5) contrast(1.3) hue-rotate(15deg);
+      filter: brightness(0.8) saturate(1.2) contrast(1.1) hue-rotate(15deg);
   }
 
   .overlay {
@@ -66,7 +68,7 @@
 
 <div class="video-container">
   <video autoplay muted loop playsinline>
-      <source src="1733168603669-5154d4f9-d6ed-d061-b328-2554ea16a594.mp4" type="video/mp4" />
+      <source src="video_inicio.mp4" type="video/mp4" />
       Tu navegador no soporta la reproducción de video.
   </video>
   <div class="overlay">

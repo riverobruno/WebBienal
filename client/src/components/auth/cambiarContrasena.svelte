@@ -5,15 +5,20 @@
 
 
   const cambiarContraseña = async () => {
-  if (!contraseña_actual || !contraseña_nueva1 ||! contraseña_nueva2) {
+    if (!contraseña_actual || !contraseña_nueva1 || !contraseña_nueva2) {
     alert('Por favor, completa todos los campos.');
+    return;
+  }
+  
+  if (contraseña_nueva1 !== contraseña_nueva2) {
+    alert('Las contraseñas nuevas no coinciden.');
     return;
   }
 
   console.log('Datos enviados:', { contraseña_actual, contraseña_nueva1,contraseña_nueva2 }); // Para depuración
 
   try {
-    const response = await fetch('http://localhost:3001/api/registro', {
+    const response = await fetch('http://localhost:3001/api/cambiarContrasena', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -29,11 +34,7 @@
     console.log('Respuesta del servidor:', data); // Para depuración
 
     if (data.success && data.token) {
-      console.log(data.token)
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('role', 'usuario');
-      console.log('usuario');
-      window.location.href = '/inicio'; // Redirigir al login
+      window.history.back();
     } else  if(response.status === 409) { alert(data.message); }
       else{ 
         alert(data.message || 'Error al cambiar la contraseña');
@@ -45,7 +46,7 @@
 };
 const cancelar = () => {
   if (confirm("¿Estás seguro de que deseas cancelar el cambio de contraseña?")) {
-    window.location.href = '/login';
+    window.history.back();
   }
 };
 </script>
@@ -55,9 +56,9 @@ const cancelar = () => {
     <div class="logo text-center">
       <h2>Cambio de Contraseña</h2>
     </div>  
-    <input type="contraseña_actual" placeholder="Contraseña actual" class="input" />
-    <input type="contraseña_nueva1" placeholder="Contraseña nueva" class="input" />
-    <input type="contraseña_nueva2" placeholder="Repita la contraseña nueva" class="input" />
+    <input type="contraseña_actual" placeholder="Contraseña actual" bind:value={contraseña_actual} class="input" />
+    <input type="contraseña_nueva1" placeholder="Contraseña nueva" bind:value={contraseña_nueva1} class="input" />
+    <input type="contraseña_nueva2" placeholder="Repita la contraseña nueva" bind:value={contraseña_nueva2} class="input" />
     <div class="button-group">
       <button type="submit" class="button">Aceptar</button>
       <button type="button" class="cancel-button" on:click={cancelar}>

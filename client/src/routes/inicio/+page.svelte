@@ -2,43 +2,55 @@
   import { onMount } from 'svelte';
   import Caras from './caras.svelte';
   import Esfera from './esfera.svelte';
-  import Megamind from './megamind.svelte';
   import Robo from './robo.svelte';
   import OuterWilds from './outerwilds.svelte';
-  import Navbar from '../../components/layout/Navbar.svelte';
 
   let sections;
+  let isScrolling = false;
+  let lastHoveredSection = null;
 
   onMount(() => {
-    // Crear un evento de scroll controlado
-    let currentSection = 0;
-    let isScrolling = false;
+    sections = document.querySelectorAll('.full-page');
 
-    const scrollHandler = (event) => {
-      if (isScrolling) return; // Evitar scroll excesivo
+    const scrollToSection = (section) => {
+      if (isScrolling || !section) return;
+
       isScrolling = true;
-
-      if (event.deltaY > 0) {
-        // Scroll hacia abajo
-        currentSection = Math.min(currentSection + 1, sections.length - 1);
-      } else {
-        // Scroll hacia arriba
-        currentSection = Math.max(currentSection - 1, 0);
-      }
-
-      sections[currentSection].scrollIntoView({
+      section.scrollIntoView({
         behavior: 'smooth',
         block: 'start',
       });
 
-      setTimeout(() => (isScrolling = false), 800); // Evitar múltiples eventos durante el scroll
+      setTimeout(() => {
+        isScrolling = false;
+      }, 800); // Tiempo de espera para evitar scrolls repetidos
     };
 
-    window.addEventListener('wheel', scrollHandler);
-    sections = document.querySelectorAll('.full-page');
+    const mouseHandler = (event) => {
+      if (isScrolling) return;
+
+      // Detectar en qué sección está el mouse
+      const hoveredSection = Array.from(sections).find((section) => {
+        const rect = section.getBoundingClientRect();
+        return (
+          event.clientY >= rect.top &&
+          event.clientY <= rect.bottom &&
+          event.clientX >= rect.left &&
+          event.clientX <= rect.right
+        );
+      });
+
+      // Si cambia de sección, desplazarse
+      if (hoveredSection && hoveredSection !== lastHoveredSection) {
+        lastHoveredSection = hoveredSection;
+        scrollToSection(hoveredSection);
+      }
+    };
+
+    window.addEventListener('mousemove', mouseHandler);
 
     return () => {
-      window.removeEventListener('wheel', scrollHandler);
+      window.removeEventListener('mousemove', mouseHandler);
     };
   });
 </script>
@@ -46,13 +58,13 @@
 <style>
   body {
     margin: 0;
-    overflow: hidden; /* Evitar que el scroll se vea */
+    overflow: hidden; /* Evitar el scroll manual */
   }
 
   .container {
     display: flex;
     flex-direction: column;
-    scroll-snap-type: y mandatory; /* Asegura el snap entre secciones */
+    scroll-snap-type: y mandatory; /* Forzar que las secciones se alineen */
   }
 
   .full-page {
@@ -61,7 +73,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    scroll-snap-align: start; /* Asegura que las secciones se alineen al inicio */
+    scroll-snap-align: start; /* Alinear las secciones al inicio */
     overflow: hidden;
   }
 </style>
@@ -77,10 +89,6 @@
 
   <div class="full-page">
     <Robo />
-  </div>
-
-  <div class="full-page">
-    <Megamind />
   </div>
 
   <div class="full-page">
