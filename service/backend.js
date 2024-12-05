@@ -51,6 +51,7 @@ const obtenerArtistas = async (busqueda, criterio, orden) => {
     const cards = [];
     for (const [index, artista] of ArtistasOrdenados.entries()) {
       // Accede a los métodos de la clase Esculturas
+      const dni = artista.getDNI();
       const nombre = artista.getNyA();
       const imagen = artista.getURL_foto();
       const biografia = artista.getRes_biografia();
@@ -59,6 +60,7 @@ const obtenerArtistas = async (busqueda, criterio, orden) => {
       const nacionalidad=artista.getNacionalidad();
       cards.push({
         id: index + 1,
+        dni: dni,
         escultorPantalla: nombre.replace(/ /g, ''), 
         content: biografia,
         escultorName: nombre,

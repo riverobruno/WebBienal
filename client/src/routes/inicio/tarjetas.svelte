@@ -1,66 +1,33 @@
 <script>
-    const tarjetas = [
-        { 
-            nombre: "Ejemplo 1", 
-            lugar: "Otra Ciudad", 
-            bandera: "https://flagcdn.com/w320/ar.png", 
-            imagen: "pablopicasso.png" 
-        },
-        { 
-            nombre: "Ejemplo 2", 
-            lugar: "Otra Ciudad", 
-            bandera: "https://flagcdn.com/w320/br.png", 
-            imagen: "pablopicasso.png" 
-        },
-        { 
-            nombre: "Ejemplo 3", 
-            lugar: "Ciudad 3", 
-            bandera: "https://flagcdn.com/w320/us.png", 
-            imagen: "pablopicasso.png" 
-        },
-        { 
-            nombre: "Ejemplo 4", 
-            lugar: "Ciudad 4", 
-            bandera: "https://flagcdn.com/w320/fr.png", 
-            imagen: "pablopicasso.png" 
-        },
-        { 
-            nombre: "Ejemplo 5", 
-            lugar: "Ciudad 5", 
-            bandera: "https://flagcdn.com/w320/it.png", 
-            imagen: "pablopicasso.png" 
-        },
-        { 
-            nombre: "Ejemplo 6", 
-            lugar: "Ciudad 6", 
-            bandera: "https://flagcdn.com/w320/de.png", 
-            imagen: "pablopicasso.png" 
-        },
-        { 
-            nombre: "Ejemplo 7", 
-            lugar: "Ciudad 7", 
-            bandera: "https://flagcdn.com/w320/jp.png", 
-            imagen: "pablopicasso.png" 
-        },
-        { 
-            nombre: "Ejemplo 8", 
-            lugar: "Ciudad 8", 
-            bandera: "https://flagcdn.com/w320/kr.png", 
-            imagen: "pablopicasso.png" 
-        },
-        { 
-            nombre: "Ejemplo 9", 
-            lugar: "Ciudad 9", 
-            bandera: "https://flagcdn.com/w320/au.png", 
-            imagen: "pablopicasso.png" 
-        },
-        { 
-            nombre: "Ejemplo 10", 
-            lugar: "Ciudad 10", 
-            bandera: "https://flagcdn.com/w320/ca.png", 
-            imagen: "pablopicasso.png" 
+  import { onMount } from "svelte";
+  import axios from "axios";
+  import "flag-icons/css/flag-icons.min.css";
+    /**
+     * @type {any[]}
+     */
+  let cards = []; // Resultado de las esculturas
+  
+  // Función para realizar la búsqueda
+  async function fetchEscultores() {
+    try {
+      const res = await axios.get(`http://localhost:3001/api/escultores`, {
+        params: {
+          search: "",
+          sortBy: "promedio",
+          order: "DESC"
         }
-    ];
+      });
+      cards = res.data.slice(0,10);
+      console.log(cards)
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  // Ejecutar la consulta inicial cuando se monta la página
+  onMount(() => {
+    fetchEscultores(); // Sin query al principio
+  });
 </script>
 
 <style>
@@ -114,39 +81,23 @@
         margin-bottom: 4px;
     }
 
-    .lugar {
+    .correo {
         font-size: 14px;
         color: #666;
-        margin-bottom: 8px;
-    }
-
-    .boton {
-        align-self: center;
-        padding: 8px 12px;
-        background-color: black;
-        color: white;
-        font-size: 12px;
-        font-weight: bold;
-        text-transform: uppercase;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-    }
-
-    .boton:hover {
-        background-color: #444;
+        margin-bottom: 0px;
     }
 </style>
 
 <div class="contenedor">
-    {#each tarjetas as tarjeta}
+    {#each cards as tarjeta}
         <div class="tarjeta">
-            <img src={tarjeta.imagen} alt="Foto de {tarjeta.nombre}" class="imagen" />
-            <img src={tarjeta.bandera} alt="Bandera de {tarjeta.lugar}" class="bandera" />
+            <div class="imagen-container">
+                <img src={tarjeta.escultorFoto} alt="Foto de {tarjeta.escultorName}" class="imagen" />
+                <span class={`fi fi-${tarjeta.nacionalidad}`}></span>
+            </div>
             <div class="contenido">
-                <div class="nombre">{tarjeta.nombre}</div>
-                <div class="lugar">{tarjeta.lugar}</div>
-                <button class="boton">Ver</button>
+                <div class="nombre">{tarjeta.escultorName}</div>
+                <div class="correo">{tarjeta.contactoEmail}</div>
             </div>
         </div>
     {/each}

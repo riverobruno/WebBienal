@@ -319,9 +319,6 @@
     padding: 8px; /* Reduce el padding */
   } 
 }
-    .-button:hover {
-        background-color: #525252; /* Color de fondo al pasar el mouse */
-    }
 
     .stars {
         margin-top: 8px; /* Espaciado superior */
