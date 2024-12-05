@@ -17,6 +17,7 @@
     $: slug = $page.url.searchParams.get('slug');
     $: [name, code] = slug ? slug.replace(/\/$/, '').split('-') : [null, null];
 
+
     function decodificarToken(token) {
     try {
       const payload = token.split('.')[1];
@@ -76,39 +77,49 @@
     }
 
     const votar = async (nombre) => {
-      if (rating == 0) {
-        alert('Por favor, ingrese un puntaje');
+      const honeypot = document.querySelector("input[name='honeypot']").value;
+
+      // Si el campo honeypot tiene un valor, se considera que es un bot
+      if (honeypot) {
+        alert("Actividad sospechosa detectada.");
         return;
       }
 
-      console.log('Mandado:', { rating, nombre , email}); // Para depuración
+      if (rating == 0) {
+        alert("Por favor, ingrese un puntaje");
+        return;
+      }
+
+      console.log("Mandado:", { rating, nombre, email }); // Para depuración
 
       try {
-        const response = await fetch('http://localhost:3001/api/votacion', {
-          method: 'POST',
+        const response = await fetch("http://localhost:3001/api/votacion", {
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
           body: JSON.stringify({
             rating,
-            nombre, 
-            email
-
+            nombre,
+            email,
           }),
         });
 
         const data = await response.json();
-        console.log('Respuesta del servidor:', data); // Para depuración
+        console.log("Respuesta del servidor:", data); // Para depuración
         if (data.success) {
-          alert('¡Voto registrado correctamente!\nMuchas gracias por su participación');
+          alert(
+            "¡Voto registrado correctamente!\nMuchas gracias por su participación"
+          );
           goObras();
-        } else  if(response.status === 409) { alert(data.message); }
-          else{ 
-            alert(data.message || 'Error al registrar usuario');
+        } else if (response.status === 409) {
+          alert(data.message);
+        } else {
+          alert(data.message || "Error al registrar usuario");
         }
       } catch (error) {
-        console.error('Error al intentar registrar usuario:', error);
-        alert('Hubo un error al intentar registrar el usuario.');
+        console.error("Error al intentar registrar usuario:", error);
+        alert("Hubo un error al intentar registrar el usuario.");
       }
     };
 
@@ -169,7 +180,10 @@
 
   <p class="rating-text">Puntaje seleccionado: {rating}</p>
   <div>
-    <button class="button" on:click={votar(obra.obraName)}>Realizar votación</button>
+    <input type="text" name="honeypot" style="display:none" />
+    <button class="button" on:click={votar(obra.obraName)}
+      >Realizar votación</button
+    >
     <button class="buttonCancelar" on:click={goObras}>Cancelar</button>
   </div>
 </div>
