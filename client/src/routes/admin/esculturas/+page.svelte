@@ -1,29 +1,70 @@
 <script>
     import { onMount } from 'svelte';
   
+    let userRole;
+    let accesoPermitido = false;
+  
+    onMount(() => {
+      userRole = localStorage.getItem('role');
+      if (userRole === 'admin') {
+        accesoPermitido = true;
+      } else {
+        alert('Acceso denegado. Redirigiendo a la página principal.');
+        window.location.href = '/inicio';
+      }
+    });
+  
     let artistas = [];
     let eventos = [];
     let nombre = '';
     let fechaCreacion = '';
     let tecnica = '';
     let antecedentes = '';
-    let artistaSeleccionado = '';
-    let eventoSeleccionado = '';
+    let artistasSeleccionados = [];
+    let eventosSeleccionados = [];
+    let imagenes = [];
+    let filtroArtistas = ''; // Para filtrar artistas
+    let filtroEventos = ''; // Para filtrar eventos
+    let mostrarArtistas = false; // Controla la visibilidad del menú de artistas
+    let mostrarEventos = false; // Controla la visibilidad del menú de eventos
   
     onMount(async () => {
-      // Simula la obtención de datos de artistas y eventos desde una API
       artistas = await fetchArtistas();
       eventos = await fetchEventos();
     });
   
     async function fetchArtistas() {
-      // Reemplaza con tu llamada a API para obtener los artistas
-      return ['Artista 1', 'Artista 2', 'Artista 3'];
+      return ['Artista 1', 'Artista 2', 'Artista 3', 'Artista 4', 'Artista 5', 'Artista 6'];
     }
   
     async function fetchEventos() {
-      // Reemplaza con tu llamada a API para obtener los eventos
-      return ['Evento 1', 'Evento 2', 'Evento 3'];
+      return ['Evento 1', 'Evento 2', 'Evento 3', 'Evento 4', 'Evento 5', 'Evento 6'];
+    }
+  
+    function handleFileChange(event) {
+      imagenes = Array.from(event.target.files);
+    }
+  
+    function seleccionarArtista(artista) {
+      if (!artistasSeleccionados.includes(artista)) {
+        artistasSeleccionados = [...artistasSeleccionados, artista];
+      }
+      filtroArtistas = ''; // Limpiar el filtro
+    }
+  
+    function seleccionarEvento(evento) {
+      if (!eventosSeleccionados.includes(evento)) {
+        eventosSeleccionados = [...eventosSeleccionados, evento];
+      }
+      filtroEventos = ''; // Limpiar el filtro
+    }
+  
+    function eliminarArtista(artista) {
+      artistasSeleccionados = artistasSeleccionados.filter(a => a !== artista);
+    }
+  
+    function eliminarEvento(evento) {
+      eventosSeleccionados = eventosSeleccionados.filter(e => e !== evento);
     }
   
     function enviarFormulario() {
@@ -32,60 +73,130 @@
         fechaCreacion,
         tecnica,
         antecedentes,
-        artistaSeleccionado,
-        eventoSeleccionado,
+        artistasSeleccionados,
+        eventosSeleccionados,
+        imagenes,
       };
       console.log('Formulario enviado:', data);
       alert('Datos enviados con éxito');
     }
   </script>
   
-  <section>
-    <h1>Registrar Escultura</h1>
-    <form on:submit|preventDefault={enviarFormulario} class="formulario">
-      <div class="campo">
-        <label for="nombre">Nombre de la escultura</label>
-        <input type="text" id="nombre" bind:value={nombre} required />
-      </div>
+  {#if accesoPermitido}
+    <section>
+      <h1>Registrar Escultura</h1>
+      <form on:submit|preventDefault={enviarFormulario} class="formulario">
+        <div class="campo">
+          <label for="nombre">Nombre de la escultura</label>
+          <input type="text" id="nombre" bind:value={nombre} required />
+        </div>
   
-      <div class="campo">
-        <label for="fechaCreacion">Fecha de creación</label>
-        <input type="date" id="fechaCreacion" bind:value={fechaCreacion} required />
-      </div>
+        <div class="campo">
+          <label for="fechaCreacion">Fecha de creación</label>
+          <input type="date" id="fechaCreacion" bind:value={fechaCreacion} required />
+        </div>
   
-      <div class="campo">
-        <label for="tecnica">Técnica</label>
-        <input type="text" id="tecnica" bind:value={tecnica} required />
-      </div>
+        <div class="campo">
+          <label for="tecnica">Técnica</label>
+          <input type="text" id="tecnica" bind:value={tecnica} required />
+        </div>
   
-      <div class="campo">
-        <label for="antecedentes">Antecedentes</label>
-        <textarea id="antecedentes" bind:value={antecedentes} rows="4" required></textarea>
-      </div>
+        <div class="campo">
+          <label for="antecedentes">Antecedentes</label>
+          <textarea id="antecedentes" bind:value={antecedentes} rows="4" required></textarea>
+        </div>
   
-      <div class="campo">
-        <label for="artistaSeleccionado">Artista</label>
-        <select id="artistaSeleccionado" bind:value={artistaSeleccionado} required>
-          <option value="" disabled selected>Selecciona un artista</option>
-          {#each artistas as artista}
-            <option value={artista}>{artista}</option>
-          {/each}
-        </select>
-      </div>
+        <!-- Artistas seleccionados -->
+        <div class="campo">
+          <label>Artistas seleccionados:</label>
+          <ul>
+            {#each artistasSeleccionados as artista}
+              <li>
+                {artista} 
+                <button type="button" class="btn-cruz" on:click={() => eliminarArtista(artista)}>✖</button>
+              </li>
+            {/each}
+          </ul>
+        </div>
   
-      <div class="campo">
-        <label for="eventoSeleccionado">Evento</label>
-        <select id="eventoSeleccionado" bind:value={eventoSeleccionado} required>
-          <option value="" disabled selected>Selecciona un evento</option>
-          {#each eventos as evento}
-            <option value={evento}>{evento}</option>
-          {/each}
-        </select>
-      </div>
+        <!-- Buscar y agregar artistas -->
+        <div class="campo">
+          <label for="artistasSeleccionados">Buscar Artista</label>
+          <div class="buscador">
+            <input
+              type="text"
+              placeholder="Buscar artista..."
+              bind:value={filtroArtistas}
+              on:focus={() => (mostrarArtistas = true)}
+            />
+            <button type="button" class="btn-toggle" on:click={() => (mostrarArtistas = !mostrarArtistas)}>
+              {mostrarArtistas ? '▲' : '▼'}
+            </button>
+          </div>
+          {#if mostrarArtistas}
+            <select
+              id="artistasSeleccionados"
+              bind:value={filtroArtistas}
+              size="5"
+              on:change={() => seleccionarArtista(filtroArtistas)}
+            >
+              {#each artistas.filter(artista => artista.toLowerCase().includes(filtroArtistas.toLowerCase()) && !artistasSeleccionados.includes(artista)) as artista}
+                <option value={artista}>{artista}</option>
+              {/each}
+            </select>
+          {/if}
+        </div>
   
-      <button type="submit">Registrar Escultura</button>
-    </form>
-  </section>
+        <!-- Eventos seleccionados -->
+        <div class="campo">
+          <label>Eventos seleccionados:</label>
+          <ul>
+            {#each eventosSeleccionados as evento}
+              <li>
+                {evento} 
+                <button type="button" class="btn-cruz" on:click={() => eliminarEvento(evento)}>✖</button>
+              </li>
+            {/each}
+          </ul>
+        </div>
+  
+        <!-- Buscar y agregar eventos -->
+        <div class="campo">
+          <label for="eventosSeleccionados">Buscar Evento</label>
+          <div class="buscador">
+            <input
+              type="text"
+              placeholder="Buscar evento..."
+              bind:value={filtroEventos}
+              on:focus={() => (mostrarEventos = true)}
+            />
+            <button type="button" class="btn-toggle" on:click={() => (mostrarEventos = !mostrarEventos)}>
+              {mostrarEventos ? '▲' : '▼'}
+            </button>
+          </div>
+          {#if mostrarEventos}
+            <select
+              id="eventosSeleccionados"
+              bind:value={filtroEventos}
+              size="5"
+              on:change={() => seleccionarEvento(filtroEventos)}
+            >
+              {#each eventos.filter(evento => evento.toLowerCase().includes(filtroEventos.toLowerCase()) && !eventosSeleccionados.includes(evento)) as evento}
+                <option value={evento}>{evento}</option>
+              {/each}
+            </select>
+          {/if}
+        </div>
+  
+        <div class="campo">
+          <label for="imagenes">Imágenes de la escultura</label>
+          <input type="file" id="imagenes" multiple on:change={handleFileChange} />
+        </div>
+  
+        <button type="submit">Registrar Escultura</button>
+      </form>
+    </section>
+  {/if}
   
   <style>
     section {
@@ -135,6 +246,36 @@
   
     button:hover {
       background-color: #0056b3;
+    }
+  
+    .btn-cruz {
+      margin-left: 10px;
+      background-color: transparent;
+      border: none;
+      color: red;
+      font-size: 18px;
+      cursor: pointer;
+    }
+  
+    .btn-cruz:hover {
+      color: darkred;
+    }
+  
+    .buscador {
+      display: flex;
+      align-items: center;
+    }
+  
+    .btn-toggle {
+      margin-left: 5px;
+      background-color: transparent;
+      border: none;
+      font-size: 16px;
+      cursor: pointer;
+    }
+  
+    .btn-toggle:hover {
+      color: #007BFF;
     }
   </style>
   

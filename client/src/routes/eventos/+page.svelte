@@ -218,13 +218,13 @@
     }
 
     .search-input:focus {
-        border-color: #86512c; /* Cambia el color del borde al hacer foco */
+        border-color: #000000; /* Cambia el color del borde al hacer foco */
         outline: none; /* Elimina el contorno por defecto */
     }
 
     .search-button {
         padding: 10px 15px; /* Espaciado interno */
-        background-color: #713307; /* Color de fondo del botón */
+        background-color: #000000; /* Color de fondo del botón */
         color: white; /* Color del texto */
         border: none; /* Sin borde */
         border-radius: 5px; /* Esquinas redondeadas */
@@ -234,7 +234,7 @@
     }
 
     .search-button:hover {
-        background-color: #7c4218; /* Color de fondo al pasar el mouse */
+        background-color: #525252; /* Color de fondo al pasar el mouse */
     }
 
     .search-select {
@@ -249,12 +249,12 @@
     }
 
     .search-select:hover {
-        border-color: #86512c; /* Cambia el color del borde al pasar el mouse */
+        border-color: #000000; /* Cambia el color del borde al pasar el mouse */
     }
 
     .search-select:focus {
         outline: none; /* Elimina el contorno por defecto */
-        border-color: #86512c; /* Cambia el color del borde al hacer foco */
+        border-color: #ffffff; /* Cambia el color del borde al hacer foco */
     }
 
     .pagination {

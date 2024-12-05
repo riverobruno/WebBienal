@@ -221,24 +221,24 @@
   }
 
   .search-input:focus {
-    border-color: #86512c;
+    border-color: #000000;
     outline: none;
   }
 
   .search-button {
-    padding: 10px 15px;
-    background-color: #713307;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: background-color 0.3s;
-  }
+        padding: 10px 15px; /* Espaciado interno */
+        background-color: #000000; /* Color de fondo del botón */
+        color: white; /* Color del texto */
+        border: none; /* Sin borde */
+        border-radius: 5px; /* Esquinas redondeadas */
+        cursor: pointer; /* Cambia el cursor al pasar el mouse */
+        font-size: 16px; /* Tamaño de la fuente */
+        transition: background-color 0.3s; /* Transición para el color de fondo */
+    }
 
-  .search-button:hover {
-    background-color: #7c4218;
-  }
+    .search-button:hover {
+        background-color: #525252; /* Color de fondo al pasar el mouse */
+    }
 
   .search-select {
     padding: 10px 15px;

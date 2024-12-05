@@ -6,6 +6,7 @@
   let isNavOpen = false;
   let isDropdownOpen = false;
   let isEscultor = false;
+  let isAdmin = false;
 
   /**
    * @param {string} token
@@ -33,6 +34,11 @@
         isEscultor = true; // Establecemos 'isEscultor' si el permiso es "escultor"
       } else {
         isEscultor = false; // Restablecemos 'isEscultor' si el permiso no es "escultor"
+      }
+      if (permisos === 'admin') {
+        isAdmin = true; // Establecemos 'isAdmin' si el permiso es "admin"
+      } else {
+        isAdmin = false; // Restablecemos 'isAdmin' si el permiso no es "admin"
       }
     } else {
       console.error('El token no contiene permisos válidos');
@@ -75,7 +81,9 @@ function irAPerfil() {
 </script>
 
 <!-- Main navigation container -->
-<nav class="flex-no-wrap relative flex w-full items-center justify-between py-2 shadow-dark-mild lg:flex-wrap lg:justify-start lg:py-4 shadow-lg" style="background: linear-gradient(to top, rgb(109, 46, 1), rgba(109, 46, 1, 0.8));">
+<nav 
+  class="flex-no-wrap relative flex w-full items-center justify-between py-1 shadow-dark-mild lg:flex-wrap lg:justify-start lg:py-2 shadow-lg" 
+  style="background: linear-gradient(to top, rgba(0, 0, 0), rgba(0, 0, 0, 0.9));">
   <div class="flex w-full flex-wrap items-center justify-between px-3">
 
     <!-- Hamburger button for mobile view -->
@@ -136,20 +144,24 @@ function irAPerfil() {
           </svg>
         </button>
       
-        <!-- Menú desplegable para cerrar sesión -->
+      <!-- Menú desplegable para cerrar sesión -->
       {#if isDropdownOpen}
-      <div class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 shadow-lg rounded-lg py-2 z-10">
-        <!-- Botón para cerrar sesión -->
-        <button on:click={cerrarSesion} class="block px-4 py-2 text-sm text-neutral-600 dark:text-white hover:bg-pink-500 hover:text-white cursor-pointer">
-          Cerrar sesión
-        </button>
-
+      <div class="absolute right-0 top-full w-48 bg-white dark:bg-gray-800 shadow-lg rounded-lg py-2 z-10">
         <!-- Botón QR, solo visible si isEscultor es true -->
         {#if isEscultor}
           <button on:click={irAPerfil} class="block px-4 py-2 text-sm text-neutral-600 dark:text-white hover:bg-pink-500 hover:text-white cursor-pointer">
           Ir al perfil
         </button>
         {/if}
+        {#if !isAdmin}
+          <button on:click={irAPerfil} class="block px-4 py-2 text-sm text-neutral-600 dark:text-white hover:bg-pink-500 hover:text-white cursor-pointer">
+          Cambiar contraseña
+        </button>
+        {/if}
+        <!-- Botón para cerrar sesión -->
+        <button on:click={cerrarSesion} class="block px-4 py-2 text-sm text-neutral-600 dark:text-white hover:bg-pink-500 hover:text-white cursor-pointer">
+          Cerrar sesión
+        </button>
       </div>
       {/if}
     

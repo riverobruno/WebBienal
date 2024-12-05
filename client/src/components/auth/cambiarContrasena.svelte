@@ -1,21 +1,16 @@
 <script>
-  let nombreapellido = '';
-  let correo = '';
-  let contraseña = '';
-  let confirmcontraseña = '';
-  const registrarUsuario = async () => {
-  if (!nombreapellido || !correo || !contraseña|| !confirmcontraseña) {
+  let contraseña_actual = '';
+  let contraseña_nueva1 = '';
+  let contraseña_nueva2 = '';
+
+
+  const cambiarContraseña = async () => {
+  if (!contraseña_actual || !contraseña_nueva1 ||! contraseña_nueva2) {
     alert('Por favor, completa todos los campos.');
     return;
   }
-  if (confirmcontraseña!==contraseña) {
-    alert('La contraseña y su confirmación no coinciden. Inténtelo de nuevo.');
-    confirmcontraseña='';
-    contraseña='';
-    return;
-  }
 
-  console.log('Datos enviados:', { nombreapellido, correo, contraseña }); // Para depuración
+  console.log('Datos enviados:', { contraseña_actual, contraseña_nueva1,contraseña_nueva2 }); // Para depuración
 
   try {
     const response = await fetch('http://localhost:3001/api/registro', {
@@ -24,9 +19,9 @@
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        nombreapellido,
-        correo,
-        contraseña,
+        contraseña_actual,
+        contraseña_nueva1,
+        contraseña_nueva2,
       }),
     });
 
@@ -41,31 +36,30 @@
       window.location.href = '/inicio'; // Redirigir al login
     } else  if(response.status === 409) { alert(data.message); }
       else{ 
-        alert(data.message || 'Error al registrar usuario');
+        alert(data.message || 'Error al cambiar la contraseña');
     }
   } catch (error) {
-    console.error('Error al intentar registrar usuario:', error);
-    alert('Hubo un error al intentar registrar el usuario.');
+    console.error('Error al cambiar la contraseña:', error);
+    alert('Hubo un error al intentar cambiar la contraseña.');
   }
 };
 const cancelar = () => {
-  if (confirm("¿Estás seguro de que deseas cancelar el registro?")) {
+  if (confirm("¿Estás seguro de que deseas cancelar el cambio de contraseña?")) {
     window.location.href = '/login';
   }
 };
 </script>
 
 <section class="form-container">
-  <form on:submit|preventDefault={registrarUsuario} class="form">
+  <form on:submit|preventDefault={cambiarContraseña} class="form">
     <div class="logo text-center">
-      <h2>Registro</h2>
+      <h2>Cambio de Contraseña</h2>
     </div>  
-    <input type="text" placeholder="Nombre y Apellido" bind:value={nombreapellido} class="input" />
-    <input type="email" placeholder="Correo electrónico" bind:value={correo} class="input" />
-    <input type="password" placeholder="Contraseña" bind:value={contraseña} class="input" />
-    <input type="password" placeholder="Confirmar contraseña" bind:value={confirmcontraseña} class="input" />
+    <input type="contraseña_actual" placeholder="Contraseña actual" class="input" />
+    <input type="contraseña_nueva1" placeholder="Contraseña nueva" class="input" />
+    <input type="contraseña_nueva2" placeholder="Repita la contraseña nueva" class="input" />
     <div class="button-group">
-      <button type="submit" class="button">Registrarse</button>
+      <button type="submit" class="button">Aceptar</button>
       <button type="button" class="cancel-button" on:click={cancelar}>
         Cancelar
       </button>

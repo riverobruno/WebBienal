@@ -76,7 +76,7 @@
               src="https://raw.githubusercontent.com/FRRe-DS/2024-06-TPI/main/client/src/public/bienal_logo.png"
               alt="logo"
             />
-            <h4>Iniciar Sesión</h4>
+            <h2>Iniciar Sesión</h2>
           </div>
           <form on:submit|preventDefault={iniciarSesion}>
             <div class="input-wrapper">
@@ -94,6 +94,12 @@
                 bind:value={contraseña}
                 class="input"
               />
+              <div class="logo text-center">
+                <p>
+                  ¿Ha olvidado su contraseña?
+                  <a href="/cambiarContraseña"><b><u>Cámbiela aquí</u></b></a>. <br />
+                </p>
+              </div>
             </div>
             <button type="submit" class="button">Iniciar sesión</button>
           </form>
@@ -182,7 +188,7 @@
     margin-bottom: 1rem;
   }
 
-  .logo h4 {
+  .logo h2 {
     margin-bottom: 2rem;
     font-size: 1.5rem;
     color: var(--text-color);
@@ -210,6 +216,7 @@
     border-radius: 8px;
     color: white;
     font-size: 1rem;
+    font-weight: bold;
     cursor: pointer;
     transition: background 0.3s ease;
   }

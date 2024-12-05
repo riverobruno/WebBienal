@@ -1,4 +1,4 @@
-<footer class="bg-zinc-50 text-center dark:bg-neutral-700 lg:text-left" style="background: linear-gradient(to bottom, rgb(109, 46, 1), rgba(109, 46, 1, 0.8));">
+<footer class="bg-zinc-50 text-center dark:bg-neutral-700 lg:text-left" style="background: linear-gradient(to bottom, rgb(0, 0, 0), rgba(0, 0, 0, 0.8));">
   <div class="bg-black/5 p-4 flex justify-between items-center text-surface dark:text-white">
     <!-- Texto del footer -->
     <span>© 2024 UTN_FRRE Grupo 6</span>
