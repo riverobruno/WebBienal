@@ -81,7 +81,9 @@ function irAPerfil() {
 </script>
 
 <!-- Main navigation container -->
-<nav class="flex-no-wrap relative flex w-full items-center justify-between py-2 shadow-dark-mild lg:flex-wrap lg:justify-start lg:py-4 shadow-lg" style="background: linear-gradient(to top, rgb(0, 0, 0), rgba(0, 0, 0, 0.8));">
+<nav 
+  class="flex-no-wrap relative flex w-full items-center justify-between py-1 shadow-dark-mild lg:flex-wrap lg:justify-start lg:py-2 shadow-lg" 
+  style="background: linear-gradient(to top, rgba(0, 0, 0), rgba(0, 0, 0, 0.9));">
   <div class="flex w-full flex-wrap items-center justify-between px-3">
 
     <!-- Hamburger button for mobile view -->
