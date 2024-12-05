@@ -860,30 +860,6 @@ app.post('/api/compitenNuevo', async (req, res) => {
   }
 });
 
-app.post('/api/validate-captcha', async (req, res) => {
-  const { recaptchaResponse } = req.body;
-
-  try {
-    const response = await axios.post(`https://www.google.com/recaptcha/api/siteverify`, null, {
-      params: {
-        secret: process.env.VITE_RECAPTCHA_SECRET_KEY,
-        response: recaptchaResponse
-      }
-    });
-
-    if (response.data.success) {
-      res.json({ success: true });
-    } else {
-      res.json({ success: false });
-    }
-  } catch (error) {
-    res.status(500).json({ success: false, message: 'Error en la verificación' });
-  }
-});
-
-
-
-
 app.post('/api/borrarEvento', async (req, res) => {
   const { nombre_evento, lugar_evento } = req.body;
 
