@@ -469,7 +469,6 @@ cloudinary.config({
   api_key: process.env.api_key,
   api_secret: process.env.api_secret
 });
-console.log(process.env.cloud_name)
 // Función para insertar un artista
 export async function insertarArtista(artista, imagenPerfil) {
   console.log("Insertando artista...");
@@ -643,4 +642,161 @@ export async function cambiar_Contraseña(correo, contraseña_actual, contraseñ
       });
     });
   });
+}
+//Registrar escultura
+export async function registrar_escultura(nombre, f_creacion, antecedentes, tecnica) {
+  let con = crearConexion();
+
+  return new Promise((resolve, reject) => {
+    con.connect((err) => {
+      if (err) {
+        console.error('Error connecting: ' + err.stack);
+        reject(err); // Rechazar la promesa en caso de error de conexión
+        return;
+      }
+      console.log("Connected!");
+
+      // Realizamos la consulta a la base de datos pasando los parámetros
+      const query = 'INSERT INTO esculturas (nombre, f_creacion, antecedentes, tecnica) VALUES (?, ?, ?, ?)'; // Usamos placeholders
+      con.query(query, [nombre, f_creacion, antecedentes, tecnica], (err, results) => { // Pasamos los valores
+        if (err) {
+          console.error('Error querying the database:', err);
+          reject(err); // Rechazar la promesa en caso de error en la consulta
+        } else {
+          resolve('Registro exitoso'); // Resolver la promesa con los resultados
+        }
+        con.end(); // Cerramos la conexión
+      });
+    });
+  });
+}
+
+
+//Registar hechas por
+export async function registrar_hechas_por(DNI, nombre_escultura) {
+  let con = crearConexion(); // Asegúrate de que esta función esté bien configurada
+
+  return new Promise((resolve, reject) => {
+    con.connect((err) => {
+      if (err) {
+        console.error('Error connecting: ' + err.stack);
+        reject(err);
+        return;
+      }
+      console.log("Connected!");
+
+      // Consulta SQL para insertar en la tabla `hechas_por`
+      const query = 'INSERT INTO hechas_por (DNI, nombre_escultura) VALUES (?, ?)';
+      con.query(query, [DNI, nombre_escultura], (err, results) => {
+        if (err) {
+          console.error('Error querying the database:', err);
+          reject(err);
+        } else {
+          resolve('Registro exitoso en hechas_por');
+        }
+        con.end(); // Cerramos la conexión
+      });
+    });
+  });
+};
+
+//Proabaaaaaaaaaararararrararaararararararararararararararararararararararraraarraraarrararara
+export async function registrar_imagen(etapa, nombre_escultura, imagen) {
+  console.log("Insertando imagen...");
+  console.log("Etapa:", etapa);
+  console.log("Nombre de la escultura:", nombre_escultura);
+  console.log("Detalles de la imagen:", imagen);
+
+  // Validación básica
+  if (!etapa || !nombre_escultura || !imagen || !imagen.buffer) {
+    throw new Error("Faltan datos obligatorios: etapa, nombre de escultura o imagen.");
+  }
+
+  try {
+    // Convertir el buffer de la imagen en un stream legible
+    const bufferStream = new Readable();
+    bufferStream.push(imagen.buffer);
+    bufferStream.push(null); // Indica el final del stream
+
+    // Subir la imagen a Cloudinary
+    const result = await new Promise((resolve, reject) => {
+      const stream = cloudinary.uploader.upload_stream(
+        {
+          folder: 'imagenes_obras',
+          public_id: `imagen_${nombre_escultura}_${etapa}`, // ID único basado en la escultura y etapa
+          resource_type: 'image', // Especifica que es una imagen
+        },
+        (error, result) => {
+          if (error) {
+            return reject(error);
+          }
+          resolve(result);
+        }
+      );
+      bufferStream.pipe(stream); // Pasar el stream al uploader de Cloudinary
+    });
+
+    const urlFoto = result.secure_url;
+    console.log("URL DE LA IMAGEN:", urlFoto);
+
+    // Crear el query para insertar en la base de datos
+    const query = `
+      INSERT INTO imagenes (etapa, nombre_escultura, URL) 
+      VALUES (?, ?, ?);
+    `;
+
+    // Ejecutar el query
+    return new Promise((resolve, reject) => {
+      pool.execute(query, [etapa, nombre_escultura, urlFoto], (error, result) => {
+        if (error) {
+          console.error("Error al insertar la imagen:", error);
+          reject(error);
+        } else {
+          console.log("Imagen insertada:", result);
+          resolve(result.insertId);
+        }
+      });
+    });
+  } catch (error) {
+    console.error("Error al subir la imagen o insertar en la base de datos:", error);
+    throw error;
+  }
+}
+
+
+
+//registrar compiten
+export async function registrar_compiten(nombre_evento, nombre_escultura) {
+  console.log("Insertando registro en compiten...");
+  console.log("Evento:", nombre_evento);
+  console.log("Escultura:", nombre_escultura);
+
+  // Validación básica de entrada
+  if (!nombre_evento || !nombre_escultura) {
+    throw new Error("Faltan datos obligatorios: nombre_evento o nombre_escultura.");
+  }
+
+  try {
+    // Crear el query para insertar en la tabla `compiten`
+    const query = `
+      INSERT INTO compiten (nombre_evento, nombre_escultura) 
+      VALUES (?, ?);
+    `;
+
+    // Ejecutar el query
+    return new Promise((resolve, reject) => {
+      pool.execute(query, [nombre_evento, nombre_escultura], (error, result) => {
+        if (error) {
+          console.error("Error al insertar en compiten:", error);
+          reject(error);
+        } else {
+          console.log("Registro insertado en compiten:", result);
+          resolve(result.insertId);
+        }
+      });
+    });
+  } catch (error) {
+    console.error("Error al registrar en compiten:", error);
+    throw error;
+  }
 }

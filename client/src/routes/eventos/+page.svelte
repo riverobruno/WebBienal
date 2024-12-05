@@ -81,27 +81,29 @@
 {#if mostrandoCarga}
     <div class="loading-icon"></div>
 {:else}
+    {#if obraReciente}
     <article
         data-aos="fade-down"
         data-aos-duration="1000"
         class="max-w-full mx-auto mt-8 p-6 bg-white shadow-md rounded-lg text-center">
-        <section class="mt-4">
-            <h1 class="text-4xl font-bold">
-                <u>Evento próximo:</u>
-            </h1>
-            <h2 class="text-3xl font-semibold">{obraReciente.eventName}</h2>
-            <h3 class="text-xl font-semibold">Detalles del Evento</h3>
-            <div class="grid grid-cols-2 gap-4 mt-4">
-                <!-- Primera columna -->
-                <p class="text-right"><strong>Fecha de inicio:</strong> {obraReciente.eventStartDate}</p>
-                <p class="text-left"><strong>Fecha de fin:</strong> {obraReciente.eventFinishDate}</p>
-                <!-- Segunda columna -->
-                <p class="text-right"><strong>Hora:</strong> {obraReciente.startTime} - {obraReciente.finishTime}</p>
-                <p class="text-left"><strong>Ubicación:</strong> {obraReciente.location}</p>
-            </div>
-            <p class="mt-4">{obraReciente.content}</p>
-        </section>
-    </article>
+            <section class="mt-4">
+                <h1 class="text-4xl font-bold">
+                    <u>Evento próximo:</u>
+                </h1>
+                <h2 class="text-3xl font-semibold">{obraReciente.eventName}</h2>
+                <h3 class="text-xl font-semibold">Detalles del Evento</h3>
+                <div class="grid grid-cols-2 gap-4 mt-4">
+                    <!-- Primera columna -->
+                    <p class="text-right"><strong>Fecha de inicio:</strong> {obraReciente.eventStartDate}</p>
+                    <p class="text-left"><strong>Fecha de fin:</strong> {obraReciente.eventFinishDate}</p>
+                    <!-- Segunda columna -->
+                    <p class="text-right"><strong>Hora:</strong> {obraReciente.startTime} - {obraReciente.finishTime}</p>
+                    <p class="text-left"><strong>Ubicación:</strong> {obraReciente.location}</p>
+                </div>
+                <p class="mt-4">{obraReciente.content}</p>
+            </section>
+        </article>
+    {/if}
     <div class="search-container">
         <div>
             <input
@@ -319,9 +321,6 @@
     padding: 8px; /* Reduce el padding */
   } 
 }
-    .-button:hover {
-        background-color: #525252; /* Color de fondo al pasar el mouse */
-    }
 
     .stars {
         margin-top: 8px; /* Espaciado superior */

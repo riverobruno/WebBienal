@@ -10,9 +10,8 @@ import { dirname, join } from 'path';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 dotenv.config({ path: join(__dirname, '../.env') });
-import { ArtistasConsulta, EsculturasConsulta, EventosConsulta, login, ObrasdeUnEvento, ObrasdeUnArtista, EventosYEsculturasDeObra, insertarEvento, insertarArtista, register, registrar_voto } from './conexiondb.js';
+import { ArtistasConsulta, EsculturasConsulta, EventosConsulta, login, ObrasdeUnEvento, ObrasdeUnArtista, EventosYEsculturasDeObra, insertarEvento, insertarArtista, register, registrar_voto,registrar_escultura, registrar_hechas_por, registrar_imagen, registrar_compiten } from './conexiondb.js';
 import { ordenarEsculturas, buscarEsculturas, ordenarEventos, buscarEventos, ordenarArtistas, buscarArtistas, eventoProximo } from './filtrosObjetos.js';
-
 
 // Clave secreta para firmar el token (debería ser almacenada de forma segura, como en variables de entorno)
 const JWT_SECRET = process.env.JWT_SECRET; // Cambir por algo más seguro
@@ -51,20 +50,24 @@ const obtenerArtistas = async (busqueda, criterio, orden) => {
     const cards = [];
     for (const [index, artista] of ArtistasOrdenados.entries()) {
       // Accede a los métodos de la clase Esculturas
+      const dni = artista.getDNI();
       const nombre = artista.getNyA();
       const imagen = artista.getURL_foto();
       const biografia = artista.getRes_biografia();
       const contacto = artista.getContacto();
       const promedio = artista.getPromedio();
+      const DNI = artista.getDNI();
       const nacionalidad=artista.getNacionalidad();
       cards.push({
         id: index + 1,
+        dni: dni,
         escultorPantalla: nombre.replace(/ /g, ''), 
         content: biografia,
         escultorName: nombre,
         escultorFoto: imagen,
         contactoEmail: contacto,
         promedio: promedio,
+        DNI: DNI,
         nacionalidad:nacionalidad
       });
     }
@@ -361,37 +364,37 @@ const obtenerEventoProximo = async () => {
     const eventProximo = eventoProximo(eventosCache);
 
     const card = [];
+    if (eventProximo) {
+      const titulo = eventProximo.getNombre();
+      const fechaInicio = new Date(eventProximo.getFechaInicio());
+      const fechaFin = new Date(eventProximo.getFechaFin());
+      const tematica = eventProximo.getTematica();
+      const lugar = eventProximo.getLugar();
+      const horaInicio = eventProximo.getHoraInicio();
+      const horaFin = eventProximo.getHoraFin();
+      const promedio = eventProximo.getPromedio();
+      const options = { month: 'long', day: 'numeric' };
+      const formattedFechaInicio = fechaInicio.toLocaleDateString('es-ES', options);
+      const formattedFechaFin = fechaFin.toLocaleDateString('es-ES', options);
 
-    const titulo = eventProximo.getNombre();
-    const fechaInicio = new Date(eventProximo.getFechaInicio());
-    const fechaFin = new Date(eventProximo.getFechaFin());
-    const tematica = eventProximo.getTematica();
-    const lugar = eventProximo.getLugar();
-    const horaInicio = eventProximo.getHoraInicio();
-    const horaFin = eventProximo.getHoraFin();
-    const promedio = eventProximo.getPromedio();
-    const options = { month: 'long', day: 'numeric' };
-    const formattedFechaInicio = fechaInicio.toLocaleDateString('es-ES', options);
-    const formattedFechaFin = fechaFin.toLocaleDateString('es-ES', options);
+      const formattedHoraInicio = horaInicio.split(':').slice(0, 2).join(':');  // De "09:30:00" a "09:30"
+      const formattedHoraFin = horaFin.split(':').slice(0, 2).join(':');        // De "15:00:00" a "15:00"
 
-    const formattedHoraInicio = horaInicio.split(':').slice(0, 2).join(':');  // De "09:30:00" a "09:30"
-    const formattedHoraFin = horaFin.split(':').slice(0, 2).join(':');        // De "15:00:00" a "15:00"
+      card.push({
+        title: 'evento',
+        eventName: titulo,
+        eventoPantalla: titulo.replace(/ /g, ''),
+        eventStartDate: formattedFechaInicio,
+        eventFinishDate: formattedFechaFin,
+        startTime: formattedHoraInicio,
+        finishTime: formattedHoraFin,
+        location: lugar,
+        content: tematica,
+        promedio: promedio
+      });
 
-    card.push({
-      title: 'evento',
-      eventName: titulo,
-      eventoPantalla: titulo.replace(/ /g, ''),
-      eventStartDate: formattedFechaInicio,
-      eventFinishDate: formattedFechaFin,
-      startTime: formattedHoraInicio,
-      finishTime: formattedHoraFin,
-      location: lugar,
-      content: tematica,
-      promedio: promedio
-    });
-
-    return card;
-
+      return card;
+    }
   } catch (error) {
     console.error('Error al obtener eventos:', error);
     return [];  // Retornar un array vacío en caso de error
@@ -672,6 +675,87 @@ app.post('/api/artistaNuevo', upload.single('imagenPerfil'), async (req, res) =>
   }
 });
 
+
+
+
+// Endpoint para registrar una escultura
+app.post('/api/esculturaNueva', async (req, res) => {
+  console.log("Llama a crear Escultura")
+  const { nombre, f_creacion, antecedentes, tecnica } = req.body;
+
+  if (!nombre || !f_creacion || antecedentes == null || !tecnica) {
+    console.log("Falta Algo")
+    console.log(nombre,f_creacion,antecedentes,tecnica)
+    return res.status(400).json({ error: 'Todos los campos son obligatorios' });
+    
+  }
+
+  try {
+    const resultado = await registrar_escultura(nombre, f_creacion, antecedentes, tecnica);
+    console.log(resultado)
+    cache.del(['esculturas']);
+    res.status(200).json({ mensaje: 'Escultura registrada con éxito', resultado });
+  } catch (error) {
+    console.error('Error al registrar escultura:', error);
+    res.status(500).json({ error: 'Error al registrar la escultura' });
+  }
+});
+
+// Endpoint para registrar relación "hechas_por"
+app.post('/api/hechasPorNueva', async (req, res) => {
+  const { DNI, nombre_escultura } = req.body;
+
+  if (!DNI || !nombre_escultura) {
+    console.log("Faltan Datos")
+    return res.status(400).json({ error: 'DNI y nombre de escultura son obligatorios' });
+
+  }
+
+  try {
+    const resultado = await registrar_hechas_por(DNI, nombre_escultura);
+    res.status(200).json({ mensaje: 'Relación registrada con éxito', resultado });
+  } catch (error) {
+    console.error('Error al registrar relación hechas_por:', error);
+    res.status(500).json({ error: 'Error al registrar la relación' });
+  }
+});
+
+// Endpoint para registrar una imagen
+app.post('/api/imagenNueva', upload.single('imagen'), async (req, res) => {
+  const { etapa, nombre_escultura } = req.body;
+  const imagen = req.file;
+
+  if (!etapa || !nombre_escultura || !imagen) {
+    return res.status(400).json({ error: 'Todos los campos y la imagen son obligatorios' });
+  }
+
+  try {
+    const resultado = await registrar_imagen(etapa, nombre_escultura, imagen);
+    res.status(200).json({ mensaje: 'Imagen registrada con éxito', resultado });
+  } catch (error) {
+    console.error('Error al registrar imagen:', error);
+    res.status(500).json({ error: 'Error al registrar la imagen' });
+  }
+});
+
+// Endpoint para registrar relación "compiten"
+app.post('/api/compitenNuevo', async (req, res) => {
+  const { nombre_evento, nombre_escultura } = req.body;
+  console.log("Entra a compiten nuevo")
+  console.log(nombre_evento,nombre_escultura)
+
+  if (!nombre_evento || !nombre_escultura) {
+    return res.status(400).json({ error: 'Nombre del evento y nombre de la escultura son obligatorios' });
+  }
+
+  try {
+    const resultado = await registrar_compiten(nombre_evento, nombre_escultura);
+    res.status(200).json({ mensaje: 'Relación registrada con éxito', resultado });
+  } catch (error) {
+    console.error('Error al registrar relación compiten:', error);
+    res.status(500).json({ error: 'Error al registrar la relación' });
+  }
+});
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
 });
