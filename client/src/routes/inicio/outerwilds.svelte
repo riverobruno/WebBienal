@@ -11,21 +11,17 @@
         overflow: hidden;
         border-radius: 12px;
         box-shadow: 0 6px 15px rgba(0, 0, 0, 0.5);
-        transition: transform 0.5s ease, box-shadow 0.5s ease;
-    }
-
-    .video-container:hover {
-        transform: scale(1.05);
-        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.7);
+        display: grid;
+        grid-template-columns: 1fr 1fr; /* Divide en dos columnas iguales */
+        align-items: center;
     }
 
     .video-container video {
+        grid-column: span 2; /* El video ocupa ambas columnas */
         width: 100%;
         height: auto;
         filter: brightness(0.8) contrast(1.2) saturate(1.1);
         transition: filter 0.5s ease;
-        transform: translateZ(0); /* Activa la aceleración por hardware */
-
     }
 
     .video-container:hover video {
@@ -33,73 +29,48 @@
     }
 
     .overlay {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
         display: flex;
         flex-direction: column;
         justify-content: center;
-        align-items: center;
-        background: radial-gradient(circle, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.6) 70%, rgba(0, 0, 0, 1) 100%);
-        color: #fff;
-        text-align: center;
         padding: 2rem;
         font-family: 'Orbitron', sans-serif;
+        color: #fff;
         animation: fadeIn 2s ease-in-out;
     }
 
-    @keyframes fadeIn {
-        0% {
-            opacity: 0;
-        }
-        100% {
-            opacity: 1;
-        }
+    .overlay.text {
+        grid-column: 1; /* Se coloca en la primera columna */
+        background: radial-gradient(circle, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.6) 70%, rgba(0, 0, 0, 1) 100%);
+        text-align: left;
+    }
+
+    .overlay.map {
+        grid-column: 2; /* Se coloca en la segunda columna */
+        text-align: center;
     }
 
     .title {
-        font-size: 3.5rem;
+        font-size: 2rem;
         font-weight: bold;
         margin-bottom: 1rem;
         color: #00d4ff;
         text-shadow: 0 0 20px #00d4ff, 0 0 30px #00aaff;
-        animation: slideIn 1.5s ease-out;
-    }
-
-    @keyframes slideIn {
-        0% {
-            transform: translateY(-50%);
-            opacity: 0;
-        }
-        100% {
-            transform: translateY(0);
-            opacity: 1;
-        }
     }
 
     .subtitle {
-        font-size: 1.5rem;
+        font-size: 1rem;
         font-weight: 300;
         line-height: 1.5;
         color: #d1e9ff;
         text-shadow: 0 0 10px #0077ff, 0 0 20px #0057ff;
-        animation: slideIn 2s ease-out;
-        animation-delay: 0.5s;
     }
 
-    @keyframes starTwinkle {
-        0%, 100% {
-            text-shadow: 0 0 10px #fff, 0 0 20px #ffef00;
-        }
-        50% {
-            text-shadow: 0 0 15px #fff, 0 0 30px #ffef00;
-        }
-    }
-
-    .title, .subtitle {
-        animation: starTwinkle 3s infinite;
+    iframe {
+        border: none;
+        width: 100%;
+        height: 100%;
+        border-radius: 12px;
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.5);
     }
 </style>
 
@@ -108,10 +79,16 @@
         <source src={videoSource} type="video/mp4" />
         Tu navegador no soporta la reproducción de video.
     </video>
-    <div class="overlay">
+    <div class="overlay text">
         <div class="title">Explora el Cosmos</div>
         <div class="subtitle">
             Es un orgullo para nosotros, los chaqueños, haber construido un acontecimiento internacional de reconocimiento pleno en la escena escultórica mundial. Grandes escultores del mundo en escena y en acción, trabajando a cielo abierto y en público, esculpiendo piezas que tienen por destino las veredas de Resistencia. Y así se cierra el círculo virtuoso: la obra de arte que pasa a formar parte del paisaje cotidiano haciendo del arte un bien de todos.
         </div>
+    </div>
+    <div class="overlay map">
+        <iframe 
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3877.4016932270254!2d-58.98294772504339!3d-27.451034227805328!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94450c2e020c3455%3A0xb0322c7a23a998a!2sResistencia%2C%20Chaco!5e0!3m2!1sen!2sar!4v1693922801512!5m2!1sen!2sar" 
+            allowfullscreen>
+        </iframe>
     </div>
 </div>
