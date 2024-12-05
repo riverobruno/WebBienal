@@ -1,34 +1,73 @@
 <script>
-  // Datos de ejemplo para los artistas
-  let artistas = [
-    { id: 1, nombre: "Juan", apellido: "Pérez", email: "juan.perez@example.com", nacionalidad: "Argentina" },
-    { id: 2, nombre: "Maria", apellido: "Gómez", email: "maria.gomez@example.com", nacionalidad: "México" },
-    { id: 3, nombre: "Carlos", apellido: "Martínez", email: "carlos.martinez@example.com", nacionalidad: "España" },
-  ];
+  import { onMount } from 'svelte';
+  import axios from 'axios';
 
-  const editarArtista = (id,ruta) => {
-    console.log(`Editar artista con ID: ${id}`);
-    window.location.href = ruta; // Redirige a la ruta especificada
-    // Lógica para editar
-  };
+  let artistas = [];  // Inicializamos un array vacío para los artistas.
 
-  function redirigir(ruta) {
-      window.location.href = ruta; // Redirige a la ruta especificada
+  // Función para obtener artistas desde la API
+  async function fetchArtistas(query = "", criterio = 'nombre', orden = 'ASC') {
+    try {
+      const res = await axios.get(`http://localhost:3001/api/escultores`, {
+        params: {
+          search: query,     // Parámetro de búsqueda
+          sortBy: criterio,  // Criterio de ordenación (nombre, f_creacion, promedio)
+          order: orden       // Orden (asc o desc)
+        }
+      });
+
+      // Extraemos solo los nombres y el DNI de los artistas
+      artistas = res.data.map(artista => ({
+        nombre: artista.escultorName, // Asegúrate de que 'escultorName' sea el campo correcto en la respuesta
+        dni: artista.dni,             // Asegúrate de que 'DNI' sea el campo correcto en la respuesta
+        email:artista.contactoEmail,
+        nacionalidad:artista.nacionalidad,
+      
+      }));
+    } catch (error) {
+      console.log(error);
+      artistas = []; // Si hay un error, asignamos un array vacío
     }
+  }
 
-  const eliminarArtista = (id) => {
-    console.log(`Eliminar artista con ID: ${id}`);
-    // Lógica para eliminar
+  // Llamar la función de fetch cuando el componente se monte
+  onMount(() => {
+      fetchArtistas();
+  });
+
+  // Función para redirigir a las páginas de edición o alta de artistas
+  const editarArtista = (id) => {
+      console.log(`Editar artista con ID: ${id}`);
+      window.location.href = `/admin/artistas/mod_artista/${id}`; // Redirige a la página de edición con el ID del artista
   };
 
+  // Función para borrar un artista
+  const eliminarArtista = async (dni) => {
+    try {
+        const res = await axios.post('http://localhost:3001/api/borrarArtista', { dni });
+
+        // Verificar que el artista fue borrado exitosamente
+        if (res.status === 200) {
+            alert('Artista borrado con éxito');
+            // Recargar la lista de artistas después de eliminar uno
+            fetchArtistas();
+        }
+    } catch (error) {
+        console.error('Error al borrar el artista:', error);
+        alert('Error al borrar el artista');
+    }
+  };
+
+  const redirigir = (ruta) => {
+      window.location.href = ruta; // Redirige a la ruta especificada
+  };
 
   const confirmar = () => {
-    console.log('Acción confirmada');
-    // Lógica para confirmar
+      console.log('Acción confirmada');
+      // Lógica para confirmar
   };
 
   const volver = () => {
-    window.location.href = '/admin';
+      window.location.href = '/admin';
   };
 </script>
 
@@ -200,22 +239,22 @@
     <thead>
       <tr>
         <th>Nombre</th>
-        <th>Apellido</th>
+        <th>DNI</th>
         <th>Email</th>
         <th>Nacionalidad</th>
         <th>Acciones</th>
       </tr>
     </thead>
     <tbody>
-      {#each artistas as { id, nombre, apellido, email, nacionalidad }}
+      {#each artistas as { id, nombre, dni, email, nacionalidad }}
         <tr>
           <td>{nombre}</td>
-          <td>{apellido}</td>
+          <td>{dni}</td>
           <td>{email}</td>
           <td>{nacionalidad}</td>
           <td class="acciones">
-            <button class="btn-editar" on:click={() => redirigir('/admin/artistas/mod_artista')}>✏️</button>
-            <button class="btn-eliminar" on:click={() => eliminarArtista(id)}>❌</button>
+            <button class="btn-editar" on:click={() => editarArtista(dni)}>✏️</button>
+            <button class="btn-eliminar" on:click={() => eliminarArtista(dni)}>❌</button>
           </td>
         </tr>
       {/each}
