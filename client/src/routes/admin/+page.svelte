@@ -28,15 +28,15 @@
   <div class="panel-opciones">
     <button class="opcion" on:click={() => redirigir('/admin/esculturas')}>
       <img src="/escultura_opc.png" alt="Esculturas" />
-      <span>Añadir Esculturas</span>
+      <span>Gestionar Esculturas</span>
     </button>
     <button class="opcion" on:click={() => redirigir('/admin/artistas')}>
       <img src="/escultor_opc.png" alt="Artistas" />
-      <span>Añadir Artistas</span>
+      <span>Gestionar Artistas</span>
     </button>
     <button class="opcion" on:click={() => redirigir('/admin/eventos')}>
       <img src="/evento_opc.png" alt="Eventos" />
-      <span>Añadir Eventos</span>
+      <span>Gestionar Eventos</span>
     </button>
   </div>
 </section>
