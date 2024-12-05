@@ -1,115 +1,130 @@
 <script>
-    let videoSource = "B24-web-slide-institucional-nuevo-c.mp4";
-  </script>
-  
-  <style>
-    .video-container {
-      position: relative;
-      width: 100%;
-      max-width: 1920px;
-      margin: 0 auto;
-      overflow: hidden;
-      border-radius: 12px;
-      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
-      transition: transform 0.5s ease, box-shadow 0.5s ease;
+  import HoverCard from './shape.svelte'; // Asegúrate de que la ruta sea correcta
+
+  let videoSource = "B24-web-slide-institucional-nuevo-c.mp4";
+
+  const eventos = [
+    { imageSrc: 'Fondo-bienal.jpg', title: 'XIII Bienal Internacional de Escultura' },
+    { imageSrc: 'dorado.jpg', title: 'IX Encuentro de Escultores Invitados' },
+    { imageSrc: 'EoU.jpg', title: 'IX Concurso de Escultura para Estudiantes de Artes' },
+    { imageSrc: 'fondobienal2018v3.jpg', title: 'IV Congreso Internacional de Artes' },
+    { imageSrc: 'fondobienal2024_2.jpg', title: 'V Festival Filarmónico' },
+    { imageSrc: 'psicodelico.jpg', title: 'Artesanía' },
+    { imageSrc: 'pablopicasso.png', title: 'Artes Escénicas' },
+    { imageSrc: 'Fondo-bienal.jpg', title: 'Muestras Individuales y Colectivas' },
+    { imageSrc: 'fondobienal2024_2.jpg', title: 'V Festival Filarmónico' },
+    { imageSrc: 'psicodelico.jpg', title: 'Artesanía' },
+    { imageSrc: 'pablopicasso.png', title: 'Artes Escénicas' },
+    { imageSrc: 'Fondo-bienal.jpg', title: 'Muestras Individuales y Colectivas' }
+  ];
+</script>
+
+<style>
+  .video-container {
+    position: relative;
+    width: 100%;
+    max-width: 1920px;
+    margin: 0 auto;
+    overflow: hidden;
+    border-radius: 12px;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+    transition: transform 0.5s ease, box-shadow 0.5s ease;
+  }
+
+  .video-container:hover {
+    transform: scale(1.02);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+  }
+
+  .video-container video {
+    width: 100%;
+    height: auto;
+    filter: brightness(0.9) saturate(1.2) contrast(1.1) sepia(0.1);
+    transition: filter 0.5s ease;
+  }
+
+  .video-container:hover video {
+    filter: brightness(1.1) saturate(1.5) contrast(1.3) hue-rotate(15deg);
+    animation: hueShift 5s infinite linear;
+  }
+
+  .overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: space-between; /* Asegura que las tarjetas no se solapen con el video */
+    align-items: flex-start;
+    padding: 1.5rem;
+    font-family: 'Montserrat', sans-serif;
+  }
+
+  .card-section {
+    display: flex;
+    flex-direction: column;
+    max-width: 40%; /* Limita el ancho total de las tarjetas */
+    padding-right: 1rem;
+  }
+
+  .section-title {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: white;
+    margin-bottom: 1rem;
+    text-align: center;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+  }
+
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* 4 columnas por fila */
+    grid-gap: 1rem; /* Espaciado entre tarjetas */
+  }
+
+  .hover-card {
+    max-width: 100%;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    background: rgba(255, 255, 255, 0.8); /* Fondo semitransparente */
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    padding: 0.5rem;
+    text-align: center; /* Centra el texto en cada tarjeta */
+  }
+
+  .hover-card:hover {
+    transform: scale(1.1);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+  }
+
+  @keyframes hueShift {
+    0% {
+      filter: hue-rotate(0deg);
     }
-  
-    .video-container:hover {
-      transform: scale(1.02);
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+    100% {
+      filter: hue-rotate(360deg);
     }
-  
-    .video-container video {
-      width: 100%;
-      height: auto;
-      filter: brightness(0.9) saturate(1.2) contrast(1.1) sepia(0.1);
-      transition: filter 0.5s ease;
-    }
-  
-    .video-container:hover video {
-      filter: brightness(1.1) saturate(1.5) contrast(1.3) hue-rotate(15deg);
-    }
-  
-    .overlay {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      background: linear-gradient(180deg, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0.3) 60%, rgba(0, 0, 0, 0.8) 100%);
-      color: #fff;
-      text-align: center;
-      padding: 1.5rem;
-      font-family: 'Montserrat', sans-serif;
-      animation: fadeIn 2s ease-in-out;
-    }
-  
-    @keyframes fadeIn {
-      0% {
-        opacity: 0;
-      }
-      100% {
-        opacity: 1;
-      }
-    }
-  
-    .title {
-      font-size: 3rem;
-      font-weight: bold;
-      margin-bottom: 1rem;
-      text-shadow: 0 4px 8px rgba(0, 0, 0, 0.6);
-      animation: slideIn 1.5s ease-out;
-    }
-  
-    @keyframes slideIn {
-      0% {
-        transform: translateY(-50%);
-        opacity: 0;
-      }
-      100% {
-        transform: translateY(0);
-        opacity: 1;
-      }
-    }
-  
-    .subtitle {
-      font-size: 1.8rem;
-      font-weight: 300;
-      line-height: 1.5;
-      text-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
-      animation: slideIn 2s ease-out;
-      animation-delay: 0.5s;
-    }
-  
-    @keyframes hueShift {
-      0% {
-        filter: hue-rotate(0deg);
-      }
-      100% {
-        filter: hue-rotate(360deg);
-      }
-    }
-  
-    .video-container:hover video {
-      animation: hueShift 5s infinite linear;
-    }
-  </style>
-  
-  <div class="video-container">
-    <video autoplay muted loop playsinline>
-      <source src={videoSource} type="video/mp4" />
-      Tu navegador no soporta la reproducción de video.
-    </video>
-    <div class="overlay">
-      <div class="title">Bienal del Chaco 2024</div>
-      <div class="subtitle">
-        Del 13 al 21 de julio, Resistencia, Chaco.  
-        Vive el arte, conecta con la naturaleza y la creatividad en una experiencia inolvidable.
+  }
+</style>
+
+<div class="video-container">
+  <video autoplay muted loop playsinline>
+    <source src={videoSource} type="video/mp4" />
+    Tu navegador no soporta la reproducción de video.
+  </video>
+  <div class="overlay">
+    <!-- Sección de tarjetas con título -->
+    <div class="card-section">
+      <div class="section-title">Obras Destacadas</div>
+      <div class="card-grid">
+        {#each eventos as evento}
+          <div class="hover-card">
+            <HoverCard imageSrc={evento.imageSrc} title={evento.title} />
+          </div>
+        {/each}
       </div>
     </div>
+    <!-- Espacio para el video y figura -->
   </div>
-  
+</div>

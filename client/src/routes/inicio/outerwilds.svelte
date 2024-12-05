@@ -24,6 +24,8 @@
         height: auto;
         filter: brightness(0.8) contrast(1.2) saturate(1.1);
         transition: filter 0.5s ease;
+        transform: translateZ(0); /* Activa la aceleración por hardware */
+
     }
 
     .video-container:hover video {

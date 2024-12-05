@@ -65,75 +65,76 @@
     export let mostrandoCarga = false;
 </script>
 
-<div class="search-container">
-    <input
-        type="text"
-        class="search-input"
-        bind:value="{searchQuery}"
-        placeholder="Buscar evento..."
-    />
+<div class="main-container" style="background-image: url('fondobienal2024_2.jpg');">
 
-    <!-- Lista desplegable para el criterio de orden -->
-    <select class="search-select" bind:value="{criterio}">
-        <option value="promedio">Mejores eventos</option>
-        <option value="nombre">Nombre</option>
-        <option value="fecha_inicio">Fecha de inicio</option>
-    </select>
+    <div class="search-container">
+        <input
+            type="text"
+            class="search-input"
+            bind:value="{searchQuery}"
+            placeholder="Buscar evento..."
+        />
 
-    <!-- Mostrar el ícono de carga solo cuando mostrandoCarga es true -->   
-    {#if mostrandoCarga}
-        <div class="loading-icon"></div>
-    {/if}
+        <!-- Lista desplegable para el criterio de orden -->
+        <select class="search-select" bind:value="{criterio}">
+            <option value="promedio">Mejores eventos</option>
+            <option value="nombre">Nombre</option>
+            <option value="fecha_inicio">Fecha de inicio</option>
+        </select>
 
-    <!-- Lista desplegable para el orden ascendente/descendente -->
-    <select class="search-select" bind:value="{orden}">
-        <option value="DESC">Descendente</option>
-        <option value="ASC">Ascendente</option>
-    </select>
+        <!-- Mostrar el ícono de carga solo cuando mostrandoCarga es true -->   
+        {#if mostrandoCarga}
+            <div class="loading-icon"></div>
+        {/if}
 
-    <button class="search-button" on:click="{() => fetchEventos(searchQuery, criterio, orden)}">Buscar</button>
-</div>
+        <!-- Lista desplegable para el orden ascendente/descendente -->
+        <select class="search-select" bind:value="{orden}">
+            <option value="DESC">Descendente</option>
+            <option value="ASC">Ascendente</option>
+        </select>
 
+        <button class="search-button" on:click="{() => fetchEventos(searchQuery, criterio, orden)}">Buscar</button>
+    </div>
 
-<!-- Contenedor de las cards -->
-<div class="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 p-4 auto-rows-auto {animate ? 'animate' : ''}">
-    {#each displayedCards as card}
-        <div class="card block rounded-lg bg-white shadow-secondary-1 m-2.5 border-2 border-gray-300 rounded-md" class:animate={animate}>
-            <div class="relative overflow-hidden bg-cover bg-no-repeat">
-                <a href={`/eventos/${card.eventoPantalla}`} class="hover:underline">
-                <div class="absolute bottom-0 left-0 right-0 top-0 h-full w-full overflow-hidden bg-[hsla(0,0%,98%,0.15)] bg-fixed opacity-0 transition duration-300 ease-in-out hover:opacity-100"></div>
-                </a>
-                <div class="p-6 text-surface dark:text-white">
-                    <h5 class="mb-2 text-xl font-medium leading-tight text-black">{card.eventName}</h5>
-                    <span class="text-cyan-900">{card.eventStartDate} - {card.eventFinishDate}</span><br>
-                    <span class="text-cyan-900">De {card.startTime} a {card.finishTime}</span><br>
-                    <span class="text-cyan-900">Lugar: {card.location}</span>
-                    <p class="mb-4 text-base text-left text-black">{card.content}</p>
-                    <div class="stars">
-                        {#each Array(5) as _, index}
-                            {#if index < Math.floor(card.promedio)} <!-- Estrella completa -->
-                                <span class="star filled">★</span>
-                            {:else if index < card.promedio} <!-- Media estrella -->
-                                <span class="star half-filled">★</span>
-                            {:else} <!-- Estrella vacía -->
-                                <span class="star">★</span>
-                            {/if}
-                        {/each}
+    <!-- Contenedor de las cards -->
+    <div class="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 p-4 auto-rows-auto {animate ? 'animate' : ''}">
+        {#each displayedCards as card}
+            <div class="card block rounded-lg bg-white shadow-secondary-1 m-2.5 border-2 border-gray-300 rounded-md" class:animate={animate}>
+                <div class="relative overflow-hidden bg-cover bg-no-repeat">
+                    <a href={`/eventos/${card.eventoPantalla}`} class="hover:underline">
+                        <div class="absolute bottom-0 left-0 right-0 top-0 h-full w-full overflow-hidden bg-[hsla(0,0%,98%,0.15)] bg-fixed opacity-0 transition duration-300 ease-in-out hover:opacity-100"></div>
+                    </a>
+                    <div class="p-6 text-surface dark:text-white">
+                        <h5 class="mb-2 text-xl font-medium leading-tight text-black">{card.eventName}</h5>
+                        <span class="text-cyan-900">{card.eventStartDate} - {card.eventFinishDate}</span><br>
+                        <span class="text-cyan-900">De {card.startTime} a {card.finishTime}</span><br>
+                        <span class="text-cyan-900">Lugar: {card.location}</span>
+                        <p class="mb-4 text-base text-left text-black">{card.content}</p>
+                        <div class="stars">
+                            {#each Array(5) as _, index}
+                                {#if index < Math.floor(card.promedio)} <!-- Estrella completa -->
+                                    <span class="star filled">★</span>
+                                {:else if index < card.promedio} <!-- Media estrella -->
+                                    <span class="star half-filled">★</span>
+                                {:else} <!-- Estrella vacía -->
+                                    <span class="star">★</span>
+                                {/if}
+                            {/each}
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    {/each}
-</div>
+        {/each}
+    </div>
 
-
-<!-- Controles de paginación -->
-<div class="pagination">
-    {#each Array(totalPages) as _, index}
-        <button class="page-button" on:click="{() => changePage(index + 1)}">
-            {index + 1}
-        </button>
-    {/each}
+    <!-- Controles de paginación -->
+    <div class="pagination">
+        {#each Array(totalPages) as _, index}
+            <button class="page-button" on:click="{() => changePage(index + 1)}">
+                {index + 1}
+            </button>
+        {/each}
+    </div>
 </div>
 
 <style>

@@ -20,12 +20,14 @@
   .video-container video {
       width: 100%;
       height: auto;
-      filter: brightness(0.9) saturate(1.2) contrast(1.1) sepia(0.1);
+      filter: brightness(0.7) saturate(1.1) contrast(1) sepia(0.05);
       transition: filter 0.5s ease;
+      transform: translateZ(0); /* Activa la aceleración por hardware */
+
   }
 
   .video-container:hover video {
-      filter: brightness(1.1) saturate(1.5) contrast(1.3) hue-rotate(15deg);
+      filter: brightness(0.8) saturate(1.2) contrast(1.1) hue-rotate(15deg);
   }
 
   .overlay {

@@ -64,81 +64,82 @@
   export let mostrandoCarga = false;
 </script>
 
-<!-- Mostrar el ícono de carga solo cuando mostrandoCarga es true -->
-{#if mostrandoCarga}
-    <div class="loading-icon"></div>
-{/if}
+<div style="background-image: url('dorado.jpg');">
+  <!-- Mostrar el ícono de carga solo cuando mostrandoCarga es true -->
+  {#if mostrandoCarga}
+      <div class="loading-icon"></div>
+  {/if}
 
-<div class="search-container">
-  <input
-    type="text"
-    class="search-input"
-    bind:value="{searchQuery}"
-    placeholder="Buscar artista..."
-  />
+  <div class="search-container">
+    <input
+      type="text"
+      class="search-input"
+      bind:value="{searchQuery}"
+      placeholder="Buscar artista..."
+    />
 
-  <!-- Lista desplegable para el criterio de orden -->
-  <select class="search-select" bind:value="{criterio}">
-    <option value="promedio">Mejores artistas</option>
-    <option value="nombre">Nombre</option>
-  </select>
+    <!-- Lista desplegable para el criterio de orden -->
+    <select class="search-select" bind:value="{criterio}">
+      <option value="promedio">Mejores artistas</option>
+      <option value="nombre">Nombre</option>
+    </select>
 
-  <!-- Lista desplegable para el orden ascendente/descendente -->
-  <select class="search-select" bind:value="{orden}">
-    <option value="DESC">Descendente</option>
-    <option value="ASC">Ascendente</option>
-  </select>
+    <!-- Lista desplegable para el orden ascendente/descendente -->
+    <select class="search-select" bind:value="{orden}">
+      <option value="DESC">Descendente</option>
+      <option value="ASC">Ascendente</option>
+    </select>
 
-  <button class="search-button" on:click="{() => fetchEscultores(searchQuery, criterio, orden)}">Buscar</button>
-</div>
+    <button class="search-button" on:click="{() => fetchEscultores(searchQuery, criterio, orden)}">Buscar</button>
+  </div>
 
 <!-- Contenedor de las cards -->
-<div class="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 p-4 auto-rows-auto">
-  {#each displayedCards as card}
-    <div class="block rounded-lg bg-white shadow-secondary-1 m-2.5 border-2 border-gray-300 rounded-md {animate ? 'animate' : ''}">
-      <div class="relative overflow-hidden bg-cover bg-no-repeat">
-        <a href={`/escultores/${encodeURIComponent(card.escultorPantalla)}`}>
-          <img
-            src={card.escultorFoto}
-            class="w-40 rounded-full mx-auto pt-2"
-            alt="Avatar" />
-          <div class="absolute bottom-0 left-0 right-0 top-0 h-full w-full overflow-hidden bg-[hsla(0,0%,98%,0.15)] bg-fixed opacity-0 transition duration-300 ease-in-out hover:opacity-100"></div>
-        </a>    
-      </div>
-      <div class="p-6 text-surface dark:text-white">
-        <h5 class="mb-2 text-xl font-medium leading-tight text-black">
-          {card.escultorName}
-        </h5>
-        <p class="mb-4 text-base text-left text-black">{card.content}</p>
-        <div class="stars">
-            {#each Array(5) as _, index}
-                {#if index < Math.floor(card.promedio)} <!-- Estrella completa -->
-                    <span class="star filled">★</span>
-                {:else if index < card.promedio} <!-- Media estrella -->
-                    <span class="star half-filled">★</span>
-                {:else} <!-- Estrella vacía -->
-                    <span class="star">★</span>
-                {/if}
-            {/each}
+  <div class="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 p-4 auto-rows-auto">
+    {#each displayedCards as card}
+      <div class="block rounded-lg bg-white shadow-secondary-1 m-2.5 border-2 border-gray-300 rounded-md {animate ? 'animate' : ''}">
+        <div class="relative overflow-hidden bg-cover bg-no-repeat">
+          <a href={`/escultores/${encodeURIComponent(card.escultorPantalla)}`}>
+            <img
+              src={card.escultorFoto}
+              class="w-40 rounded-full mx-auto pt-2"
+              alt="Avatar" />
+            <div class="absolute bottom-0 left-0 right-0 top-0 h-full w-full overflow-hidden bg-[hsla(0,0%,98%,0.15)] bg-fixed opacity-0 transition duration-300 ease-in-out hover:opacity-100"></div>
+          </a>    
         </div>
-        <!-- Nuevo bloque para el contacto -->
-        <p class="text-sm text-left text-gray-600">
-          Contacto: <a href="mailto:{card.contactoEmail}" class="text-blue-600 hover:underline">{card.contactoEmail}</a>
-        </p>
+        <div class="p-6 text-surface dark:text-white">
+          <h5 class="mb-2 text-xl font-medium leading-tight text-black">
+            {card.escultorName}
+          </h5>
+          <p class="mb-4 text-base text-left text-black">{card.content}</p>
+          <div class="stars">
+              {#each Array(5) as _, index}
+                  {#if index < Math.floor(card.promedio)} <!-- Estrella completa -->
+                      <span class="star filled">★</span>
+                  {:else if index < card.promedio} <!-- Media estrella -->
+                      <span class="star half-filled">★</span>
+                  {:else} <!-- Estrella vacía -->
+                      <span class="star">★</span>
+                  {/if}
+              {/each}
+          </div>
+          <!-- Nuevo bloque para el contacto -->
+          <p class="text-sm text-left text-gray-600">
+            Contacto: <a href="mailto:{card.contactoEmail}" class="text-blue-600 hover:underline">{card.contactoEmail}</a>
+          </p>
+        </div>
       </div>
-    </div>
-  {/each}
-</div>
+    {/each}
+  </div>
 
-<!-- Controles de paginación -->
-<div class="pagination">
-  {#each Array(totalPages) as _, index}
-    <button class="page-button" on:click="{() => changePage(index + 1)}">
-      {index + 1}
-    </button>
-  {/each}
+  <!-- Controles de paginación -->
+  <div class="pagination">
+    {#each Array(totalPages) as _, index}
+      <button class="page-button" on:click="{() => changePage(index + 1)}">
+        {index + 1}
+      </button>
+    {/each}
+  </div>
 </div>
-
 <style>
     .stars {
         margin-top: 8px; /* Espaciado superior */

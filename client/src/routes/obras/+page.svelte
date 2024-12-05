@@ -69,100 +69,109 @@
     }
 </script>
 
-<div class="search-container">
-    <input
-        type="text"
-        class="search-input"
-        bind:value="{searchQuery}"
-        placeholder="Buscar obra..."
-    />
+<div class="main-container" style="background-image: url('psicodelico.jpg');">
 
-    <!-- Lista desplegable para el criterio de orden -->
-    <select class="search-select" bind:value="{criterio}">
-        <option value="promedio">Mejores obras</option>
-        <option value="nombre">Nombre</option>
-        <option value="f_creacion">Fecha de creación</option>
-    </select>
+    <div class="search-container">
+        <input
+            type="text"
+            class="search-input"
+            bind:value="{searchQuery}"
+            placeholder="Buscar obra..."
+        />
 
-    <!-- Lista desplegable para el orden ascendente/descendente -->
-    <select class="search-select" bind:value="{orden}">
-        <option value="DESC">Descendente</option>
-        <option value="ASC">Ascendente</option>
-    </select>
+        <!-- Lista desplegable para el criterio de orden -->
+        <select class="search-select" bind:value="{criterio}">
+            <option value="promedio">Mejores obras</option>
+            <option value="nombre">Nombre</option>
+            <option value="f_creacion">Fecha de creación</option>
+        </select>
 
-    <button class="search-button" on:click="{() => fetchObras(searchQuery, criterio, orden)}">Buscar</button>
-</div>
+        <!-- Lista desplegable para el orden ascendente/descendente -->
+        <select class="search-select" bind:value="{orden}">
+            <option value="DESC">Descendente</option>
+            <option value="ASC">Ascendente</option>
+        </select>
 
-<!-- Contenedor de las cards -->
-<div class="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 p-4 auto-rows-auto {animate ? 'animate' : ''}">
-    {#each displayedCards as card}
-        <div class="card block bg-white shadow-secondary-1 m-2.5 border-2 border-gray-300 rounded-md">
-            <div class="relative overflow-hidden bg-cover bg-no-repeat">
-                <!-- Contenedor con scroll horizontal para las imágenes -->
-                <div class="absolute bottom-0 left-0 right-0 top-0 h-full w-full overflow-hidden bg-[hsla(0,0%,98%,0.15)] bg-fixed opacity-0 transition duration-300 ease-in-out hover:opacity-100"></div>
-            </div>
-            <a href={`/obras/${card.obraPantalla}`}>
-                <div class="scroll-container">
-                    {#each card.obraImage as image}
-                        <div class="scroll-item">
-                            <img class="scroll-image rounded-t-lg" src={image} alt={card.title} />
-                        </div>
-                    {/each}
+        <button class="search-button" on:click="{() => fetchObras(searchQuery, criterio, orden)}">Buscar</button>
+    </div>
+
+    <!-- Contenedor de las cards -->
+    <div class="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 p-4 auto-rows-auto {animate ? 'animate' : ''}">
+        {#each displayedCards as card}
+            <div class="card block bg-white shadow-secondary-1 m-2.5 border-2 border-gray-300 rounded-md">
+                <div class="relative overflow-hidden bg-cover bg-no-repeat">
+                    <!-- Contenedor con scroll horizontal para las imágenes -->
+                    <div class="absolute bottom-0 left-0 right-0 top-0 h-full w-full overflow-hidden bg-[hsla(0,0%,98%,0.15)] bg-fixed opacity-0 transition duration-300 ease-in-out hover:opacity-100"></div>
                 </div>
-                <div class="p-6 text-surface dark:text-white">
-                    <h5 class="mb-2 text-xl font-medium leading-tight text-black">{card.obraName}</h5>
-                    <span class="text-cyan-900">
-                        <div class="flex items-center space-x-2">
-                            {#each card.obraEscultor.escultoresNombre.slice(0, 4) as nombre, index}
-                                <div class="escultor-item">
-                                    {#if index === 0}
-                                        <!-- Imagen grande con nombre para el primer escultor -->
-                                        <img
-                                            src={card.obraEscultor.escultoresFotos[index]}
-                                            class="w-32 h-32 rounded-full"
-                                            alt="Avatar"
-                                        />
-                                        <h2>{nombre}</h2>
-                                    {:else}
-                                        <!-- Imágenes pequeñas sin nombre para el resto -->
-                                        <img
-                                            src={card.obraEscultor.escultoresFotos[index]}
-                                            class="w-16 h-16 rounded-full"
-                                            alt="Avatar"
-                                        />
-                                    {/if}
-                                </div>
-                            {/each}
-                        </div>
-                    </span>
-                    <p class="mb-4 text-base text-left text-black">{card.content}</p>
-                    <p class="text-gray-600 text-sm">Fecha de creación: {card.f_creacion}</p>
-                    <!-- Aquí se agrega el puntaje con estrellas, incluyendo medias estrellas -->
-                    <div class="stars">
-                        {#each Array(5) as _, index}
-                            {#if index < Math.floor(card.promedio)} <!-- Estrella completa -->
-                                <span class="star filled">★</span>
-                            {:else if index < card.promedio} <!-- Media estrella -->
-                                <span class="star half-filled">★</span>
-                            {:else} <!-- Estrella vacía -->
-                                <span class="star">★</span>
-                            {/if}
+                <a href={`/obras/${card.obraPantalla}`}>
+                    <div class="scroll-container">
+                        {#each card.obraImage as image}
+                            <div class="scroll-item">
+                                <img class="scroll-image rounded-t-lg" src={image} alt={card.title} />
+                            </div>
                         {/each}
                     </div>
-                </div>
-            </a>
-        </div>
-    {/each}
+                    <div class="p-6 text-surface dark:text-white">
+                        <h5 class="mb-2 text-xl font-medium leading-tight text-black">{card.obraName}</h5>
+                        <span class="text-cyan-900">
+                            <div class="flex items-center space-x-2">
+                                {#each card.obraEscultor.escultoresNombre.slice(0, 4) as nombre, index}
+                                    <div class="escultor-item">
+                                        {#if index === 0}
+                                            <!-- Imagen grande con nombre para el primer escultor -->
+                                            <img
+                                                src={card.obraEscultor.escultoresFotos[index]}
+                                                class="w-32 h-32 rounded-full"
+                                                alt="Avatar"
+                                            />
+                                            <h2>{nombre}</h2>
+                                        {:else}
+                                            <!-- Imágenes pequeñas sin nombre para el resto -->
+                                            <img
+                                                src={card.obraEscultor.escultoresFotos[index]}
+                                                class="w-16 h-16 rounded-full"
+                                                alt="Avatar"
+                                            />
+                                        {/if}
+                                    </div>
+                                {/each}
+                            </div>
+                        </span>
+                        <p class="mb-4 text-base text-left text-black">{card.content}</p>
+                        <p class="text-gray-600 text-sm">Fecha de creación: {card.f_creacion}</p>
+                        <!-- Aquí se agrega el puntaje con estrellas, incluyendo medias estrellas -->
+                        <div class="stars">
+                            {#each Array(5) as _, index}
+                                {#if index < Math.floor(card.promedio)} <!-- Estrella completa -->
+                                    <span class="star filled">★</span>
+                                {:else if index < card.promedio} <!-- Media estrella -->
+                                    <span class="star half-filled">★</span>
+                                {:else} <!-- Estrella vacía -->
+                                    <span class="star">★</span>
+                                {/if}
+                            {/each}
+                        </div>
+                    </div>
+                </a>
+            </div>
+        {/each}
+    </div>
+
+    <!-- Controles de paginación -->
+    <div class="pagination">
+        {#each Array(totalPages) as _, index}
+            <button class="page-button" on:click="{() => changePage(index + 1)}">
+                {index + 1}
+            </button>
+        {/each}
+    </div>
+
+    <!-- Mostrar el ícono de carga solo cuando mostrandoCarga es true -->
+    {#if mostrandoCarga}
+    <div class="loading-icon"></div>
+    {/if}
 </div>
 
-<!-- Controles de paginación -->
-<div class="pagination">
-    {#each Array(totalPages) as _, index}
-        <button class="page-button" on:click="{() => changePage(index + 1)}">
-            {index + 1}
-        </button>
-    {/each}
-</div>
 
 <!-- Mostrar el ícono de carga solo cuando mostrandoCarga es true -->
 {#if mostrandoCarga}
