@@ -79,7 +79,7 @@
     gap: 1rem;
     width: 100%;
     max-width: 400px;
-    background: white;
+    background: rgba(255, 255, 255, 0.8); /* Semitransparencia */
     padding: 2rem;
     border-radius: 12px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -88,7 +88,7 @@
   .input {
     padding: 0.75rem;
     border-radius: 8px;
-    border: 1px solid #ccc;
+    border: 1px solid #444;
     font-size: 1rem;
     outline: none;
     transition: border-color 0.3s, box-shadow 0.3s;
@@ -105,21 +105,20 @@
     border-radius: 8px;
     font-size: 1rem;
     font-weight: bold;
-    color: #fff;
+    color: white;
     background: linear-gradient(to right, #0066cc, #00bcd4);
     cursor: pointer;
-    transition: background 0.3s, transform 0.2s;
+    transition: background 0.3s ease;
   }
 
   .button:hover {
-    background: linear-gradient(to right, #004c99, #008ba3);
-    transform: scale(1.03);
+    background: linear-gradient(to right, var(--button-hover-start), var(--button-hover-end));
   }
 
   /* Modo oscuro */
   @media (prefers-color-scheme: dark) {
     .form-container {
-      background: linear-gradient(to bottom, #333, #222);
+      background: linear-gradient(to bottom, #444, #444);
     }
 
     h2 {
@@ -127,11 +126,11 @@
     }
 
     .form {
-      background: #444;
+      background: #1e1e1e;
     }
 
     .input {
-      background: #555;
+      background: #1e1e1e;
       color: #fff;
       border: 1px solid #666;
     }
