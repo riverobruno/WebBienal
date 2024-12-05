@@ -43,7 +43,7 @@
       formData.append('dni', dni);
       formData.append('biografia', biografia);
       formData.append('email', email);
-      formData.append('contraseña', contraseña);
+      formData.append('contrasena', contraseña);
       formData.append('imagenPerfil', imagenPerfil);
 
       const res = await axios.post('http://localhost:3001/api/artistaNuevo', formData, {
