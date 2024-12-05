@@ -927,3 +927,33 @@ export async function borrar_artista(DNI) {
     });
   });
 };
+
+export async function borrar_escultura(nombreEscultura) {
+  let con = crearConexion(); // Asegúrate de que esta función esté bien configurada
+  console.log("Se llama al 2do para borrar escultura");
+
+  return new Promise((resolve, reject) => {
+    con.connect((err) => {
+      if (err) {
+        console.error('Error connecting: ' + err.stack);
+        reject(err);
+        return;
+      }
+      console.log("Connected!");
+
+      // Llamada al procedimiento almacenado `borrar_obra`
+      const query = 'CALL borrar_obra(?)';
+      con.query(query, [nombreEscultura], (err, results) => {
+        if (err) {
+          console.error('Error executing the procedure:', err);
+          reject(err);
+        } else {
+          resolve('Escultura borrada exitosamente');
+        }
+        con.end(); // Cerramos la conexión
+      });
+    });
+  });
+};
+
+

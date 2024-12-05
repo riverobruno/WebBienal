@@ -14,7 +14,7 @@ dotenv.config({ path: join(__dirname, '../.env') });
 import { ArtistasConsulta, EsculturasConsulta, EventosConsulta, login, 
   ObrasdeUnEvento, ObrasdeUnArtista, EventosYEsculturasDeObra, insertarEvento, 
   insertarArtista, register, registrar_voto,registrar_escultura, registrar_hechas_por, 
-  registrar_imagen, registrar_compiten, cambiar_Contraseña,modificar_evento,borrar_evento,borrar_artista } from './conexiondb.js';
+  registrar_imagen, registrar_compiten, cambiar_Contraseña,modificar_evento,borrar_evento,borrar_artista, borrar_escultura } from './conexiondb.js';
 
 import { ordenarEsculturas, buscarEsculturas, ordenarEventos, 
   buscarEventos, ordenarArtistas, buscarArtistas, eventoProximo } from './filtrosObjetos.js';
@@ -885,9 +885,7 @@ app.post('/api/validate-captcha', async (req, res) => {
   }
 });
 
-app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`);
-});
+
 
 
 app.post('/api/borrarEvento', async (req, res) => {
@@ -973,3 +971,35 @@ app.post('/api/borrarArtista', async (req, res) => {
   }
 });
 
+
+app.post('/api/borrarEscultura', async (req, res) => {
+  const { nombreEscultura } = req.body;
+  console.log("Se llama al 1er para borrar escultura");
+  console.log(nombreEscultura);
+
+  // Verificación de campos obligatorios
+  if (!nombreEscultura) {
+    return res.status(400).json({ error: 'El nombre de la escultura es obligatorio' });
+  }
+
+  try {
+    // Llamamos a la función para borrar la escultura
+    const resultado = await borrar_escultura(nombreEscultura);
+
+    // Si deseas limpiar algún cache relacionado con esculturas, puedes hacerlo aquí
+    cache.del(['esculturas']);
+
+    res.status(200).json({ mensaje: 'Escultura borrada con éxito', resultado });
+  } catch (error) {
+    console.error('Error al borrar la escultura:', error);
+    res.status(500).json({ error: 'Error al borrar la escultura' });
+  }
+});
+
+
+
+
+
+app.listen(port, () => {
+  console.log(`Example app listening on port ${port}`);
+});
