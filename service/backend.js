@@ -56,7 +56,7 @@ const obtenerArtistas = async (busqueda, criterio, orden) => {
       const biografia = artista.getRes_biografia();
       const contacto = artista.getContacto();
       const promedio = artista.getPromedio();
-
+      const nacionalidad=artista.getNacionalidad();
       cards.push({
         id: index + 1,
         escultorPantalla: nombre.replace(/ /g, ''), 
@@ -64,7 +64,8 @@ const obtenerArtistas = async (busqueda, criterio, orden) => {
         escultorName: nombre,
         escultorFoto: imagen,
         contactoEmail: contacto,
-        promedio: promedio
+        promedio: promedio,
+        nacionalidad:nacionalidad
       });
     }
     return cards;

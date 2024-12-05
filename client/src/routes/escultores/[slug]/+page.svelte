@@ -3,6 +3,8 @@
     import { onMount } from "svelte";
     import axios from "axios";
     import { page } from "$app/stores";
+    import "flag-icons/css/flag-icons.min.css";
+
     let slug;
     $: slug = $page.params.slug;
     let escultor = {}; // Objeto vacío para los datos del escultor
@@ -46,7 +48,7 @@
   <article class="escultor-detail-container max-w-2xl mx-auto mt-8 p-6 bg-white shadow-lg rounded-lg animate">
       <header class="text-center">
           <img src={escultor.escultorFoto} alt="{escultor.escultorName}" class="w-32 h-32 rounded-full mx-auto" />
-          <h1 class="text-3xl font-bold mt-4">{escultor.escultorName}</h1>
+          <h1 class="text-3xl font-bold mt-4">{escultor.escultorName} <span class={`fi fi-${escultor.nacionalidad}`}></span></h1>
       </header>
 
       <section class="mt-4">
@@ -100,6 +102,7 @@
 </div>
 
 <style>
+
     .scroll-container {
         display: flex;
         overflow-x: scroll;
@@ -231,4 +234,5 @@
       text-decoration: underline;
       color: #86512c;
     }
+    
   </style>

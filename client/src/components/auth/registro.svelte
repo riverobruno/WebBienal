@@ -2,10 +2,16 @@
   let nombreapellido = '';
   let correo = '';
   let contraseña = '';
-
+  let confirmcontraseña = '';
   const registrarUsuario = async () => {
-  if (!nombreapellido || !correo || !contraseña) {
+  if (!nombreapellido || !correo || !contraseña||!confirmcontraseña) {
     alert('Por favor, completa todos los campos.');
+    return;
+  }
+  if (confirmcontraseña!==contraseña) {
+    alert('La contraseña y su confirmación no coinciden. Inténtelo de nuevo.');
+    confirmcontraseña='';
+    contraseña='';
     return;
   }
 
@@ -51,6 +57,7 @@
     <input type="text" placeholder="Nombre y Apellido" bind:value={nombreapellido} class="input" />
     <input type="email" placeholder="Correo electrónico" bind:value={correo} class="input" />
     <input type="password" placeholder="Contraseña" bind:value={contraseña} class="input" />
+    <input type="password" placeholder="Confirmar contraseña" bind:value={confirmcontraseña} class="input" />
     <button type="submit" class="button">Registrarse</button>
   </form>
 </section>

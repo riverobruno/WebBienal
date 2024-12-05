@@ -52,7 +52,7 @@ export async function ArtistasConsulta() {
         }
         const resultados = results[0];
         const listArtistas = resultados.map((row) => {
-          return new Artistas(row.DNI, row.NyA, row.res_biografia, row.contacto, row.URL_foto, row.promedio);
+          return new Artistas(row.DNI, row.NyA, row.res_biografia, row.contacto, row.URL_foto, row.promedio,row.nacionalidad);
         });
 
         // Cerrar la conexión

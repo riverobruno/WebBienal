@@ -107,7 +107,7 @@
       </div>
       <div class="p-6 text-surface dark:text-white">
         <h5 class="mb-2 text-xl font-medium leading-tight text-black">
-          {card.escultorName}
+          {card.escultorName} <span class={`fi fi-${card.nacionalidad}`}></span>
         </h5>
         <p class="mb-4 text-base text-left text-black">{card.content}</p>
         <div class="stars">

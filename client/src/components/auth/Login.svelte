@@ -100,10 +100,10 @@
         </div>
         <!-- Columna derecha -->
         <div class="info-panel">
-          <h4>Bienvenido a la bienal</h4>
+          <h4>¡Bienvenido a la Bienal!</h4>
           <p>
             Si quiere votar a las esculturas y no tiene cuenta, 
-            <a href="/registro">Regístrese Aquí</a>. <br />
+            <a href="/registro">regístrese aquí</a>. <br />
             Si es un escultor y no tiene perfil, comuníquese con administración.
           </p>
         </div>

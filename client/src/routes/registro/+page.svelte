@@ -1,5 +1,5 @@
 <script>
-    import Login from "../../components/auth/registro.svelte";
+    import Register from "../../components/auth/registro.svelte";
 </script>
 
-<Login/>
+<Register/>
