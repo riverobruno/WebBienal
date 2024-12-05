@@ -3,6 +3,9 @@
     import axios from "axios";
     import "flag-icons/css/flag-icons.min.css";
   
+    /**
+     * @type {any[]}
+     */
     let cards = []; // Resultado de las esculturas
   
     // Función para realizar la búsqueda
