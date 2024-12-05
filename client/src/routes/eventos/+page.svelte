@@ -86,13 +86,19 @@
         data-aos-duration="1000"
         class="max-w-full mx-auto mt-8 p-6 bg-white shadow-md rounded-lg text-center">
         <section class="mt-4">
-            <h2 class="text-4xl font-bold">Evento más próximo</h2>
+            <h1 class="text-4xl font-bold">
+                <u>Evento próximo:</u>
+            </h1>
             <h2 class="text-3xl font-semibold">{obraReciente.eventName}</h2>
             <h3 class="text-xl font-semibold">Detalles del Evento</h3>
-            <p><strong>Fecha de inicio:</strong> {obraReciente.eventStartDate}</p>
-            <p><strong>Fecha de fin:</strong> {obraReciente.eventFinishDate}</p>
-            <p><strong>Hora:</strong> {obraReciente.startTime} - {obraReciente.finishTime}</p>
-            <p><strong>Ubicación:</strong> {obraReciente.location}</p>
+            <div class="grid grid-cols-2 gap-4 mt-4">
+                <!-- Primera columna -->
+                <p class="text-right"><strong>Fecha de inicio:</strong> {obraReciente.eventStartDate}</p>
+                <p class="text-left"><strong>Fecha de fin:</strong> {obraReciente.eventFinishDate}</p>
+                <!-- Segunda columna -->
+                <p class="text-right"><strong>Hora:</strong> {obraReciente.startTime} - {obraReciente.finishTime}</p>
+                <p class="text-left"><strong>Ubicación:</strong> {obraReciente.location}</p>
+            </div>
             <p class="mt-4">{obraReciente.content}</p>
         </section>
     </article>
@@ -103,7 +109,6 @@
             bind:value="{searchQuery}"
             placeholder="Buscar evento..."
         />
-
         <!-- Lista desplegable para el criterio de orden -->
         <select class="search-select" bind:value="{criterio}">
             <option value="promedio">Mejores eventos</option>
