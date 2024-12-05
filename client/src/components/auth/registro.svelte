@@ -88,7 +88,7 @@ const cancelar = () => {
   .logo h2 {
     margin-bottom: 2rem;
     font-size: 1.5rem;
-    color: var(--text-color);
+    color: white;
   }
   .form {
     display: flex;
