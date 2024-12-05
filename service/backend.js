@@ -13,6 +13,7 @@ dotenv.config({ path: join(__dirname, '../.env') });
 import { ArtistasConsulta, EsculturasConsulta, EventosConsulta, login, ObrasdeUnEvento, ObrasdeUnArtista, EventosYEsculturasDeObra, insertarEvento, insertarArtista, register, registrar_voto,registrar_escultura, registrar_hechas_por, registrar_imagen, registrar_compiten } from './conexiondb.js';
 import { ordenarEsculturas, buscarEsculturas, ordenarEventos, buscarEventos, ordenarArtistas, buscarArtistas, eventoProximo } from './filtrosObjetos.js';
 import bcrypt from 'bcrypt';
+import sharp from 'sharp';
 // Clave secreta para firmar el token (debería ser almacenada de forma segura, como en variables de entorno)
 const JWT_SECRET = process.env.JWT_SECRET; // Cambir por algo más seguro
 const app = express();
@@ -651,21 +652,36 @@ app.post('/api/eventoNuevo', async (req, res) => {
 });
 
 // Endpoint para registrar un nuevo artista
+
+
 app.post('/api/artistaNuevo', upload.single('imagenPerfil'), async (req, res) => {
-  console.log(req.body)
-  const { dni, nombre, apellido, biografia, email,contrasena } = req.body;
+  console.log(req.body);
+  const { dni, nombre, apellido, biografia, email, contrasena } = req.body;
+  
   const imagenPerfil = req.file; // La imagen viene en 'imagenPerfil' debido a 'upload.single('imagenPerfil')'
   // Verifica si la imagen fue cargada
+  console.log(imagenPerfil);
   
-
   if (!imagenPerfil) {
     return res.status(400).json({ error: 'La imagen de perfil es requerida' });
   }
-  // Llamar a la función insertarArtista para subir la imagen y registrar al artista
+
   try {
-    console.log(contrasena)
+    // Convertir la imagen a WebP usando sharp
+    let imagenWebpBuffer = await sharp(imagenPerfil.buffer)
+      .webp()  // Convierte la imagen a WebP
+      .toBuffer();  // Obtiene el buffer de la imagen convertida
+
+    // Verifica que el resultado sea un Buffer
+    if (!(imagenWebpBuffer instanceof Buffer)) {
+      imagenWebpBuffer = Buffer.from(imagenWebpBuffer); // Si es un ArrayBuffer, conviértelo a Buffer
+    }
+
+    console.log(imagenWebpBuffer);  // Verifica el buffer convertido
+
+    // Procesar el resto de la lógica
     const hashedPassword = await bcrypt.hash(contrasena, 10);
-    
+
     const artista = {
       DNI: dni,           // Asignar los valores con los nombres que espera tu función
       NyA: `${nombre} ${apellido}`,
@@ -673,7 +689,9 @@ app.post('/api/artistaNuevo', upload.single('imagenPerfil'), async (req, res) =>
       contacto: email,
       contrasena: hashedPassword,  
     };
-    const artistaId = await insertarArtista(artista, imagenPerfil);
+
+    // Insertar el artista con el buffer convertido a WebP
+    const artistaId = await insertarArtista(artista, imagenWebpBuffer); // Usar el buffer convertido en lugar del original
     cache.del(['artistas']);
     res.status(200).json({ mensaje: 'Artista registrado con éxito', artistaId });
   } catch (error) {
@@ -681,6 +699,8 @@ app.post('/api/artistaNuevo', upload.single('imagenPerfil'), async (req, res) =>
     res.status(500).json({ error: 'Hubo un error al registrar el artista' });
   }
 });
+
+
 
 
 
@@ -731,13 +751,15 @@ app.post('/api/hechasPorNueva', async (req, res) => {
 // Endpoint para registrar una imagen
 app.post('/api/imagenNueva', upload.single('imagen'), async (req, res) => {
   const { etapa, nombre_escultura } = req.body;
-  const imagen = req.file;
+  const imagen = req.file; // Se obtiene la imagen desde el request
 
+  // Verificación de campos obligatorios
   if (!etapa || !nombre_escultura || !imagen) {
     return res.status(400).json({ error: 'Todos los campos y la imagen son obligatorios' });
   }
 
   try {
+    // Llamamos a la función para registrar la imagen en la base de datos
     const resultado = await registrar_imagen(etapa, nombre_escultura, imagen);
     res.status(200).json({ mensaje: 'Imagen registrada con éxito', resultado });
   } catch (error) {
