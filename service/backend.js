@@ -14,7 +14,7 @@ dotenv.config({ path: join(__dirname, '../.env') });
 import { ArtistasConsulta, EsculturasConsulta, EventosConsulta, login, 
   ObrasdeUnEvento, ObrasdeUnArtista, EventosYEsculturasDeObra, insertarEvento, 
   insertarArtista, register, registrar_voto,registrar_escultura, registrar_hechas_por, 
-  registrar_imagen, registrar_compiten, cambiar_Contraseña } from './conexiondb.js';
+  registrar_imagen, registrar_compiten, cambiar_Contraseña,modificar_evento,borrar_evento,borrar_artista } from './conexiondb.js';
 
 import { ordenarEsculturas, buscarEsculturas, ordenarEventos, 
   buscarEventos, ordenarArtistas, buscarArtistas, eventoProximo } from './filtrosObjetos.js';
@@ -863,6 +863,113 @@ app.post('/api/compitenNuevo', async (req, res) => {
     res.status(500).json({ error: 'Error al registrar la relación' });
   }
 });
+
+app.post('/api/validate-captcha', async (req, res) => {
+  const { recaptchaResponse } = req.body;
+
+  try {
+    const response = await axios.post(`https://www.google.com/recaptcha/api/siteverify`, null, {
+      params: {
+        secret: process.env.VITE_RECAPTCHA_SECRET_KEY,
+        response: recaptchaResponse
+      }
+    });
+
+    if (response.data.success) {
+      res.json({ success: true });
+    } else {
+      res.json({ success: false });
+    }
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Error en la verificación' });
+  }
+});
+
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
 });
+
+
+app.post('/api/borrarEvento', async (req, res) => {
+  const { nombre_evento, lugar_evento } = req.body;
+
+  // Verificación de campos obligatorios
+  if (!nombre_evento || !lugar_evento) {
+    return res.status(400).json({ error: 'El nombre y lugar del evento son obligatorios' });
+  }
+
+  try {
+    // Llamamos a la función para borrar el evento
+    const resultado = await borrar_evento(nombre_evento, lugar_evento);
+    cache.del(['eventos']);
+    res.status(200).json({ mensaje: 'Evento borrado con éxito', resultado });
+  } catch (error) {
+    console.error('Error al borrar el evento:', error);
+    res.status(500).json({ error: 'Error al borrar el evento' });
+  }
+});
+
+
+app.post('/api/modificarEvento', async (req, res) => {
+  const {
+    nombre_evento_actual,
+    lugar_evento_actual,
+    nombre_evento_nuevo,
+    lugar_evento_nuevo,
+    fecha_inicio,
+    fecha_fin,
+    tematica,
+    hora_inicio,
+    hora_fin
+  } = req.body;
+
+  // Verificación de campos obligatorios
+  if (!nombre_evento_actual || !lugar_evento_actual || !nombre_evento_nuevo || !lugar_evento_nuevo) {
+    return res.status(400).json({ error: 'Los campos actuales y nuevos de nombre y lugar del evento son obligatorios' });
+  }
+
+  try {
+    // Llamamos a la función para modificar el evento
+    const resultado = await modificar_evento(
+      nombre_evento_actual,
+      lugar_evento_actual,
+      nombre_evento_nuevo,
+      lugar_evento_nuevo,
+      fecha_inicio,
+      fecha_fin,
+      tematica,
+      hora_inicio,
+      hora_fin
+    );
+    cache.del(['eventos']);
+    res.status(200).json({ mensaje: 'Evento modificado con éxito', resultado });
+  } catch (error) {
+    console.error('Error al modificar el evento:', error);
+    res.status(500).json({ error: 'Error al modificar el evento' });
+  }
+});
+
+
+app.post('/api/borrarArtista', async (req, res) => {
+  const { dni } = req.body;
+  console.log("Se llama al 1er")
+  console.log(dni)
+
+  // Verificación de campos obligatorios
+  if (!dni) {
+    return res.status(400).json({ error: 'El DNI del artista es obligatorio' });
+  }
+
+  try {
+    // Llamamos a la función para borrar el artista
+    const resultado = await borrar_artista(dni);
+    // Si deseas limpiar algún cache relacionado con artistas, puedes hacerlo aquí
+    cache.del(['artistas']); 
+
+    res.status(200).json({ mensaje: 'Artista borrado con éxito', resultado });
+  } catch (error) {
+    console.error('Error al borrar el artista:', error);
+    res.status(500).json({ error: 'Error al borrar el artista' });
+  }
+});
+

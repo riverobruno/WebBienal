@@ -87,7 +87,7 @@
         {#if obraReciente}
         <article
             data-aos="fade-down"
-            data-aos-duration="1000"
+            data-aos-duration="400"
             class="max-w-full mx-auto mt-8 p-6 bg-white shadow-md rounded-lg text-center">
                 <section class="mt-4">
                     <h1 class="text-4xl font-bold">
@@ -301,7 +301,7 @@
     align-items: center; /* Centra los elementos verticalmente */
     gap: 10px; /* Espaciado uniforme entre elementos */
     flex-wrap: wrap; /* Permite que los elementos se ajusten si no hay espacio suficiente */
-    margin-top: 20px; /* Espaciado superior opcional */
+    margin-top: 00px; /* Espaciado superior opcional */
     padding: 10px; /* Añade espacio interior opcional */
     }   
 

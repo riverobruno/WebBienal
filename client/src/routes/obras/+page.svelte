@@ -129,7 +129,7 @@
                                             <!-- Imagen grande con nombre para el primer escultor -->
                                             <img
                                                 src={card.obraEscultor.escultoresFotos[index]}
-                                                class="w-32 h-32 rounded-full"
+                                                class="w-32 h-32 rounded-full object-cover"
                                                 alt="Avatar"
                                             />
                                             <h2>{nombre}</h2>
@@ -137,7 +137,7 @@
                                             <!-- Imágenes pequeñas sin nombre para el resto -->
                                             <img
                                                 src={card.obraEscultor.escultoresFotos[index]}
-                                                class="w-16 h-16 rounded-full"
+                                                class="w-16 h-16 rounded-full object-cover"
                                                 alt="Avatar"
                                             />
                                         {/if}
@@ -187,6 +187,8 @@
 {/if}
 
 <style>
+
+
     .scroll-container {
         display: flex;
         overflow-x: scroll;
@@ -225,7 +227,7 @@
   gap: 10px; /* Espaciado entre los elementos */
   justify-content: center; /* Centra horizontalmente */
   align-items: center; /* Centra verticalmente */
-  margin-top: 20px;
+  margin-top: 0px;
   width: 100%; /* Ancho completo */
 }
 
@@ -309,11 +311,7 @@
     font-size: 14px; /* Reduce el tamaño de fuente */
     padding: 8px; /* Reduce el padding */
   }
-}  
-
-    .-button:hover {
-        background-color: #525252; /* Color de fondo al pasar el mouse */
-    }
+} 
 
     .stars {
         margin-top: 8px; /* Espaciado superior */

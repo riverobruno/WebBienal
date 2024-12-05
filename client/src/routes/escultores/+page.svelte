@@ -219,7 +219,7 @@
   gap: 10px; /* Espaciado entre los elementos */
   justify-content: center; /* Centra horizontalmente */
   align-items: center; /* Centra verticalmente */
-  margin-top: 20px;
+  margin-top: 0px;
   width: 100%; /* Ancho completo */
 }
 
@@ -279,7 +279,7 @@
     align-items: center; /* Centra los elementos verticalmente */
     gap: 10px; /* Espaciado uniforme entre elementos */
     flex-wrap: wrap; /* Permite que los elementos se ajusten si no hay espacio suficiente */
-    margin-top: 20px; /* Espaciado superior opcional */
+    margin-top: 00px; /* Espaciado superior opcional */
     padding: 10px; /* Añade espacio interior opcional */
     }   
 

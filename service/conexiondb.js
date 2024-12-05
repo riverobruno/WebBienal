@@ -824,3 +824,106 @@ export async function registrar_compiten(nombre_evento, nombre_escultura) {
     throw error;
   }
 }
+
+export async function borrar_evento(nombre_evento, lugar_evento) {
+  let con = crearConexion(); // Asegúrate de que esta función esté bien configurada
+
+  return new Promise((resolve, reject) => {
+    con.connect((err) => {
+      if (err) {
+        console.error('Error connecting: ' + err.stack);
+        reject(err);
+        return;
+      }
+      console.log("Connected!");
+
+      // Llamada al procedimiento almacenado `borrar_evento`
+      const query = 'CALL borrar_evento(?, ?)';
+      con.query(query, [nombre_evento, lugar_evento], (err, results) => {
+        if (err) {
+          console.error('Error executing the procedure:', err);
+          reject(err);
+        } else {
+          resolve('Evento borrado exitosamente');
+        }
+        con.end(); // Cerramos la conexión
+      });
+    });
+  });
+};
+
+
+export async function modificar_evento(
+  nombre_evento_actual,
+  lugar_evento_actual,
+  nombre_evento_nuevo,
+  lugar_evento_nuevo,
+  fecha_inicio,
+  fecha_fin,
+  tematica,
+  hora_inicio,
+  hora_fin
+) {
+  let con = crearConexion(); // Asegúrate de que esta función esté bien configurada
+
+  return new Promise((resolve, reject) => {
+    con.connect((err) => {
+      if (err) {
+        console.error('Error connecting: ' + err.stack);
+        reject(err);
+        return;
+      }
+      console.log("Connected!");
+
+      // Llamada al procedimiento almacenado `modificar_evento`
+      const query = 'CALL modificar_evento(?, ?, ?, ?, ?, ?, ?, ?, ?)';
+      con.query(query, [
+        nombre_evento_actual,
+        lugar_evento_actual,
+        nombre_evento_nuevo,
+        lugar_evento_nuevo,
+        fecha_inicio,
+        fecha_fin,
+        tematica,
+        hora_inicio,
+        hora_fin
+      ], (err, results) => {
+        if (err) {
+          console.error('Error executing the procedure:', err);
+          reject(err);
+        } else {
+          resolve('Evento modificado exitosamente');
+        }
+        con.end(); // Cerramos la conexión
+      });
+    });
+  });
+};
+
+export async function borrar_artista(DNI) {
+  let con = crearConexion(); // Asegúrate de que esta función esté bien configurada
+  console.log("Se llama al 2do")
+
+  return new Promise((resolve, reject) => {
+    con.connect((err) => {
+      if (err) {
+        console.error('Error connecting: ' + err.stack);
+        reject(err);
+        return;
+      }
+      console.log("Connected!");
+
+      // Llamada al procedimiento almacenado `borrar_artista`
+      const query = 'CALL borrar_artista(?)';
+      con.query(query, [DNI], (err, results) => {
+        if (err) {
+          console.error('Error executing the procedure:', err);
+          reject(err);
+        } else {
+          resolve('Artista borrado exitosamente');
+        }
+        con.end(); // Cerramos la conexión
+      });
+    });
+  });
+};
