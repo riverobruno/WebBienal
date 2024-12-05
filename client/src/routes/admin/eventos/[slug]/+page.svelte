@@ -1,20 +1,43 @@
 <script>
+  // @ts-nocheck
   import { onMount } from 'svelte';
   import axios from 'axios';
+  import { page } from "$app/stores";
 
   let userRole;
   let accesoPermitido = false;
   let mostrandoCarga = false;
   let mensaje = '';
 
-  let id = ''; // ID del evento a modificar
-  let nombre = '';
-  let lugar = '';
-  let tematica = '';
-  let fecha_inicio = '';
-  let fecha_fin = '';
-  let hora_inicio = '';
-  let hora_fin = '';
+  /**
+   * @type {string}
+   */
+  let slug;
+  $: slug = $page.params.slug;
+  let evento;
+  let nombre;
+  let lugar;
+  let tematica;
+  let fecha_inicio;
+  let fecha_fin;
+  let hora_inicio;
+  let hora_fin;
+  let fecha_original;
+
+  const meses = {
+    "enero": "January",
+    "febrero": "February",
+    "marzo": "March",
+    "abril": "April",
+    "mayo": "May",
+    "junio": "June",
+    "julio": "July",
+    "agosto": "August",
+    "septiembre": "September",
+    "octubre": "October",
+    "noviembre": "November",
+    "diciembre": "December"
+  };
 
   onMount(() => {
     userRole = localStorage.getItem('role');
@@ -27,18 +50,30 @@
     }
   });
 
+  const formatFecha = (fechaEntrada) => {
+    const [dia, mes] = fechaEntrada.toLowerCase().split(' de ');
+    const fecha = new Date(`${meses[mes]} ${dia}, ${new Date().getFullYear()}`);
+    const year = fecha.getFullYear();
+    const month = (fecha.getMonth() + 1).toString().padStart(2, '0'); // Mes de 2 dígitos
+    const day = fecha.getDate().toString().padStart(2, '0'); // Día de 2 dígitos
+    return `${year}-${month}-${day}`;
+  };
+
   async function obtenerDatosEvento() {
     mostrandoCarga = true;
     try {
-      const res = await axios.get(`http://localhost:3001/api/evento/${id}`);
-      const data = res.data;
-      nombre = data.nombre;
-      lugar = data.lugar;
-      tematica = data.tematica;
-      fecha_inicio = data.fecha_inicio;
-      fecha_fin = data.fecha_fin;
-      hora_inicio = data.hora_inicio;
-      hora_fin = data.hora_fin;
+      const res = await axios.get(`http://localhost:3001/api/eventos/${slug}`, {
+        params: { nombre: slug },
+      });
+      evento = res.data.evento;
+      nombre = evento.eventName;
+      lugar = evento.location;
+      tematica = evento.content;
+      const fecha_inicio = formatFecha(evento.eventStartDate);
+      const fecha_fin = formatFecha(evento.eventFinishDate);
+      fecha_original = evento.eventStartDate + ' al ' + evento.eventFinishDate
+      hora_inicio = evento.startTime;
+      hora_fin = evento.finishTime;
     } catch (error) {
       console.error('Error al obtener los datos del evento:', error);
       mensaje = 'No se pudo cargar la información del evento.';
@@ -71,47 +106,32 @@
       mostrandoCarga = false;
     }
   }
-
-  async function borrarEvento() {
-    if (confirm(`¿Estás seguro de que deseas borrar el evento "${nombre}"?`)) {
-      mostrandoCarga = true;
-      try {
-        const res = await axios.post(`http://localhost:3001/api/borrarEvento`, { nombre_evento: nombre, lugar_evento: lugar });
-        mensaje = res.data.mensaje || 'Evento borrado con éxito';
-      } catch (error) {
-        console.error('Error al borrar el evento:', error);
-        mensaje = 'Error al borrar el evento. Por favor, intenta de nuevo.';
-      } finally {
-        mostrandoCarga = false;
-      }
-    }
-  }
 </script>
 
 {#if accesoPermitido}
-{#if mostrandoCarga}
-  <div class="loading-icon"></div>
-{/if}
+  {#if mostrandoCarga}
+    <div class="loading-icon"></div>
+  {:else}
 
-<div class="form-container">
-  <h1>Modificar Evento</h1>
-  <form on:submit|preventDefault={modificarEvento}>
-    <input bind:value={nombre} placeholder="Nombre del evento" required />
-    <input bind:value={lugar} placeholder="Lugar del evento" required />
-    <input bind:value={tematica} placeholder="Temática" required />
-    <input type="date" bind:value={fecha_inicio} placeholder="Fecha inicio" required />
-    <input type="date" bind:value={fecha_fin} placeholder="Fecha fin" required />
-    <input type="time" bind:value={hora_inicio} placeholder="Hora inicio" required />
-    <input type="time" bind:value={hora_fin} placeholder="Hora fin" required />
-    <button type="submit">Modificar</button>
-    <button class="btn-volver" on:click={() => (window.location.href = '/admin/eventos')}>Volver</button>
-    <button type="button" class="btn-borrar" on:click={borrarEvento}>Borrar Evento</button>
-  </form>
-
-  {#if mensaje}
-    <p class="mensaje">{mensaje}</p>
+  <div class="form-container">
+    <h1>Modificar Evento</h1>
+    <form on:submit|preventDefault={modificarEvento}>
+      <input bind:value={nombre} placeholder="Nombre del evento" required />
+      <input bind:value={lugar} placeholder="Lugar del evento" required />
+      <input bind:value={tematica} placeholder="Temática" required />
+      <p>Fecha original: {fecha_original}</p>
+      <input type="date" bind:value={fecha_inicio} placeholder="Fecha inicio" required />
+      <input type="date" bind:value={fecha_fin} placeholder="Fecha fin" required />
+      <input type="time" bind:value={hora_inicio} placeholder="Hora inicio" required />
+      <input type="time" bind:value={hora_fin} placeholder="Hora fin" required />
+      <button type="submit">Modificar</button>
+      <button class="btn-volver" on:click={() => (window.location.href = '/admin/eventos')}>Volver</button>
+    </form>
+    {#if mensaje}
+      <p class="mensaje">{mensaje}</p>
+    {/if}
+  </div>
   {/if}
-</div>
 {/if}
 
 <style>
@@ -183,20 +203,6 @@ button:hover {
 }
 
 .btn-volver:hover {
-  background-color: #b02a37;
-}
-
-.btn-borrar {
-  background-color: #dc3545;
-  color: white;
-  padding: 10px 15px;
-  font-size: 16px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.btn-borrar:hover {
   background-color: #b02a37;
 }
 </style>

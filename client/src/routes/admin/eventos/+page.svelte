@@ -1,4 +1,5 @@
 <script>
+  // @ts-nocheck
   import { onMount } from 'svelte';
   import axios from 'axios';
 
@@ -17,10 +18,10 @@
           
           // Asegurarse de que los nombres de los campos coincidan con los datos que devuelve la API.
           eventos = res.data.map(evento => ({
-              id: evento.id,
               nombre: evento.eventName,  // Asegúrate de que 'eventName' sea el nombre correcto en la respuesta
               lugar: evento.location,    // Asegúrate de que 'location' sea el nombre correcto en la respuesta
-              tematica: evento.content     // Asegúrate de que 'theme' sea el nombre correcto en la respuesta
+              tematica: evento.content,   // Asegúrate de que 'theme' sea el nombre correcto en la respuesta
+              url: evento.eventoPantalla
           }));
       } catch (error) {
           console.log(error);
@@ -58,8 +59,8 @@
         }
   };
 
-  const redirigir = (ruta) => {
-      window.location.href = ruta; // Redirige a la ruta especificada
+  const redirigir = (ruta, slug) => {
+      window.location.href = ruta+slug; // Redirige a la ruta especificada
   };
 
   const confirmar = () => {
@@ -246,13 +247,13 @@
           </tr>
       </thead>
       <tbody>
-          {#each eventos as { id, nombre, lugar, tematica }}
+          {#each eventos as { nombre, lugar, tematica, url }}
               <tr>
                   <td>{nombre}</td>
                   <td>{lugar}</td>
                   <td>{tematica}</td>
                   <td class="acciones">
-                      <button class="btn-editar" on:click={() => redirigir('/admin/eventos/mod_eventos')}>✏️</button>
+                      <button class="btn-editar" on:click={() => redirigir('/admin/eventos/', url)}>✏️</button>
                       <button class="btn-eliminar" on:click={() => borrarEvento(nombre, lugar)}>❌</button>
                   </td>
               </tr>
