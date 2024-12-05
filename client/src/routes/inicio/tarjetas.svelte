@@ -86,6 +86,16 @@
         color: #666;
         margin-bottom: 0px;
     }
+    
+    .fi {
+        position: absolute;
+        top: 5px; /* Ajusta según el espacio que quieras desde la parte superior */
+        left: 5px; /* Ajusta según el espacio que quieras desde la parte izquierda */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;  /* Ajusta el tamaño del ícono */
+    }
 </style>
 
 <div class="contenedor">

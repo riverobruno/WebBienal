@@ -1,7 +1,15 @@
 <script>
+  // @ts-nocheck
+  import { writable } from 'svelte/store';
+
   let contraseña_actual = '';
   let contraseña_nueva1 = '';
   let contraseña_nueva2 = '';
+  let mostrarContrasena = writable(false); // Controla si la contraseña es visible
+
+  const toggleVisibilidad = () => {
+    mostrarContrasena.update(value => !value);
+  };
 
 
   const cambiarContraseña = async () => {
@@ -9,13 +17,26 @@
     alert('Por favor, completa todos los campos.');
     return;
   }
+
+  function decodificarToken(token) {
+    try {
+      const payload = token.split('.')[1];
+      const decoded = atob(payload);
+      return JSON.parse(decoded);
+    } catch (error) {
+      console.error('Error al decodificar el token:', error);
+      return null;
+    }
+  } 
+  const token = localStorage.getItem('token');
+  const email = token ? decodificarToken(token).correo : '';
   
   if (contraseña_nueva1 !== contraseña_nueva2) {
     alert('Las contraseñas nuevas no coinciden.');
     return;
   }
 
-  console.log('Datos enviados:', { contraseña_actual, contraseña_nueva1,contraseña_nueva2 }); // Para depuración
+  console.log('Datos enviados:', { email, contraseña_actual, contraseña_nueva1 }); // Para depuración
 
   try {
     const response = await fetch('http://localhost:3001/api/cambiarContrasena', {
@@ -24,16 +45,17 @@
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
+        email,
         contraseña_actual,
-        contraseña_nueva1,
-        contraseña_nueva2,
+        contraseña_nueva1
       }),
     });
 
     const data = await response.json();
     console.log('Respuesta del servidor:', data); // Para depuración
 
-    if (data.success && data.token) {
+    if (data.success) {
+      alert('Contraseña cambiada correctamente.');
       window.history.back();
     } else  if(response.status === 409) { alert(data.message); }
       else{ 
@@ -55,10 +77,83 @@ const cancelar = () => {
   <form on:submit|preventDefault={cambiarContraseña} class="form">
     <div class="logo text-center">
       <h2>Cambio de Contraseña</h2>
-    </div>  
-    <input type="contraseña_actual" placeholder="Contraseña actual" bind:value={contraseña_actual} class="input" />
-    <input type="contraseña_nueva1" placeholder="Contraseña nueva" bind:value={contraseña_nueva1} class="input" />
-    <input type="contraseña_nueva2" placeholder="Repita la contraseña nueva" bind:value={contraseña_nueva2} class="input" />
+    </div>
+    <p class="texto-blanco">Contraseña actual</p>
+    <div class="input-group">
+      {#if $mostrarContrasena}
+        <input
+          type="text"
+          placeholder="..."
+          bind:value={contraseña_actual}
+          class="input"
+        />
+      {:else}
+        <input
+          type="password"
+          placeholder="..."
+          bind:value={contraseña_actual}
+          class="input"
+        />
+      {/if}
+      <button type="button" class="eye-button" on:click={toggleVisibilidad}>
+        {#if $mostrarContrasena}
+          👁️
+        {:else}
+          👁️‍🗨️
+        {/if}
+      </button>
+    </div>
+    <p class="texto-blanco">Contraseña nueva</p>
+    <div class="input-group">
+      {#if $mostrarContrasena}
+        <input
+          type="text"
+          placeholder="..."
+          bind:value={contraseña_nueva1}
+          class="input"
+        />
+      {:else}
+        <input
+          type="password"
+          placeholder="..."
+          bind:value={contraseña_nueva1}
+          class="input"
+        />
+      {/if}
+      <button type="button" class="eye-button" on:click={toggleVisibilidad}>
+        {#if $mostrarContrasena}
+          👁️
+        {:else}
+          👁️‍🗨️
+        {/if}
+      </button>
+    </div>
+    <p class="texto-blanco">Repetir contraseña nueva</p>
+    <div class="input-group">
+      {#if $mostrarContrasena}
+        <input
+          type="text"
+          placeholder="..."
+          bind:value={contraseña_nueva2}
+          class="input"
+        />
+      {:else}
+        <input
+          type="password"
+          placeholder="..."
+          bind:value={contraseña_nueva2}
+          class="input"
+        />
+      {/if}
+      <button type="button" class="eye-button" on:click={toggleVisibilidad}>
+        {#if $mostrarContrasena}
+          👁️
+        {:else}
+          👁️‍🗨️
+        {/if}
+      </button>
+    </div>
+
     <div class="button-group">
       <button type="submit" class="button">Aceptar</button>
       <button type="button" class="cancel-button" on:click={cancelar}>
@@ -69,6 +164,30 @@ const cancelar = () => {
 </section>
 
 <style>
+  .texto-blanco {
+    color: white;
+  }
+
+  .input-group {
+    display: flex;
+    align-items: center;
+    position: relative;
+  }
+  
+  .input {
+    flex: 1;
+    padding-right: 2.5rem; /* Espacio para el botón */
+  }
+  
+  .eye-button {
+    position: absolute;
+    right: 0.5rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.2rem;
+    padding: 0;
+  }
   /* Contenedor principal centrado */
   .form-container {
     display: flex;

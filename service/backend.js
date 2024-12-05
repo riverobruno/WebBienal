@@ -10,8 +10,14 @@ import { dirname, join } from 'path';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 dotenv.config({ path: join(__dirname, '../.env') });
-import { ArtistasConsulta, EsculturasConsulta, EventosConsulta, login, ObrasdeUnEvento, ObrasdeUnArtista, EventosYEsculturasDeObra, insertarEvento, insertarArtista, register, registrar_voto,registrar_escultura, registrar_hechas_por, registrar_imagen, registrar_compiten } from './conexiondb.js';
-import { ordenarEsculturas, buscarEsculturas, ordenarEventos, buscarEventos, ordenarArtistas, buscarArtistas, eventoProximo } from './filtrosObjetos.js';
+
+import { ArtistasConsulta, EsculturasConsulta, EventosConsulta, login, 
+  ObrasdeUnEvento, ObrasdeUnArtista, EventosYEsculturasDeObra, insertarEvento, 
+  insertarArtista, register, registrar_voto,registrar_escultura, registrar_hechas_por, 
+  registrar_imagen, registrar_compiten, cambiar_Contraseña } from './conexiondb.js';
+
+import { ordenarEsculturas, buscarEsculturas, ordenarEventos, 
+  buscarEventos, ordenarArtistas, buscarArtistas, eventoProximo } from './filtrosObjetos.js';
 
 // Clave secreta para firmar el token (debería ser almacenada de forma segura, como en variables de entorno)
 const JWT_SECRET = process.env.JWT_SECRET; // Cambir por algo más seguro
@@ -607,6 +613,35 @@ app.post('/api/registro', (req, res) => {
     }
     return res.status(500).json({ success: false, message: 'Error en el servidor' });
   });
+});
+
+app.post('/api/cambiarContrasena', (req, res) => {
+  const { email, contraseña_actual, contraseña_nueva1  } = req.body;
+  console.log(email, contraseña_actual, contraseña_nueva1);
+  if (!email || !contraseña_actual || !contraseña_nueva1) {
+    return res.status(400).json({ message: 'Por favor ingrese todos los campos'});
+  }
+
+  cambiar_Contraseña(email, contraseña_actual, contraseña_nueva1)
+    .then(conexion => {
+      if (conexion == 'hecho') {
+        return res.status(200).json({ success: true, message: 'Contraseña cambiada correctamente'});
+      } else {
+        return res.status(401).json({ success: false, message: 'Error en el cambio de contraseña' });
+      }
+
+    })
+    .catch(error => {
+      console.error('Error en la conexión:', error);
+      if (error.code == 'ER_DUP_ENTRY') {
+        return res.status(409).json({ success: false, message: 'El correo ya está en uso. Por favor use uno diferente' });
+      }
+      if (error.message === 'Contraseña incorrecta') {
+        return res.status(500).json({ success: false, message: 'Contraseña incorrecta' });
+      } else {
+        return res.status(500).json({ success: false, message: 'Error en el servidor' });
+      }
+    });
 });
 
 app.post('/api/votacion', (req, res) => {

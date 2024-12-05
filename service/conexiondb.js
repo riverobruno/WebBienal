@@ -606,6 +606,7 @@ export async function cambiar_Contraseña(correo, contraseña_actual, contraseñ
         return;
       }
       console.log("Connected!");
+      
 
       // Consulta para obtener el hash de la contraseña
       con.query('CALL getUserByEmail(?)', [correo], (err, results) => {
@@ -627,16 +628,23 @@ export async function cambiar_Contraseña(correo, contraseña_actual, contraseñ
               reject(new Error('Contraseña incorrecta'));
             } else {
               // Contraseña correcta
-              con.query('cambiar_contraseña(?,?)', [correo, contraseña_nueva], async (err, results) => { // Pasamos los valores
+              bcrypt.hash(contraseña_nueva, 10, (err, hashedPassword) => { // 10 es el número de rondas de salt
+                if (err) {
+                  console.error('Error hashing password:', err);
+                  reject(err); // Rechazar si hay un error al hashear la contraseña
+                  return;
+                }
+                con.query('CALL cambiar_contraseña(?,?)', [correo, hashedPassword], async (err, results) => { // Pasamos los valores
                 if (err) {
                   console.error('Error querying the database:', err);
                   reject(err); // Rechazar la promesa en caso de error en la consulta
                 } else {
+                  
                   resolve('hecho'); // Resolver la promesa con los resultados
                 }
                 con.end(); // Cerramos la conexión
               });
-            }
+            })};
           });
         }
       });
