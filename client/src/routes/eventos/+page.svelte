@@ -34,6 +34,7 @@
                 }
             });
             cards = res.data;
+            console.log(cards);
 
             const resObraReciente = await axios.get(`http://localhost:3001/api/eventoProximo`);
             obraReciente = resObraReciente.data[0];
@@ -144,6 +145,10 @@
                             <span class="text-cyan-900">De {card.startTime} a {card.finishTime}</span><br>
                             <span class="text-cyan-900">Lugar: {card.location}</span>
                             <p class="mb-4 text-base text-left text-black">{card.content}</p>
+                            <!-- Mostrar el estado con colores dinámicos -->
+                            <span class="{card.estado === 'Terminado' ? 'text-black' : card.estado === 'En curso' ? 'text-blue-600' : 'text-gray-500'}">
+                                {card.estado}
+                            </span><br>
                             <div class="stars">
                                 {#each Array(5) as _, index}
                                     {#if index < Math.floor(card.promedio)} <!-- Estrella completa -->

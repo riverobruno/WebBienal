@@ -151,6 +151,8 @@ const obtenerEventos = async (busqueda, criterio, orden) => {
     const eventosFiltrados = buscarEventos(eventosCache, busqueda);
     const eventosOrdenados = ordenarEventos(eventosFiltrados, criterio, orden);
 
+    const now = new Date();  // Obtener la fecha y hora actual una sola vez
+
     const cards = [];
     for (const [index, evento] of eventosOrdenados.entries()) {
       // Accede a los métodos de la clase Eventos
@@ -169,6 +171,16 @@ const obtenerEventos = async (busqueda, criterio, orden) => {
       const formattedHoraInicio = horaInicio.split(':').slice(0, 2).join(':');  // De "09:30:00" a "09:30"
       const formattedHoraFin = horaFin.split(':').slice(0, 2).join(':');        // De "15:00:00" a "15:00"
 
+      // Crear objetos Date completos para el inicio y fin con hora y fecha
+      const eventoInicio = new Date(fechaInicio.setHours(horaInicio.split(':')[0], horaInicio.split(':')[1]));
+      const eventoFin = new Date(fechaFin.setHours(horaFin.split(':')[0], horaFin.split(':')[1]));
+      // Calcular el estado basado en la fecha y hora
+      let estado = 'Terminado';
+      if (now < eventoInicio) {
+        estado = 'Próximo';
+      } else if (now >= eventoInicio && now <= eventoFin) {
+        estado = 'En curso';
+      }
 
       cards.push({
         title: 'evento' + (index + 1),
@@ -180,7 +192,8 @@ const obtenerEventos = async (busqueda, criterio, orden) => {
         finishTime: formattedHoraFin,
         location: lugar,
         content: tematica,
-        promedio: promedio
+        promedio: promedio,
+        estado: estado 
       });
     }
 
