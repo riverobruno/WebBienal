@@ -1,4 +1,4 @@
-# Proyecto integrador de la cátedra Diseño de Software
+# Proyecto integrador de la cátedra Desarrollo de Software
 ## Grupo 6
 ### Año 2024 - Segundo cuatrimestre
 
@@ -15,23 +15,40 @@
 - Zeniquel Martinelli, Camila Aylen
 
 ## Pasos para inicializar el proyecto
-TENER NPM INSTALADO
+Tener npm instalado
 
-CLONAR EL REPOSITORIO
+# Instrucciones para configurar el proyecto
 
-AHORA VAS A ABRIR OTRA CONSOLA Y VAS A TENER QUE TENER DOS TERMINALES ABIERTAS
+1. Abrís una consola de comandos o terminal y ejecutás el siguiente comando para clonar el repositorio:
+   `git clone https://github.com/FRRe-DS/2024-06-TPI.git`
 
-EN UNA HACÉS ESTO
-### Backend
-1. TE PARÁS EN ESA CONSOLA EN LA CARPETA SERVICE
-2. EJECUTAS EL COMANDO "npm install", ESO TE INSTALA TODAS LAS LIBRERIAS NECESARIAS PARA EL BACKEND EN ESA
-3. AHORA PODÉS EJECUTAR " node backend.js", ESO TE CORRE CON NODE 
+2. Abre una segunda consola o terminal, ya que necesitarás trabajar con dos instancias abiertas simultáneamente.
 
-Y EN LA OTRA TERMINAL TENÉS QUE HACER ESTO
-### Frontend
-1. TE PARÁS EN LA CARPETA client/src 
-2. CORRES NPM INSTALL, AHI TE INSTALA LO MISMO PERO EN LA CARPETA DE FRONTEND
-3. AHORA EJECUTÁS EL COMANDO "npm run dev" Y TE DEBERÍA CORRER EL FRONT  
+---
 
+## Configuración del Backend
 
+1. En la primera consola, navega hasta la carpeta _service_ del proyecto:
+   cd service
+
+2. Ejecuta el siguiente comando para instalar todas las librerías necesarias para el backend:
+   `npm install`
+
+3. Una vez completada la instalación, iniciás el backend ejecutando:
+   `node backend.js`
+
+---
+
+## Configuración del Frontend
+
+1. En la segunda consola, navegás hasta la carpeta _client/src_ del proyecto:
+   `cd client/src`
+
+2. Ejecutás el siguiente comando para instalar las librerías necesarias para el frontend:
+   `npm install`
+
+3. Finalmente, iniciás el entorno de desarrollo del frontend con el siguiente comando:
+   `npm run dev`
+
+Esto debería ser suficiente para poner en funcionamiento tanto el backend como el frontend.
 
